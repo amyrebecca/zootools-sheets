@@ -42,11 +42,11 @@ var SheetManager = (function(sheet){
     
     if(sheet){
       var ct = 2;
-      var row = sheet.getRange(ct, 1, 1, 3).getValues()[0];
+      var row = sheet.getRange(ct, 1, 1, 5).getValues()[0];
       while(row && row[0]){
-        accum[row[0]] = { invert: row[1], log: row[2] };
+        accum[row[0]] = { invert: row[1], log: row[2], min: row[3], max: row[4] };
         ct++;
-        var row = sheet.getRange(ct, 1, 1, 3).getValues()[0];
+        var row = sheet.getRange(ct, 1, 1, 5).getValues()[0];
       }
     }
     
@@ -63,11 +63,17 @@ var SheetManager = (function(sheet){
     for(var idx in variableList){
       if(!variableList[idx]) continue;
       if(lookup[variableList[idx]]){
-        augmented.push({name: variableList[idx], invert: lookup[variableList[idx]].invert, log: lookup[variableList[idx]].log });
+        augmented.push({
+          name: variableList[idx], 
+          invert: lookup[variableList[idx]].invert, 
+          log: lookup[variableList[idx]].log,
+          min: lookup[variableList[idx]].min,
+          max: lookup[variableList[idx]].max
+        });
       }
       else
       {
-        augmented.push({name: variableList[idx], invert: false, log: false});
+        augmented.push({name: variableList[idx], invert: false, log: false, min: null, max: null});
       }
     }
 

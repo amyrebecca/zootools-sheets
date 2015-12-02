@@ -1,16 +1,12 @@
 <script type="text/javascript">
 
-var xInit = null;
-var yInit = null;
 var columnDefs;
-
 var config = null;
 
 // use async call to determine initial state of dropdown lists
 // from contents of chart cells
 google.script.run.withSuccessHandler(function(res){
     config = res;
-    console.log(config);
     applyState(config);
 	document.getElementById('xVar').removeAttribute('disabled');
 	document.getElementById('yVar').removeAttribute('disabled');
@@ -41,19 +37,26 @@ function applyState(config){
   $('#invertY').checked = config.y.axes.invert;
   $('#logY').checked = config.y.axes.log;
   
-  (config.x.range ? $('#xScaleSpecific') : $('#xScaleDefault')).checked = true;
-  (config.y.range ? $('#yScaleSpecific') : $('#yScaleDefault')).checked = true;
-  
   if(config.x.range){
+    $('#xScaleSpecific').checked = true;
     enable($('#xMin')); enable($('#xMax'));
     $('#xMin').value = config.x.range.min;
     $('#xMax').value = config.x.range.max;
+  } else {
+    $('#xScaleDefault').checked = true;
+    $('#xMin').value = null;
+    $('#xMax').value = null;
   }
   
   if(config.y.range){
+    $('#yScaleSpecific').checked = true;
     enable($('#yMin')); enable($('#yMax'));
     $('#yMin').value = config.y.range.min;
     $('#yMax').value = config.y.range.max;
+  } else {
+    $('#yScaleDefault').checked = true;
+    $('#yMin').value = null;
+    $('#yMax').value = null;
   }
 }
 
@@ -76,89 +79,29 @@ function extractState(){
 
 // every time the user changes a dropdown, we check to see if they should be
 // able to submit (plotting X vs. X just makes no sense)
-function updateSelection(fromSelect){
-
-	var updateBtn = document.getElementById('updateBtn');
-	var xSelect = document.getElementById('xVar').value;
-	var ySelect = document.getElementById('yVar').value;
-
-	if(fromSelect){
-		xDefaults = columnDefs[xSelect];
-		yDefaults = columnDefs[ySelect];
-	}
-
-	if(fromSelect == 'X')
-	{
-		if(xDefaults.invert){ document.getElementById('invertX').setAttribute('checked', true); }
-		else{ document.getElementById('invertX').removeAttribute('checked'); }
-
-		if(xDefaults.log){ document.getElementById('logX').setAttribute('checked', true); }
-		else{ document.getElementById('logX').removeAttribute('checked'); }
-	}
-
-	if(fromSelect == 'Y')
-	{
-		if(yDefaults.invert){ document.getElementById('invertY').setAttribute('checked', true); }
-		else{ document.getElementById('invertY').removeAttribute('checked'); }
-
-		if(yDefaults.log){ document.getElementById('logY').setAttribute('checked', true); }
-		else{ document.getElementById('logY').removeAttribute('checked'); }
-	}
-
+function updateSelection(src){
+    var state = extractState();
+    if(src){
+      var target = state[src];
+      var defRow = columnDefs[target.variable];
+      target.axes.invert = defRow.invert;
+      target.axes.log = defRow.log;
+      target.range = null;
+      if(defRow.min || defRow.max){
+        target.range = { min: defRow.min, max: defRow.max };
+      }
+    }
+    applyState(state);
 	updateBtn.removeAttribute('disabled');
 }
 
 // update the chart from the client's selected variables
 function clientChangeSelection(){
-	var xSelect = document.getElementById('xVar').value;
-	var ySelect = document.getElementById('yVar').value;
-
-	var xOpts = { 
-		invert: document.getElementById('invertX').checked, 
-		log: document.getElementById('logX').checked,
-		range: (document.getElementById('xScaleDefault').checked ? 
-			null : 
-			{ 
-				min: document.getElementById('xMin').value, 
-				max: document.getElementById('xMax').value 
-			})
-	};
-
-	var yOpts = { 
-		invert: document.getElementById('invertY').checked, 
-		log: document.getElementById('logY').checked,
-		range: (document.getElementById('yScaleDefault').checked ? 
-			null : 
-			{ 
-				min: document.getElementById('yMin').value, 
-				max: document.getElementById('yMax').value 
-			})
-	};
-
-	var newConfig = {
-		xVal: document.getElementById('xVar').value,
-		yVal: document.getElementById('yVar').value,
-		xOpts: xOpts,
-		yOpts, yOpts
-	};
-
     google.script.run.clientSetConfiguration(extractState());
 }
 
 function removeClass(e,c) {e.className = e.className.replace( new RegExp('(?:^|\\s)'+c+'(?!\\S)') ,''); }
 function addClass(e,c){ e.className = [e.className, c].join(' '); }
-
-var rangeEnable = { x: false, y: false }
-function toggleRange(varName){
-	var textSel = ['#', varName, 'Range', ' input[type=text]'].join('');
-	Array.prototype.slice.call(document.querySelectorAll(textSel),0).map(function(e,i){ e.removeAttribute('disabled'); });
-	if(rangeEnable[varName]){
-		Array.prototype.slice.call(document.querySelectorAll(textSel),0).map(function(e,i){ e.setAttribute('disabled','disabled'); });
-	}
-
-	rangeEnable[varName] = !rangeEnable[varName];
-	updateSelection();
-}
 
 var expand = { x: false, y: false };
 
