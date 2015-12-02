@@ -16,10 +16,19 @@ function include(filename) {
 
 // these need to be exposed as bare functions so that the Apps Script
 // scripting environment / host will proxy them to the client side
-function clientGetConfiguration(){ return ConfigurationManager.getConfiguration(); };
+function clientGetConfiguration(){ 
+  return ConfigurationManager.getConfiguration(); 
+};
+
 function clientSetConfiguration(config){ 
   ConfigurationManager.setConfiguration(config);
   SheetManager.updateChart(config);
 }
-function clientGetVariables(){ return SheetManager.getVariables(); };
-function clientShowSidebar(){ return UIManager.showSidebar(); };
+
+function clientGetVariables(){ 
+  return SheetManager.getVariables(); 
+};
+
+function clientShowSidebar(){ 
+  return UIManager.showSidebar(); 
+};
