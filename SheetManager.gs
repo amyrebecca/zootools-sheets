@@ -85,33 +85,30 @@ var SheetManager = (function(sheet){
     
     purgeChartRanges();
     
-    var xOpts = config.xOpts;
-    var yOpts = config.yOpts;
-
     mutateChart(function(){
       
-      var xRange = fetchRange(config.xVal);
-      var yRange = fetchRange(config.yVal);
+      var xRange = fetchRange(config.x.variable);
+      var yRange = fetchRange(config.y.variable);
       
       chart = chart.asScatterChart()
-        .setTitle([config.yVal, 'vs', config.xVal].join(' '))
-        .setYAxisTitle(config.yVal)
-        .setXAxisTitle(config.xVal)
+        .setTitle([config.y.variable, 'vs', config.x.variable].join(' '))
+        .setYAxisTitle(config.y.variable)
+        .setXAxisTitle(config.x.variable)
         .addRange(xRange)
         .addRange(yRange)
         .setOption('aggregationTarget', 'category') // !!!!! this took forever to figure out
         .setOption('pointSize', 1)
         .setOption('legend.position', 'none');
       
-      if(xOpts && xOpts.invert){ chart.setOption('hAxis.direction', -1); }
-      if(xOpts && xOpts.log){ chart.setOption('hAxis.logScale', true); }
-      if(yOpts && yOpts.invert){ chart.setOption('vAxis.direction', -1); }
-      if(yOpts && yOpts.log){ chart.setOption('vAxis.logScale', true); }
+      if(config.x.axes.invert){ chart.setOption('hAxis.direction', -1); }
+      if(config.x.axes.log){ chart.setOption('hAxis.logScale', true); }
+      if(config.y.axes.invert){ chart.setOption('vAxis.direction', -1); }
+      if(config.y.axes.log){ chart.setOption('vAxis.logScale', true); }
 
-      if(xOpts && xOpts.range && !!xOpts.range.min){ chart.setOption('hAxis.minValue',xOpts.range.min); }
-      if(xOpts && xOpts.range && !!xOpts.range.max){ chart.setOption('hAxis.maxValue',xOpts.range.max); }
-      if(yOpts && yOpts.range && !!yOpts.range.min){ chart.setOption('vAxis.minValue',yOpts.range.min); }
-      if(yOpts && yOpts.range && !!yOpts.range.max){ chart.setOption('vAxis.maxValue',yOpts.range.max); }
+      if(config.x.range && config.x.range.min){ chart.setOption('hAxis.minValue',config.x.range.min); }
+      if(config.x.range && config.x.range.max){ chart.setOption('hAxis.minValue',config.x.range.max); }
+      if(config.y.range && config.y.range.min){ chart.setOption('vAxis.minValue',config.y.range.min); }
+      if(config.y.range && config.y.range.max){ chart.setOption('vAxis.minValue',config.y.range.max); }
     });
     
     if(isNew){

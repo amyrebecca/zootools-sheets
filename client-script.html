@@ -4,12 +4,15 @@ var xInit = null;
 var yInit = null;
 var columnDefs;
 
+var config = null;
+
 // use async call to determine initial state of dropdown lists
 // from contents of chart cells
 google.script.run.withSuccessHandler(function(res){
-	document.getElementById('xVar').value = xInit = res.xVal;
+    config = res;
+    console.log(config);
+    applyState(config);
 	document.getElementById('xVar').removeAttribute('disabled');
-	document.getElementById('yVar').value = yInit = res.yVal;
 	document.getElementById('yVar').removeAttribute('disabled');
 }).clientGetConfiguration();
 
@@ -20,6 +23,56 @@ google.script.run.withSuccessHandler(function(res){
 	}
 	columnDefs = refs;
 }).clientGetVariables();
+
+var $ = function(sel){ return document.querySelector(sel); };
+var clean = function(node){ return !!node.value ? node.value : null; };
+var enable = function(node){ node.removeAttribute('disabled'); }
+var disable = function(node){ node.setAttribute('disabled', true); }
+
+function applyState(config){
+  disable($('#xMin')); disable($('#xMax'));
+  disable($('#yMin')); disable($('#yMax'));
+
+  $('#xVar').value = config.x.variable;
+  $('#invertX').checked = config.x.axes.invert;
+  $('#logX').checked = config.x.axes.log;
+  
+  $('#yVar').value = config.y.variable;
+  $('#invertY').checked = config.y.axes.invert;
+  $('#logY').checked = config.y.axes.log;
+  
+  (config.x.range ? $('#xScaleSpecific') : $('#xScaleDefault')).checked = true;
+  (config.y.range ? $('#yScaleSpecific') : $('#yScaleDefault')).checked = true;
+  
+  if(config.x.range){
+    enable($('#xMin')); enable($('#xMax'));
+    $('#xMin').value = config.x.range.min;
+    $('#xMax').value = config.x.range.max;
+  }
+  
+  if(config.y.range){
+    enable($('#yMin')); enable($('#yMax'));
+    $('#yMin').value = config.y.range.min;
+    $('#yMax').value = config.y.range.max;
+  }
+}
+
+function extractState(){
+  var res = {
+    x: {
+      variable: $('#xVar').value,
+      axes: { invert: $('#invertX').checked, log: $('#logX').checked },
+      range: $('#xScaleDefault').checked ? null : { min: clean($('#xMin')), max: clean($('#xMax')) }
+    },
+    y: {
+      variable: $('#yVar').value,
+      axes: { invert: $('#invertY').checked, log: $('#logY').checked },
+      range: $('#yScaleDefault').checked ? null : { min: clean($('#yMin')), max: clean($('#yMax')) }
+    }
+  };
+  
+  return res;
+}
 
 // every time the user changes a dropdown, we check to see if they should be
 // able to submit (plotting X vs. X just makes no sense)
@@ -89,8 +142,7 @@ function clientChangeSelection(){
 		yOpts, yOpts
 	};
 
-//google.script.run.clientSetNames(xSelect, ySelect, xOpts, yOpts);
-google.script.run.clientSetConfiguration(newConfig);
+    google.script.run.clientSetConfiguration(extractState());
 }
 
 function removeClass(e,c) {e.className = e.className.replace( new RegExp('(?:^|\\s)'+c+'(?!\\S)') ,''); }
