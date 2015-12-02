@@ -4,6 +4,9 @@ var UIManager = (function(){
       SpreadsheetApp.getUi()
           .createMenu('Zoo Tools')
           .addItem('Scatter Plot Helper', 'clientShowSidebar')
+          .addItem('Bar Chart Helper', 'clientShowSidebar')
+          .addItem('Histogram Helper', 'clientShowSidebar')
+          .addItem('Summary Stats Helper', 'clientShowSidebar')
           .addToUi();
     },
     showSidebar: function(){
