@@ -2,13 +2,6 @@ var ConfigurationManager = (function(sheet){
 
   var configuration = null;
   
-  var getConfiguration = function(){
-    if(!configuration)
-      configuration = parseConfiguration();
-    
-    return configuration;    
-  }
-  
   var parseConfiguration = function(){
 
     var range = sheet.getRange("metadata!H2:H12");
@@ -39,8 +32,7 @@ var ConfigurationManager = (function(sheet){
     return selection;
   }
 
-  var persistConfiguration = function(){
-    var config = getConfiguration();
+  var persistConfiguration = function(config){
     var range = sheet.getRange("metadata!H2:H12");
     
     var newOpts = [
@@ -60,11 +52,14 @@ var ConfigurationManager = (function(sheet){
   }
   
   return {
-    getConfiguration: getConfiguration,
+    getConfiguration: function(){
+      configuration = configuration || parseConfiguration();
+      return configuration;    
+    },
     setConfiguration: function(config){
       configuration = config;
-      persistConfiguration();
+      persistConfiguration(config);
     }
   };
+  
 })(SpreadsheetApp.getActiveSheet());
-
