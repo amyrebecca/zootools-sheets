@@ -26,7 +26,6 @@ google.script.run.withSuccessHandler(function(res){
 function updateSelection(fromSelect){
 
 	var updateBtn = document.getElementById('updateBtn');
-	var resetBtn = document.getElementById('resetBtn');
 	var xSelect = document.getElementById('xVar').value;
 	var ySelect = document.getElementById('yVar').value;
 
@@ -53,15 +52,7 @@ function updateSelection(fromSelect){
 		else{ document.getElementById('logY').removeAttribute('checked'); }
 	}
 
-	resetBtn.removeAttribute('disabled');
 	updateBtn.removeAttribute('disabled');
-}
-
-// reset the selected variables to the state when the chart loaded
-function resetSelection(){
-	document.getElementById('xVar').value = xInit;
-	document.getElementById('yVar').value = yInit;
-	updateSelection();
 }
 
 // update the chart from the client's selected variables
