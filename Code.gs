@@ -4,12 +4,12 @@ var ConfigurationManager = (function(sheet){
   
   var getConfiguration = function(){
     if(!configuration)
-      configuration = parseSelection();
+      configuration = parseConfiguration();
     
     return configuration;    
   }
   
-  var parseSelection = function(){ //TODO: ARB: rename this
+  var parseConfiguration = function(){
 
     var range = sheet.getRange("metadata!H2:H12");
     var vals = range.getValues();
@@ -39,24 +39,6 @@ var ConfigurationManager = (function(sheet){
     return selection;
   }
 
-  var persistSelection = function(xVal, yVal, xOpts, yOpts){ //TODO: ARB: deprecate
-    var range = sheet.getRange("metadata!H2:H12");
-    var newOpts = [
-      [xVal],
-      [xOpts ? !!xOpts.invert : false],
-      [xOpts ? !!xOpts.log : false],
-      [xOpts && xOpts.range && !!xOpts.range.min ? xOpts.range.min : null],
-      [xOpts && xOpts.range && !!xOpts.range.max ? xOpts.range.max : null],
-      [''],
-      [yVal],
-      [yOpts ? !!yOpts.invert : false],
-      [yOpts ? !!yOpts.log : false],
-      [yOpts && yOpts.range && !!yOpts.range.min ? yOpts.range.min : null],
-      [yOpts && yOpts.range && !!yOpts.range.max ? yOpts.range.max : null]
-    ];
-    range.setValues(newOpts);
-  }
-
   var persistConfiguration = function(){
     var config = getConfiguration();
     var range = sheet.getRange("metadata!H2:H12");
@@ -82,15 +64,7 @@ var ConfigurationManager = (function(sheet){
     setConfiguration: function(config){
       configuration = config;
       persistConfiguration();
-      SheetManager.updateChart2();
-    },
-    getNames: function(){ 
-      var sel = parseSelection(); 
-      return [sel.xVal, sel.yVal] 
-    }, 
-    setNames: function(xVal, yVal, xOpts, yOpts){ 
-      persistSelection(xVal, yVal, xOpts, yOpts);
-      SheetManager.updateChart(xVal, yVal, xOpts, yOpts);
+      SheetManager.updateChart();
     }
   };
 })(SpreadsheetApp.getActiveSheet());
@@ -115,9 +89,9 @@ var SheetManager = (function(sheet){
   }
 
   var getRanges = function(){ 
-    var names = ConfigurationManager.getNames();
-    var newX = fetchRange(names[0]);
-    var newY = fetchRange(names[1]);
+    var config = ConfigurationManager.getConfiguration();
+    var newX = fetchRange(config.xVal);
+    var newY = fetchRange(config.yVal);
     return [newX, newY];
   }
   
@@ -187,27 +161,17 @@ var SheetManager = (function(sheet){
   
   var updateChart = function(){
     
-    var xName, yName, xOpts, yOpts;
-    if(arguments[0] instanceof Array){
-      xName = arguments[0][0];
-      yName = arguments[0][1];
-      xOpts = arguments[0][2];
-      yOpts = arguments[0][3];
-    } else {
-      xName = arguments[0];
-      yName = arguments[1];
-      xOpts = arguments[2];
-      yOpts = arguments[3];
-    }
+    var config = ConfigurationManager.getConfiguration();
+    var xOpts = config.xOpts, yOpts=config.yOpts;
     
     purgeChartRanges();
 
     mutateChart(function(){
       var ranges = getRanges();
       chart = chart.asScatterChart()
-        .setTitle([yName, 'vs', xName].join(' '))
-        .setYAxisTitle(yName)
-        .setXAxisTitle(xName)
+        .setTitle([config.yVal, 'vs', config.xVal].join(' '))
+        .setYAxisTitle(config.yVal)
+        .setXAxisTitle(config.xVal)
         .addRange(ranges[0])
         .addRange(ranges[1])
         .setOption('aggregationTarget', 'category') // !!!!! this took forever to figure out
@@ -283,11 +247,13 @@ function onOpen() {
   SheetManager.destroyCharts();
   UIManager.registerMenu();
   UIManager.showSidebar();
-  SheetManager.updateChart(ConfigurationManager.getNames());
+  SheetManager.updateChart();
 }
 
-function clientGetNames(){ return ConfigurationManager.getNames(); };
-function clientSetNames(xVal, yVal, xOpts, yOpts){ return ConfigurationManager.setNames(xVal, yVal, xOpts, yOpts); };
+function clientGetConfiguration(){ return ConfigurationManager.getConfiguration(); };
+function clientSetConfiguration(config){ return ConfigurationManager.setConfiguration(config); }
+
 function clientGetVariables(){ return SheetManager.getVariables(); };
+
 function clientShowSidebar(){ return UIManager.showSidebar(); };
 

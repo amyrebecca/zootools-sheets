@@ -20,11 +20,11 @@
       // use async call to determine initial state of dropdown lists
       // from contents of chart cells
       google.script.run.withSuccessHandler(function(res){
-        document.getElementById('xVar').value = xInit = res[0];
+        document.getElementById('xVar').value = xInit = res.xVal;
         document.getElementById('xVar').removeAttribute('disabled');
-        document.getElementById('yVar').value = yInit = res[1];
+        document.getElementById('yVar').value = yInit = res.yVal;
         document.getElementById('yVar').removeAttribute('disabled');
-      }).clientGetNames();
+      }).clientGetConfiguration();
       
       google.script.run.withSuccessHandler(function(res){
         var refs = {};
@@ -104,7 +104,15 @@
             })
         };
         
-        google.script.run.clientSetNames(xSelect, ySelect, xOpts, yOpts);
+        var newConfig = {
+          xVal: document.getElementById('xVar').value,
+          yVal: document.getElementById('yVar').value,
+          xOpts: xOpts,
+          yOpts, yOpts
+        };
+        
+        //google.script.run.clientSetNames(xSelect, ySelect, xOpts, yOpts);
+        google.script.run.clientSetConfiguration(newConfig);
       }
 
       function removeClass(e,c) {e.className = e.className.replace( new RegExp('(?:^|\\s)'+c+'(?!\\S)') ,''); }
