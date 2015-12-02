@@ -1,5 +1,16 @@
 var ConfigurationManager = (function(sheet){
-  var parseSelection = function(){
+
+  var configuration = null;
+  
+  var getConfiguration = function(){
+    if(!configuration)
+      configuration = parseSelection();
+    
+    return configuration;    
+  }
+  
+  var parseSelection = function(){ //TODO: ARB: rename this
+
     var range = sheet.getRange("metadata!H2:H12");
     var vals = range.getValues();
     vals = vals.map(function(e){ return e[0]; });
@@ -28,7 +39,7 @@ var ConfigurationManager = (function(sheet){
     return selection;
   }
 
-  var persistSelection = function(xVal, yVal, xOpts, yOpts){
+  var persistSelection = function(xVal, yVal, xOpts, yOpts){ //TODO: ARB: deprecate
     var range = sheet.getRange("metadata!H2:H12");
     var newOpts = [
       [xVal],
@@ -45,8 +56,34 @@ var ConfigurationManager = (function(sheet){
     ];
     range.setValues(newOpts);
   }
+
+  var persistConfiguration = function(){
+    var config = getConfiguration();
+    var range = sheet.getRange("metadata!H2:H12");
+    
+    var newOpts = [
+      [config.xVal],
+      [config.xOpts ? !!config.xOpts.invert : false],
+      [config.xOpts ? !!config.xOpts.log : false],
+      [config.xOpts && config.xOpts.range && !!config.xOpts.range.min ? config.xOpts.range.min : null],
+      [config.xOpts && config.xOpts.range && !!config.xOpts.range.max ? config.xOpts.range.max : null],
+      [''],
+      [config.yVal],
+      [config.yOpts ? !!config.yOpts.invert : false],
+      [config.yOpts ? !!config.yOpts.log : false],
+      [config.yOpts && config.yOpts.range && !!config.yOpts.range.min ? config.yOpts.range.min : null],
+      [config.yOpts && config.yOpts.range && !!config.yOpts.range.max ? config.yOpts.range.max : null]
+    ];
+    range.setValues(newOpts);
+  }
   
   return {
+    getConfiguration: getConfiguration,
+    setConfiguration: function(config){
+      configuration = config;
+      persistConfiguration();
+      SheetManager.updateChart2();
+    },
     getNames: function(){ 
       var sel = parseSelection(); 
       return [sel.xVal, sel.yVal] 
