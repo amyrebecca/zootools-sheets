@@ -1,18 +1,4 @@
-var SelectionManager = (function(sheet){
-  var fetchRange = function(varName){
-    var data = sheet.getDataRange().getValues();
-    for(var colIdx = 0; colIdx < data[0].length; colIdx++){
-      if(data[0][colIdx]==varName) break;
-    }
-
-    var rowIdx = 1;
-    do{
-      rowIdx++;
-    } while(data[rowIdx] && data[rowIdx][colIdx]);
-  
-    return sheet.getRange(1, colIdx+1, rowIdx-1);
-  }
-  
+var ConfigurationManager = (function(sheet){
   var parseSelection = function(){
     var range = sheet.getRange("metadata!H2:H12");
     var vals = range.getValues();
@@ -65,12 +51,6 @@ var SelectionManager = (function(sheet){
       var sel = parseSelection(); 
       return [sel.xVal, sel.yVal] 
     }, 
-    getRanges: function(){ 
-      var names = this.getNames();
-      var newX = fetchRange(names[0]);
-      var newY = fetchRange(names[1]);
-      return [newX, newY];
-    },
     setNames: function(xVal, yVal, xOpts, yOpts){ 
       persistSelection(xVal, yVal, xOpts, yOpts);
       SheetManager.updateChart(xVal, yVal, xOpts, yOpts);
@@ -83,6 +63,27 @@ var SheetManager = (function(sheet){
   var chart = null;
   var isNew = false;
   
+  var fetchRange = function(varName){
+    var data = sheet.getDataRange().getValues();
+    for(var colIdx = 0; colIdx < data[0].length; colIdx++){
+      if(data[0][colIdx]==varName) break;
+    }
+
+    var rowIdx = 1;
+    do{
+      rowIdx++;
+    } while(data[rowIdx] && data[rowIdx][colIdx]);
+  
+    return sheet.getRange(1, colIdx+1, rowIdx-1);
+  }
+
+  var getRanges = function(){ 
+    var names = ConfigurationManager.getNames();
+    var newX = fetchRange(names[0]);
+    var newY = fetchRange(names[1]);
+    return [newX, newY];
+  }
+  
   var getChart = function(){
     if(!chart){
       isNew = true;
@@ -94,8 +95,6 @@ var SheetManager = (function(sheet){
         .build();
     }
   }
-  
-  
   
   var getMetadata = function(){
     var sheet = null;
@@ -167,7 +166,7 @@ var SheetManager = (function(sheet){
     purgeChartRanges();
 
     mutateChart(function(){
-      var ranges = SelectionManager.getRanges();
+      var ranges = getRanges();
       chart = chart.asScatterChart()
         .setTitle([yName, 'vs', xName].join(' '))
         .setYAxisTitle(yName)
@@ -247,11 +246,11 @@ function onOpen() {
   SheetManager.destroyCharts();
   UIManager.registerMenu();
   UIManager.showSidebar();
-  SheetManager.updateChart(SelectionManager.getNames());
+  SheetManager.updateChart(ConfigurationManager.getNames());
 }
 
-function clientGetNames(){ return SelectionManager.getNames(); };
-function clientSetNames(xVal, yVal, xOpts, yOpts){ return SelectionManager.setNames(xVal, yVal, xOpts, yOpts); };
+function clientGetNames(){ return ConfigurationManager.getNames(); };
+function clientSetNames(xVal, yVal, xOpts, yOpts){ return ConfigurationManager.setNames(xVal, yVal, xOpts, yOpts); };
 function clientGetVariables(){ return SheetManager.getVariables(); };
 function clientShowSidebar(){ return UIManager.showSidebar(); };
 
