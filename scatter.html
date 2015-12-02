@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
     <?!= include('styles'); ?>
   </head>
-  <body>
+  <body class="sidebar">
     <div class="block">
       <h1>Scatter Plot Helper</h1>
     </div>
@@ -17,8 +17,9 @@
     </div>
     <div class="block">
       <? columnDefs = clientGetVariables(); ?>
+      <fieldset>
+      <legend>X Variable</legend>
       <div class="block form-group collapse" id="xDef">
-        <h6 style="cursor: pointer" onclick="toggleVar('x')">X Variable</h6>
         <select id="xVar" style="width: 100%;" oninput="updateSelection('x')" disabled>
           <? for(var i = 0; i < columnDefs.length; i++) { ?>
             <option><?= columnDefs[i].name ?></option>
@@ -37,9 +38,13 @@
             <div style="text-align: justify"><input type="text" pattern="\d*" id="xMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="text" pattern="\d*" id="xMax" style="width: 30%; " disabled /></div>
           </div>
         </div>
+        <span class="toggle toggle-more" onclick="toggleVar('x')">More &#9662;</span>
+        <span class="toggle toggle-less" onclick="toggleVar('x')">Less &#9652;</span>
       </div>
+      </fieldset>
+      <fieldset>
+      <legend>Y Variable</legend>
       <div class="block form-group collapse" id="yDef">
-        <h6 style="cursor: pointer" onclick="toggleVar('y')">Y Variable</h6>
         <select id="yVar" style="width: 100%;" oninput="updateSelection('y')" disabled>
           <? for(var i = 0; i < columnDefs.length; i++) { ?>
             <option><?= columnDefs[i].name ?></option>
@@ -50,16 +55,18 @@
           <div style="float: right; width: 50%;"><input type="checkbox" id="logY" onclick="updateSelection()"><label for="logY">Logarithmic</label></div>
           <div><input type="checkbox" id="invertY" onclick="updateSelection()"/><label for="invertY">Invert</label></div>
         </div>
-        <div class="extended" id="yRange">
+        <div class="extended" id="xRange">
           <p><strong>Range</strong></p>
           <p><input type="radio" id="yScaleDefault" name="yScale" onclick="updateSelection()" checked><label for="yScaleDefault">Auto</label></p>
           <p><input type="radio" id="yScaleSpecific" name="yScale" onclick="updateSelection()"><label for="yScaleSpecific">Specified</label></p>
           <div style="text-indent: 1.5em;">
-            <div style="text-align: justify"><input type="text" pattern="\d*" id="yMin" style="width: 30%; " disabled />&nbsp; to &nbsp;<input type="text" pattern="\d*" id="yMax" style="width: 30%; " disabled /></div>
+            <div style="text-align: justify"><input type="text" pattern="\d*" id="yMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="text" pattern="\d*" id="yMax" style="width: 30%; " disabled /></div>
           </div>
         </div>
+        <span class="toggle toggle-more" onclick="toggleVar('y')">More &#9662;</span>
+        <span class="toggle toggle-less" onclick="toggleVar('y')">Less &#9652;</span>
       </div>
-    </div>
+      </fieldset>
     <div class="block">
       <hr/>
     </div>
