@@ -64,7 +64,6 @@ var ConfigurationManager = (function(sheet){
     setConfiguration: function(config){
       configuration = config;
       persistConfiguration();
-      SheetManager.updateChart();
     }
   };
 })(SpreadsheetApp.getActiveSheet());

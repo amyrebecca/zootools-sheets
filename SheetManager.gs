@@ -17,13 +17,6 @@ var SheetManager = (function(sheet){
     return sheet.getRange(1, colIdx+1, rowIdx-1);
   }
 
-  var getRanges = function(){ 
-    var config = ConfigurationManager.getConfiguration();
-    var newX = fetchRange(config.xVal);
-    var newY = fetchRange(config.yVal);
-    return [newX, newY];
-  }
-  
   var getChart = function(){
     if(!chart){
       isNew = true;
@@ -88,21 +81,24 @@ var SheetManager = (function(sheet){
     chart = chart.build();
   }
   
-  var updateChart = function(){
-    
-    var config = ConfigurationManager.getConfiguration();
-    var xOpts = config.xOpts, yOpts=config.yOpts;
+  var updateChart = function(config){
     
     purgeChartRanges();
+    
+    var xOpts = config.xOpts;
+    var yOpts = config.yOpts;
 
     mutateChart(function(){
-      var ranges = getRanges();
+      
+      var xRange = fetchRange(config.xVal);
+      var yRange = fetchRange(config.yVal);
+      
       chart = chart.asScatterChart()
         .setTitle([config.yVal, 'vs', config.xVal].join(' '))
         .setYAxisTitle(config.yVal)
         .setXAxisTitle(config.xVal)
-        .addRange(ranges[0])
-        .addRange(ranges[1])
+        .addRange(xRange)
+        .addRange(yRange)
         .setOption('aggregationTarget', 'category') // !!!!! this took forever to figure out
         .setOption('pointSize', 1)
         .setOption('legend.position', 'none');
