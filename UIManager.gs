@@ -8,7 +8,7 @@ var UIManager = (function(){
     },
     showSidebar: function(){
       var html = HtmlService
-          .createTemplateFromFile('sidebar')
+          .createTemplateFromFile('scatter')
           .evaluate()
           .setSandboxMode(HtmlService.SandboxMode.IFRAME)
           .setTitle('Zoo Tools');
