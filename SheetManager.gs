@@ -112,9 +112,9 @@ var SheetManager = (function(sheet){
       if(config.y.axes.log){ chart.setOption('vAxis.logScale', true); }
 
       if(config.x.range && config.x.range.min){ chart.setOption('hAxis.minValue',config.x.range.min); }
-      if(config.x.range && config.x.range.max){ chart.setOption('hAxis.minValue',config.x.range.max); }
+      if(config.x.range && config.x.range.max){ chart.setOption('hAxis.maxValue',config.x.range.max); }
       if(config.y.range && config.y.range.min){ chart.setOption('vAxis.minValue',config.y.range.min); }
-      if(config.y.range && config.y.range.max){ chart.setOption('vAxis.minValue',config.y.range.max); }
+      if(config.y.range && config.y.range.max){ chart.setOption('vAxis.maxValue',config.y.range.max); }
     });
     
     if(isNew){

@@ -19,7 +19,7 @@
       <? columnDefs = clientGetVariables(); ?>
       <div class="block form-group collapse" id="xDef">
         <h6 style="cursor: pointer" onclick="toggleVar('x')">X Variable</h6>
-        <select id="xVar" style="width: 100%;" oninput="updateSelection('X')" disabled>
+        <select id="xVar" style="width: 100%;" oninput="updateSelection('x')" disabled>
           <? for(var i = 0; i < columnDefs.length; i++) { ?>
             <option><?= columnDefs[i].name ?></option>
           <? } ?>
@@ -31,8 +31,8 @@
         </div>
         <div class="extended" id="xRange">
           <p><strong>Range</strong></p>
-          <p><input type="radio" id="xScaleDefault" name="xScale" onclick="toggleRange('x')" checked><label for="xScaleDefault">Auto</label></p>
-          <p><input type="radio" id="xScaleSpecific" name="xScale" onclick="toggleRange('x')"><label for="xScaleSpecific">Specified</label></p>
+          <p><input type="radio" id="xScaleDefault" name="xScale" onclick="updateSelection()" checked><label for="xScaleDefault">Auto</label></p>
+          <p><input type="radio" id="xScaleSpecific" name="xScale" onclick="updateSelection()"><label for="xScaleSpecific">Specified</label></p>
           <div style="text-indent: 1.5em;">
             <div style="text-align: justify"><input type="text" pattern="\d*" id="xMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="text" pattern="\d*" id="xMax" style="width: 30%; " disabled /></div>
           </div>
@@ -40,7 +40,7 @@
       </div>
       <div class="block form-group collapse" id="yDef">
         <h6 style="cursor: pointer" onclick="toggleVar('y')">Y Variable</h6>
-        <select id="yVar" style="width: 100%;" oninput="updateSelection('Y')" disabled>
+        <select id="yVar" style="width: 100%;" oninput="updateSelection('y')" disabled>
           <? for(var i = 0; i < columnDefs.length; i++) { ?>
             <option><?= columnDefs[i].name ?></option>
           <? } ?>
@@ -52,8 +52,8 @@
         </div>
         <div class="extended" id="yRange">
           <p><strong>Range</strong></p>
-          <p><input type="radio" id="yScaleDefault" name="yScale" onclick="toggleRange('y')" checked><label for="yScaleDefault">Auto</label></p>
-          <p><input type="radio" id="yScaleSpecific" name="yScale" onclick="toggleRange('y')"><label for="yScaleSpecific">Specified</label></p>
+          <p><input type="radio" id="yScaleDefault" name="yScale" onclick="updateSelection()" checked><label for="yScaleDefault">Auto</label></p>
+          <p><input type="radio" id="yScaleSpecific" name="yScale" onclick="updateSelection()"><label for="yScaleSpecific">Specified</label></p>
           <div style="text-indent: 1.5em;">
             <div style="text-align: justify"><input type="text" pattern="\d*" id="yMin" style="width: 30%; " disabled />&nbsp; to &nbsp;<input type="text" pattern="\d*" id="yMax" style="width: 30%; " disabled /></div>
           </div>

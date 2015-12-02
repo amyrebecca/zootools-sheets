@@ -21,7 +21,7 @@ google.script.run.withSuccessHandler(function(res){
 }).clientGetVariables();
 
 var $ = function(sel){ return document.querySelector(sel); };
-var clean = function(node){ return !!node.value ? node.value : null; };
+var clean = function(node){ return !!node.value ? parseFloat(node.value) : null; };
 var enable = function(node){ node.removeAttribute('disabled'); }
 var disable = function(node){ node.setAttribute('disabled', true); }
 
@@ -73,7 +73,7 @@ function extractState(){
       range: $('#yScaleDefault').checked ? null : { min: clean($('#yMin')), max: clean($('#yMax')) }
     }
   };
-  
+
   return res;
 }
 
