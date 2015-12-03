@@ -5,14 +5,27 @@
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
     <?!= include('styles'); ?>
   </head>
-  <body>
+  <body class="sidebar">
+    <div>
+      <h1>Summary Stats</h1>
+    </div>
     <div class="block">
+      Calculate summary statistics for selected variables.
+    </div>
+    <div class="block">
+    <? columnDefs = clientGetVariables(); ?>
+      <div class="block form-group collapse" id="xDef">
+        <select id="xVar" style="width: 100%;" oninput="updateSelection('x')" disabled>
+          <? for(var i = 0; i < columnDefs.length; i++) { ?>
+            <option><?= columnDefs[i].name ?></option>
+          <? } ?>
+        </select>
+      </div> 
     </div>
     <div class="block form-group" style="text-align: center; ">
       <button id="updateBtn" class="action" onclick="clientChangeSelection()" disabled>Update</button>
       <button onclick="google.script.host.close()">Close</button>
-    </div>
-    
+    </div>      
     <?!= include('stats-script'); ?>
   </body>
 </html>
