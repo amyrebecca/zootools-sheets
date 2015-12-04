@@ -37,8 +37,6 @@ var SheetManager = (function(sheet){
       chart = sheet.newChart()
         .setChartType(Charts.ChartType.SCATTER)
         .setPosition(3, 2, 0, 0)
-        .addRange(sheet.getRange("A1:A1"))
-        .addRange(sheet.getRange("B1:B1"))
         .build();
     }
   }

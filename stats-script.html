@@ -3,6 +3,7 @@
 
 var columnDefs = null;
 var template = null;
+var statTemplate = null;
 
 function calculateNew(){
 	var varName = document.querySelector('#varName').value;
@@ -15,20 +16,20 @@ function calculateNew(){
 			stdev: math.round(math.std(res),7)
 		}
 
-		document.querySelector('#resultList').innerHTML += template(summary);
+		document.querySelector('#resultList').innerHTML += statTemplate(summary);
 	}).clientGetValues(varName);
 }
 
-(function(){
+var compile = function(selector){
 	var r = /(\{\{.+?\}\})/;
-	var elem = document.querySelector('#resultList');
-	var markup = elem.innerHTML;
-	elem.innerHTML = '';
+	var elem = document.querySelector(selector);
+	var markup = elem.outerHTML;
+	elem.remove();
 	markup = markup.replace(/\s+/,' ');
 
 	var fragments = markup.split(r);
 
-	template = (function(tpl){
+	var template = (function(tpl){
 		return function(obj){
 			var r = /(\{\{.+?\}\})/;
 			var accum = [];
@@ -45,8 +46,11 @@ function calculateNew(){
 		};
 	})(fragments);
 
-	document.querySelector('#resultList').className = '';
-})();
+    return template;
+};
+
+var statTemplate = compile('#result');
+document.querySelector('#resultList').className = '';
 
 </script>
 
