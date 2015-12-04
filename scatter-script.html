@@ -32,11 +32,11 @@ function applyState(config){
   $('#xVar').value = config.x.variable;
   $('#invertX').checked = config.x.axes.invert;
   $('#logX').checked = config.x.axes.log;
-  
+
   $('#yVar').value = config.y.variable;
   $('#invertY').checked = config.y.axes.invert;
   $('#logY').checked = config.y.axes.log;
-  
+
   if(config.x.range){
     $('#xScaleSpecific').checked = true;
     enable($('#xMin')); enable($('#xMax'));
@@ -47,7 +47,7 @@ function applyState(config){
     $('#xMin').value = null;
     $('#xMax').value = null;
   }
-  
+
   if(config.y.range){
     $('#yScaleSpecific').checked = true;
     enable($('#yMin')); enable($('#yMax'));

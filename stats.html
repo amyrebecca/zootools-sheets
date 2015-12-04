@@ -6,26 +6,56 @@
     <?!= include('styles'); ?>
   </head>
   <body class="sidebar">
-    <div>
+    <div class="block">
       <h1>Summary Stats</h1>
     </div>
-    <div class="block">
-      Calculate summary statistics for selected variables.
+    <div class="block form-group">
+      <p>Calculate summary statistics for selected variables.</p>
     </div>
-    <div class="block">
+    <div class="preinit" id="resultList">
+
+    <div class="block form-group">
+        <table style="margin-left: 0.2em; width: 100%;">
+          <colgroup>
+            <col style="width: 45%;" />
+            <col style="width: 55%;" />
+          </colgroup>
+          <tbody>
+            <tr>
+              <td><strong>{{name}} Min</strong></td>
+              <td> {{min}}</td>
+            </tr>
+            <tr>
+              <td><strong>{{name}} Max</strong></td>
+              <td> {{max}}</td>
+            </tr>
+            <tr>
+              <td><strong>{{name}} Mean</strong></td>
+              <td> {{mean}} </td>
+            </tr>
+            <tr>
+              <td><strong>{{name}} Std. Dev.</strong></td>
+              <td> {{stdev}} </td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+    </div>
+    
+    <p />
     <? columnDefs = clientGetVariables(); ?>
-      <div class="block form-group collapse" id="xDef">
-        <select id="xVar" style="width: 100%;" oninput="updateSelection('x')" disabled>
-          <? for(var i = 0; i < columnDefs.length; i++) { ?>
-            <option><?= columnDefs[i].name ?></option>
-          <? } ?>
-        </select>
-      </div> 
-    </div>
+    <div class="block form-group">
+    <select id="varName" style="width: 100%;" >
+    <? for(var i = 0; i < columnDefs.length; i++) { ?>
+    <option><?= columnDefs[i].name ?></option>
+    <? } ?>
+    </select>
+    </div> 
     <div class="block form-group" style="text-align: center; ">
-      <button id="updateBtn" class="action" onclick="clientChangeSelection()" disabled>Update</button>
+      <button id="calcBtn" class="action" onclick="calculateNew()">Calculate</button>
       <button onclick="google.script.host.close()">Close</button>
     </div>      
     <?!= include('stats-script'); ?>
   </body>
 </html>
+

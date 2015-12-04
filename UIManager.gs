@@ -16,7 +16,7 @@ var UIManager = (function(){
           .setSandboxMode(HtmlService.SandboxMode.IFRAME)
           .setTitle('Zoo Tools');
   
-      SpreadsheetApp.getUi() // Or DocumentApp or FormApp.
+      SpreadsheetApp.getUi()
           .showSidebar(html);
     }
   }

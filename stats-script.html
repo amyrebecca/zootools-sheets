@@ -2,5 +2,51 @@
 <script type="text/javascript">
 
 var columnDefs = null;
+var template = null;
+
+function calculateNew(){
+	var varName = document.querySelector('#varName').value;
+	google.script.run.withSuccessHandler(function(res){
+		var summary = {
+			name: varName,
+			min: math.round(math.min(res),7),
+			max: math.round(math.max(res),7),
+			mean: math.round(math.mean(res),7),
+			stdev: math.round(math.std(res),7)
+		}
+
+		document.querySelector('#resultList').innerHTML += template(summary);
+	}).clientGetValues(varName);
+}
+
+(function(){
+	var r = /(\{\{.+?\}\})/;
+	var elem = document.querySelector('#resultList');
+	var markup = elem.innerHTML;
+	elem.innerHTML = '';
+	markup = markup.replace(/\s+/,' ');
+
+	var fragments = markup.split(r);
+
+	template = (function(tpl){
+		return function(obj){
+			var r = /(\{\{.+?\}\})/;
+			var accum = [];
+			for(var idx in fragments){
+				var fragment = fragments[idx];
+				if(r.test(fragment)){
+					fragment = fragment.replace(/(\{\{)|(\}\})/g,'');
+					accum.push(obj[fragment]);
+				} else {
+					accum.push(fragment);
+				}
+			}
+			return accum.join('');
+		};
+	})(fragments);
+
+	document.querySelector('#resultList').className = '';
+})();
 
 </script>
+

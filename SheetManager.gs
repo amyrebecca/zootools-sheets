@@ -3,6 +3,20 @@ var SheetManager = (function(sheet){
   var chart = null;
   var isNew = false;
   
+  var getValues = function(varName){
+    var data = sheet.getDataRange().getValues();
+    for(var colIdx = 0; colIdx < data[0].length; colIdx++){
+      if(data[0][colIdx]==varName) break;
+    }
+
+    var rowIdx = 1;
+    do{
+      rowIdx++;
+    } while(data[rowIdx] && data[rowIdx][colIdx]);
+  
+    return sheet.getRange(2, colIdx+1, rowIdx-1).getValues().map(function(e){ return e[0]; });
+  }
+  
   var fetchRange = function(varName){
     var data = sheet.getDataRange().getValues();
     for(var colIdx = 0; colIdx < data[0].length; colIdx++){
@@ -145,7 +159,9 @@ var SheetManager = (function(sheet){
   return {
     getVariables: getVariables,
     updateChart: updateChart,
-    destroyCharts: destroyCharts
+    destroyCharts: destroyCharts,
+    getValues: getValues
   };
   
 })(SpreadsheetApp.getActiveSheet());
+

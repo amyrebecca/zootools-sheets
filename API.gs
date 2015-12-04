@@ -29,3 +29,7 @@ function clientShowHistogram(){
 function clientShowBar(){
   return UIManager.showSidebar('bar'); 
 }
+
+function clientGetValues(varname){
+  return SheetManager.getValues(varname);
+}
