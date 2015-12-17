@@ -1,0 +1,57 @@
+<script type="text/javascript">
+  // Selector function
+  var $ = function(sel){ return document.querySelector(sel); };
+
+    function showStatus(msg, classId) {
+      var status = $('#status'); 
+      status.className = ""
+      status.innerHTML = msg;
+      if (classId) {
+        status.classList.add(classId);
+      }
+    }
+
+  // use async call to determine initial state of dropdown lists
+  // from contents of chart cells
+  var columnDefs;
+
+  // Setup map visualization via Charts API
+  google.load('visualization', '1.0', { 'packages': ['map'] });
+  google.setOnLoadCallback(getGoogleMap);
+
+  google.script.run.withSuccessHandler(function(res){
+    var refs = {};
+    for(var idx in res){
+      refs[res[idx].name] = res[idx];
+    }
+    columnDefs = refs;
+  }).clientGetVariables();
+
+  function getCoordinates(){
+    var latitude = $('#latitude').value;
+    var longitude = $('#longitude').value;
+    
+    showStatus('Getting map...');
+    
+    google.script.run
+      .withSuccessHandler(
+        function(res) {
+          getGoogleMap(event, res);
+          showStatus(null);
+        }
+      ).clientGetCoordinates(latitude, longitude)
+  }
+
+  function getGoogleMap(event, coordinates){
+    var load = [];
+    if (coordinates) {
+      load = coordinates;
+    } else {
+      load = [['Lat', 'Long', 'Name'], [41.8339042, -88.0123485, 'Placeholder']];
+    }
+    var data = google.visualization.arrayToDataTable(load);
+    var map = new google.visualization.Map($('#map-container'));
+    
+    map.draw(data, {showTip: true});  
+  }
+</script>

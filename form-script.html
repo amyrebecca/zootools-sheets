@@ -1,0 +1,89 @@
+<script>
+  var autocomplete = {
+    institution: null,
+    location: null
+  };
+  
+  // Selector function
+  var $ = function(sel){ return document.querySelector(sel); };
+  $('#form-submit').addEventListener('click', onSubmitClick);
+  
+  /**
+   * Run initializations on dialog load.
+   */
+  function initAutocomplete() {
+    // Create the autocomplete object, restricting the search to geographical
+    // location types.
+    autocomplete.institution = new google.maps.places.SearchBox(
+      /** @type {!HTMLInputElement} */($("#institution")),
+      {types: ['geocode']});
+    autocomplete.location = new google.maps.places.SearchBox(
+      /** @type {!HTMLInputElement} */($("#location")),
+      {types: ['geocode']});
+    // When the user selects an address from the dropdown, populate the address
+    // fields in the form.
+    autocomplete.institution.addListener('place_changed', function() {autocomplete.institution.getPlace()});
+    autocomplete.location.addListener('place_changed', function() {autocomplete.location.getPlace()});
+  }
+  
+  function geolocate(event) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var geolocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        var circle = new google.maps.Circle({
+          center: geolocation,
+          radius: position.coords.accuracy
+        });
+        autocomplete[event.srcElement.id].setBounds(circle.getBounds());
+      });
+    }
+  }
+  /**
+   * Adds form submission to the sheet
+   */
+  function onSubmitClick() {
+    this.disabled = true;
+    // Gather any information that needs to be sent to the server here.
+    var institution = $('#institution').value;
+    // TODO check returned object for consistency...
+    var institutionAddress = autocomplete.institution.gm_accessors_.places.Ld.searchBoxPlaces[0].formatted_address || autocomplete.institution.gm_accessors_.places.Ld.searchBoxPlaces[0].formatted_prediction;
+    var location = $('#location').value;
+    // TODO check returned object for consistency...
+    var locationAddress = autocomplete.location.gm_accessors_.places.Ld.searchBoxPlaces[0].formatted_address || autocomplete.location.gm_accessors_.places.Ld.searchBoxPlaces[0].formatted_prediction;
+
+    showStatus('Working...');
+    // Send the value to the server and handle the response.
+    google.script.run
+      .withSuccessHandler(onSuccess)
+      .withFailureHandler(onFailure)
+      .withUserObject(this)
+      .addFormSubmission(institution, institutionAddress, location, locationAddress);
+  }
+  
+  function onSuccess(){
+    google.script.host.close()
+  }
+  
+  function onFailure(msg, element){
+    showStatus('Execution failed: ' + msg, 'error');
+    element.disabled = false;
+  }
+  /**
+   * Displays the given status message in the dialog.
+   *
+   * @param {String} msg The status message to display.
+   * @param {String} classId The message type (class id) that the message
+   *   should be displayed as.
+   */
+  function showStatus(msg, classId) {
+    var status = $('#status'); 
+    status.className = ""
+    status.innerHTML = msg;
+    if (classId) {
+      status.classList.add(classId);
+    }
+  }
+</script>

@@ -1,12 +1,15 @@
 var UIManager = (function(){
   return {
     registerMenu: function(){
-      SpreadsheetApp.getUi()
-          .createMenu('Zoo Tools')
-          .addItem('Scatter Plot Helper', 'clientShowScatter')
-          .addItem('Bar Chart Helper', 'clientShowBar')
-          .addItem('Histogram Helper', 'clientShowHistogram')
-          .addItem('Summary Stats Helper', 'clientShowStats')
+      var ui = SpreadsheetApp.getUi();
+      ui.createMenu('Zoo Tools')
+          .addItem('Scatter Plot Helper', 'clientShowScatterSidebar')
+          .addItem('Bar Chart Helper', 'clientShowSidebar')
+          .addItem('Histogram Helper', 'clientShowSidebar')
+          .addItem('Summary Stats Helper', 'clientShowSidebar')
+          .addSubMenu(ui.createMenu('Map')
+            .addItem('Map Helper', 'clientShowMapDialog')
+            .addItem('Student Location Survey', 'clientShowFormDialog'))
           .addToUi();
     },
     showSidebar: function(which){
@@ -16,8 +19,29 @@ var UIManager = (function(){
           .setSandboxMode(HtmlService.SandboxMode.IFRAME)
           .setTitle('Zoo Tools');
   
-      SpreadsheetApp.getUi()
+      SpreadsheetApp.getUi() // Or DocumentApp or FormApp.
           .showSidebar(html);
+    },
+    showDialog: function(menuItem){
+      var dialog = {
+        map: {
+          height: 400,
+          width: 600,
+          title: 'Google Map'
+        },
+        form: {
+          height: 215,
+          width: 400,
+          title: 'Student Location Survey'
+        }
+      };
+      
+      var ui = HtmlService.createTemplateFromFile(menuItem + '-dialog')
+        .evaluate()
+        .setWidth(dialog[menuItem].width)
+        .setHeight(dialog[menuItem].height)
+        .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+      SpreadsheetApp.getUi().showModalDialog(ui, dialog[menuItem].title);
     }
   }
 })();
