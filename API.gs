@@ -44,4 +44,8 @@ function clientGetCoordinates(latitude, longitude){
 
 function clientGetValues(varname){
   return SheetManager.getValues(varname);
-}
+};
+
+function clientAddFormSubmission(institution, institutionAddress, location, locationAddress){
+  return SheetManager.addFormSubmission(institution, institutionAddress, location, locationAddress);
+};

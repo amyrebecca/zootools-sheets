@@ -3,6 +3,10 @@
     institution: null,
     location: null
   };
+  var results = {
+    institution: [],
+    location: []
+  }
   
   // Selector function
   var $ = function(sel){ return document.querySelector(sel); };
@@ -20,10 +24,6 @@
     autocomplete.location = new google.maps.places.SearchBox(
       /** @type {!HTMLInputElement} */($("#location")),
       {types: ['geocode']});
-    // When the user selects an address from the dropdown, populate the address
-    // fields in the form.
-    autocomplete.institution.addListener('place_changed', function() {autocomplete.institution.getPlace()});
-    autocomplete.location.addListener('place_changed', function() {autocomplete.location.getPlace()});
   }
   
   function geolocate(event) {
@@ -48,11 +48,11 @@
     this.disabled = true;
     // Gather any information that needs to be sent to the server here.
     var institution = $('#institution').value;
-    // TODO check returned object for consistency...
-    var institutionAddress = autocomplete.institution.gm_accessors_.places.Ld.searchBoxPlaces[0].formatted_address || autocomplete.institution.gm_accessors_.places.Ld.searchBoxPlaces[0].formatted_prediction;
+    var institutionPlace = autocomplete.institution.getPlaces();
+    var institutionAddress = institutionPlace[0].formatted_address || institution; // Send something to the geocoder in case the getPlaces() call fails
     var location = $('#location').value;
-    // TODO check returned object for consistency...
-    var locationAddress = autocomplete.location.gm_accessors_.places.Ld.searchBoxPlaces[0].formatted_address || autocomplete.location.gm_accessors_.places.Ld.searchBoxPlaces[0].formatted_prediction;
+    var locationPlace = autocomplete.location.getPlaces();
+    var locationAddress = locationPlace[0].formatted_address || location; // Send something to the geocoder in case the getPlaces() call fails
 
     showStatus('Working...');
     // Send the value to the server and handle the response.
@@ -60,7 +60,7 @@
       .withSuccessHandler(onSuccess)
       .withFailureHandler(onFailure)
       .withUserObject(this)
-      .addFormSubmission(institution, institutionAddress, location, locationAddress);
+      .clientAddFormSubmission(institution, institutionAddress, location, locationAddress);
   }
   
   function onSuccess(){
@@ -87,3 +87,5 @@
     }
   }
 </script>
+
+

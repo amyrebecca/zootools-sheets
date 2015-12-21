@@ -175,18 +175,20 @@ var SheetManager = (function(sheet){
   }
   
   function getFormResponseSheet() {
-    // Get sheet with 'Student Responses' name or create sheet with name
     var sheetName = 'Student Responses';
-    var formResponseSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName) || SpreadsheetApp.create(sheetName);
-    var lastColumnWithContent = formResponseSheet.getLastColumn();
-    
-    // if new sheet, setup headers
-    var headerRow = formResponseSheet.getSheetValues(1, 1, 1, lastColumnWithContent);
-    if (headerRow[0].indexOf('Student latitude') === -1) {
-      formResponseSheet.getRange(1, lastColumnWithContent + 1, 1, 5).setValues([['Student longitude', 'Student latitude', 'Institution longitude', 'Institution latitude', 'Calculated Distance']]);
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+
+    if (sheet === undefined || sheet === null) {
+       sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName);
+       var lastColumnWithContent = sheet.getLastColumn();
+
+       // Setup headers for new sheet
+       var headerRow = sheet.getRange(1, lastColumnWithContent + 1, 1, 8);
+       headerRow.setValues([['DateTime', 'Student location name', 'Institution name', 'Student latitude', 'Student longitude', 'Institution latitude', 'Institution longitude', 'Calculated Distance']]);
+       sheet.setFrozenRows(1); // Freeze header row
     }
-    
-    return formResponseSheet;
+ 
+    return sheet;
   }
   
   function getDate() {
@@ -218,7 +220,7 @@ var SheetManager = (function(sheet){
       var lat = results[0].geometry.location.lat;
       var long = results[0].geometry.location.lng;
 
-      latLongResults = [long, lat];
+      latLongResults = [lat, long];
     } else {
       ui.alert("Error parsing location. Check form responses for invalid location.");
       latLongResults = ["invalid", "invalid"];
@@ -233,7 +235,7 @@ var SheetManager = (function(sheet){
         institutionGeocoded = geolocate(geocoder, institutionAddress),
         locationGeocoded = geolocate(geocoder, locationAddress);
 
-    // Get or setup sheet
+    // Setup latitude and longitude headers if needed
     var formResponseSheet = getFormResponseSheet();
     var rowPositionToStart = formResponseSheet.getLastRow() + 1;
     
