@@ -30,6 +30,22 @@ function clientShowBar(){
   return UIManager.showSidebar('bar'); 
 }
 
+function clientShowMapDialog(){
+  return UIManager.showDialog('map');
+};
+
+function clientShowFormDialog(){
+  return UIManager.showDialog('form');
+};
+
+function clientGetCoordinates(latitude, longitude){
+  return SheetManager.getCoordinates(latitude, longitude);
+};
+
 function clientGetValues(varname){
   return SheetManager.getValues(varname);
-}
+};
+
+function clientAddFormSubmission(institution, institutionAddress, location, locationAddress){
+  return SheetManager.addFormSubmission(institution, institutionAddress, location, locationAddress);
+};

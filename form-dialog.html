@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <!-- Use a templated HTML printing scriptlet to import common stylesheet -->
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
+    <?!= include('styles'); ?>
+  </head>
+  <body>
+    <!-- Below is the HTML code that defines the dialog element structure. -->
+    <div>
+      <p>Please fill out the form with where you are from and what institution you are attending.</p>
+      <div id="status"></div>
+      <div class="block dialog-elements">
+        <label>
+          Your Institution:
+        </label>
+        <input class="width-100" name="institution" id="institution" type="text"
+        placeholder="Enter a institution name or address" onFocus="geolocate(event)">
+        <label>
+          Where you are from:
+        </label>
+        <input class="width-100" name="location" id="location" type="text"
+        placeholder="Enter a city name and state or country or a full address" onFocus="geolocate(event)">
+      </div>
+      <div class="block dialog-button-bar">
+          <button class="action" id="form-submit">Submit</button>
+          <button id="dialog-cancel-button" onclick="google.script.host.close()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Use a templated HTML printing scriptlet to import JavaScript. -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&signed_in=true&libraries=places&callback=initAutocomplete"
+        async defer></script>
+    <?!= include('form-script') ?>
+  </body>
+</html>
+
+

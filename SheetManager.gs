@@ -154,12 +154,101 @@ var SheetManager = (function(sheet){
     }
   }
   
+  var getCoordinates = function(latitude, longitude){
+    // Latitude and longitude will already be validated from the form submission
+    var coordinates = [['Lat','Long', 'Name']];
+    var latitudeRange = fetchRange(latitude);
+    var longitudeRange = fetchRange(longitude);
+    var latitudeValues = latitudeRange.getValues();
+    var longitudeValues = longitudeRange.getValues();
+    
+    // Setup array for use with Maps API
+    for (var i = latitudeValues.length - 1; i >= 0; i--) {
+      for (var j = longitudeValues.length - 1; j >= 0; j--) {
+        // create row of lat, long, and use lat, long for tooltip popup on map
+        var row = [latitudeValues[i][0], longitudeValues[j][0], latitudeValues[i][0] + ', ' + longitudeValues[j][0]];
+        coordinates.push(row);
+      } 
+    };
+    
+    return coordinates;
+  }
+  
+  function getFormResponseSheet() {
+    var sheetName = 'Student Responses';
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+
+    if (sheet === undefined || sheet === null) {
+       sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName);
+       var lastColumnWithContent = sheet.getLastColumn();
+
+       // Setup headers for new sheet
+       var headerRow = sheet.getRange(1, lastColumnWithContent + 1, 1, 8);
+       headerRow.setValues([['DateTime', 'Student location name', 'Institution name', 'Student latitude', 'Student longitude', 'Institution latitude', 'Institution longitude', 'Calculated Distance']]);
+       sheet.setFrozenRows(1); // Freeze header row
+    }
+ 
+    return sheet;
+  }
+  
+  function getDate() {
+    var formattedDate;
+    var date = new Date();
+  
+    var year = date.getUTCFullYear(),
+        month = date.getUTCMonth(),
+        day = date.getUTCDate(),
+        hour = date.getUTCHours(),
+        minutes = date.getUTCMinutes(),
+        seconds = date.getUTCSeconds();
+  
+    //month 2 digits
+    month = ("0" + (month + 1)).slice(-2);
+    formattedDate = month + '/' + day  + "/" + year + " " + hour + ":" + minutes + ":" + seconds;
+  
+    return formattedDate;
+  }
+
+  function geolocate(geocoder, location) {
+    var latLongResults = [];
+    var ui = SpreadsheetApp.getUi()
+  
+    var geocodedLocation = geocoder.geocode(location);
+
+    if (geocodedLocation.status === "OK") {
+      var results = geocodedLocation.results;
+      var lat = results[0].geometry.location.lat;
+      var long = results[0].geometry.location.lng;
+
+      latLongResults = [lat, long];
+    } else {
+      ui.alert("Error parsing location. Check form responses for invalid location.");
+      latLongResults = ["invalid", "invalid"];
+    }
+
+    return latLongResults;
+  }
+  
+  function addFormSubmission(institution, institutionAddress, location, locationAddress) {
+    var geocoder = Maps.newGeocoder(),
+        date = getDate(),   
+        institutionGeocoded = geolocate(geocoder, institutionAddress),
+        locationGeocoded = geolocate(geocoder, locationAddress);
+
+    // Setup latitude and longitude headers if needed
+    var formResponseSheet = getFormResponseSheet();
+    var rowPositionToStart = formResponseSheet.getLastRow() + 1;
+    
+    formResponseSheet.appendRow([date, location, institution, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
+  }
+  
   return {
     getVariables: getVariables,
     updateChart: updateChart,
     destroyCharts: destroyCharts,
-    getValues: getValues
+    getValues: getValues,
+    getCoordinates: getCoordinates,
+    addFormSubmission: addFormSubmission
   };
   
 })(SpreadsheetApp.getActiveSheet());
-
