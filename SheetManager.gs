@@ -153,22 +153,18 @@ var SheetManager = (function(sheet){
       sheet.removeChart(charts[idx]);
     }
   }
-  
+        
   var getCoordinates = function(latitude, longitude){
     // Latitude and longitude will already be validated from the form submission
     var coordinates = [['Lat','Long', 'Name']];
-    var latitudeRange = fetchRange(latitude);
-    var longitudeRange = fetchRange(longitude);
-    var latitudeValues = latitudeRange.getValues();
-    var longitudeValues = longitudeRange.getValues();
+    var latitudeValues = getValues(latitude);
+    var longitudeValues = getValues(longitude);
     
     // Setup array for use with Maps API
     for (var i = latitudeValues.length - 1; i >= 0; i--) {
-      for (var j = longitudeValues.length - 1; j >= 0; j--) {
-        // create row of lat, long, and use lat, long for tooltip popup on map
-        var row = [latitudeValues[i][0], longitudeValues[j][0], latitudeValues[i][0] + ', ' + longitudeValues[j][0]];
-        coordinates.push(row);
-      } 
+      // create row of lat, long, and use lat, long for tooltip popup on map
+      var row = [latitudeValues[i], longitudeValues[i], latitudeValues[i] + ', ' + longitudeValues[i]];
+      coordinates.push(row);
     };
     
     return coordinates;
@@ -184,7 +180,7 @@ var SheetManager = (function(sheet){
 
        // Setup headers for new sheet
        var headerRow = sheet.getRange(1, lastColumnWithContent + 1, 1, 8);
-       headerRow.setValues([['DateTime', 'Student location name', 'Institution name', 'Student latitude', 'Student longitude', 'Institution latitude', 'Institution longitude', 'Calculated Distance']]);
+       headerRow.setValues([['DateTime', 'Where are you from?', 'What is your institution?', 'Student latitude', 'Student longitude', 'Institution latitude', 'Institution longitude', 'Calculated Distance']]);
        sheet.setFrozenRows(1); // Freeze header row
     }
  
