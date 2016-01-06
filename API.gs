@@ -46,6 +46,14 @@ function clientGetValues(varname){
   return SheetManager.getValues(varname);
 };
 
+function clientGetMultipleValues(varnameX, varnameY) {
+  return SheetManager.getMultipleValues(varnameX, varnameY);
+}
+
 function clientAddFormSubmission(institution, institutionAddress, location, locationAddress){
   return SheetManager.addFormSubmission(institution, institutionAddress, location, locationAddress);
 };
+
+function clientAddChart(config, type) {
+  return SheetManager.addChart(config, type);
+}

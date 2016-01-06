@@ -1,29 +1,40 @@
 <script type="text/javascript">
-
+// Setup and utility functions
 var columnDefs;
 var config = null;
-
-// use async call to determine initial state of dropdown lists
-// from contents of chart cells
-google.script.run.withSuccessHandler(function(res){
-    config = res;
-    applyState(config);
-	document.getElementById('xVar').removeAttribute('disabled');
-	document.getElementById('yVar').removeAttribute('disabled');
-}).clientGetConfiguration();
-
-google.script.run.withSuccessHandler(function(res){
-	var refs = {};
-	for(var idx in res){
-		refs[res[idx].name] = res[idx];
-	}
-	columnDefs = refs;
-}).clientGetVariables();
-
+var store = null;
+var chart = null;
 var $ = function(sel){ return document.querySelector(sel); };
 var clean = function(node){ return !!node.value ? parseFloat(node.value) : null; };
 var enable = function(node){ node.removeAttribute('disabled'); }
 var disable = function(node){ node.setAttribute('disabled', true); }
+
+// Load the Google Visualization library
+google.load("visualization", "1", {packages:["corechart"]});
+google.setOnLoadCallback(loadChart);
+
+// Instantiate the chart
+function loadChart() {
+  chart = new google.visualization.ScatterChart($('#chart-preview'));
+} 
+// use async call to determine initial state of dropdown lists
+// from contents of chart cells
+google.script.run.withSuccessHandler(function(res){
+  console.log('res', res);
+  var refs = {};
+  for(var idx in res){
+    // Handle if user is not on a sheet with data! Response returns empty string for names
+    if (res.length === 1) {
+      showStatus('No variables to choose from. Close and reopen helper on sheet with data.');
+    }
+ 
+    refs[res[idx].name] = res[idx];
+  }
+  columnDefs = refs;
+  enable($('#xVar'));
+  enable($('#yVar'));
+  enable($('#updateBtn'));
+}).clientGetVariables();
 
 function applyState(config){
   disable($('#xMin')); disable($('#xMax'));
@@ -32,11 +43,11 @@ function applyState(config){
   $('#xVar').value = config.x.variable;
   $('#invertX').checked = config.x.axes.invert;
   $('#logX').checked = config.x.axes.log;
-
+  
   $('#yVar').value = config.y.variable;
   $('#invertY').checked = config.y.axes.invert;
   $('#logY').checked = config.y.axes.log;
-
+  
   if(config.x.range){
     $('#xScaleSpecific').checked = true;
     enable($('#xMin')); enable($('#xMax'));
@@ -47,7 +58,7 @@ function applyState(config){
     $('#xMin').value = null;
     $('#xMax').value = null;
   }
-
+  
   if(config.y.range){
     $('#yScaleSpecific').checked = true;
     enable($('#yMin')); enable($('#yMax'));
@@ -92,28 +103,107 @@ function updateSelection(src){
       }
     }
     applyState(state);
-	updateBtn.removeAttribute('disabled');
+  updateBtn.removeAttribute('disabled');
 }
 
 // update the chart from the client's selected variables
 function clientChangeSelection(){
-    google.script.run.clientSetConfiguration(extractState());
+    var xVar = $('#xVar').value;
+    var yVar = $('#yVar').value;
+    
+    showStatus('Drawing Plot...');
+    
+    google.script.run
+      .withSuccessHandler(function(res) {
+        showStatus('');
+        previewChart(res);
+      })
+      .withFailureHandler(failureHandler)
+      .clientGetMultipleValues(xVar, yVar);
 }
 
-function removeClass(e,c) {e.className = e.className.replace( new RegExp('(?:^|\\s)'+c+'(?!\\S)') ,''); }
-function addClass(e,c){ e.className = [e.className, c].join(' '); }
+// Use response from sheet to setup data in format expected by Charts API for scatter plots
+function setupDataTable(spreadsheetValues) {
+  var state = extractState();
+  var table = [[state.x.variable, state.y.variable]];
+  for (var i = spreadsheetValues.x.length - 1; i >= 0; i--) {
+    var row = [spreadsheetValues.x[i], spreadsheetValues.y[i]];
+    table.push(row);
+  };
+  
+  return table;
+}
+
+function buildChartOptions(state) {
+  options = {
+    hAxis: { title: state.x.variable },
+    vAxis: { title: state.y.variable },
+    pointSize: 1,
+    aggregationTarget: 'category',
+    legend: { position: 'none' }
+  }
+  
+  if (state.x.range && state.x.range.min) { options.hAxis.minValue = state.x.range.min; } 
+  if (state.x.range && state.x.range.max) { options.hAxis.maxValue = state.x.range.max; }
+  if (state.y.range && state.y.range.min) { options.vAxis.minValue = state.y.range.min; }
+  if (state.y.range && state.y.range.max) { options.vAxis.maxValue = state.y.range.max; }
+  if (state.x.axes.invert === true) { options.hAxis.direction = -1; }
+  if (state.x.axes.log === true) { options.hAxis.logScale = true; }
+  if (state.y.axes.invert === true) { options.vAxis.direction = -1; }
+  if (state.y.axes.log === true) { options.vAxis.logScale = true; }
+  
+  return options;
+}
+
+function previewChart(spreadsheetValues) {
+  var load = setupDataTable(spreadsheetValues);
+  var state = extractState();
+  var data = google.visualization.arrayToDataTable(load);
+  var options = buildChartOptions(state);
+  var sendToSheetBtn = $('#sendToSheetBtn');
+  
+  disable(sendToSheetBtn);
+  
+  // Add event listener
+  google.visualization.events.addListener(chart, 'ready', function(){
+    enable(sendToSheetBtn);
+  });
+  
+  // Draw the chart
+  chart.draw(data, options);
+}
+
+function sendToSheet() {
+  var state = extractState();
+  showStatus('Sending...');
+  google.script.run
+    .withSuccessHandler(function(res){
+      showStatus('');
+    })
+    .withFailureHandler(failureHandler)
+    .clientAddChart(state, 'scatter');
+}
 
 var expand = { x: false, y: false };
 
 function toggleVar(varName){
-	var elemId = varName + 'Def';
+  var elemId = varName + 'Def';
+    
+    document.getElementById(elemId).classList.toggle('collapse');
+}
 
-	removeClass(document.getElementById(elemId), 'collapse');
-	if(expand[varName]){
-		addClass(document.getElementById(elemId), 'collapse');
-	}
+function showStatus(msg, classId) {
+  var status = $('#status'); 
+  status.className = ""
+  status.innerHTML = msg;
+  if (classId) {
+    status.classList.add(classId);
+  }
+}
 
-	expand[varName] = !expand[varName];
+function failureHandler(err) {
+  console.error(err);
+  showStatus('Something went wrong: ' + err, 'error');
 }
 
 </script>
