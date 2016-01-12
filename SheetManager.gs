@@ -1,5 +1,9 @@
 var SheetManager = (function(sheet){
  
+  var getID = function() {
+    return SpreadsheetApp.getActiveSpreadsheet().getId();
+  }
+  
   var getValues = function(varName){
     var data = sheet.getDataRange().getValues();
     for(var colIdx = 0; colIdx < data[0].length; colIdx++){
@@ -14,6 +18,12 @@ var SheetManager = (function(sheet){
     return sheet.getRange(2, colIdx+1, rowIdx-1).getValues().map(function(e){ return e[0]; });
   }
   
+  var getMultipleValues = function(varNameX, varNameY) {
+    var returnedValues = { x: getValues(varNameX), y: getValues(varNameY) };
+    
+    return returnedValues;
+  }
+  
   var fetchRange = function(varName){
     var data = sheet.getDataRange().getValues();
     for(var colIdx = 0; colIdx < data[0].length; colIdx++){
@@ -26,6 +36,32 @@ var SheetManager = (function(sheet){
     } while(data[rowIdx] && data[rowIdx][colIdx]);
   
     return sheet.getRange(1, colIdx+1, rowIdx-1);
+  }
+  
+  var getQuery = function(varName1, varName2) {
+    var A1Notation, firstA1, secondA1, endRow;
+    var query = {};
+    firstA1 = fetchRange(varName1).getA1Notation();
+    
+    if (varName2) {
+      secondA1 = fetchRange(varName2).getA1Notation();
+      query.A1Notation = [firstA1, secondA1].join(',');
+      query.columnTwo = secondA1[0];
+      endRow = secondA1.split(":")[1];
+      while (/\D/.test(endRow.charAt(0)))
+        endRow = endRow.substr(1);
+      query.limit = endRow;
+    } else {
+      query.A1Notation = firstA1;
+      endRow = firstA1.split(":")[1];
+      while (/\D/.test(endRow.charAt(0)))
+        endRow = endRow.substr(1);
+      query.limit = endRow;
+    }
+    
+    query.columnOne = firstA1[0];
+    
+    return query;
   }
   
   var getVariables = function(){
@@ -48,18 +84,26 @@ var SheetManager = (function(sheet){
     return augmented;
   }
   
-  var addChart = function(config, type) {
-    // Fetch charts sheet
-    var sheetName = 'Charts';
+  var setupNamedSheet = function(sheetName) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-    SpreadsheetApp.setActiveSheet(sheet);
     
     if (sheet === undefined || sheet === null) {
       SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName);
+    } else {
+      SpreadsheetApp.setActiveSheet(sheet);
     }
     
+    return sheet;
+  }
+  
+  var addChart = function(config, type) {
+    var yRange;
+    var sheet = setupNamedSheet('Charts');
+    
     var xRange = fetchRange(config.x.variable);
-    var yRange = fetchRange(config.y.variable);
+    if (config.y) {
+      yRange = fetchRange(config.y.variable);
+    }
     
     switch (type) {
       case "scatter":
@@ -73,6 +117,13 @@ var SheetManager = (function(sheet){
     for(var idx in charts){
       sheet.removeChart(charts[idx]);
     }
+  }
+  
+  var addStats = function(data) {
+    var sheet = setupNamedSheet('Statistics');
+    var rowToStart = sheet.getLastRow();
+
+    sheet.getRange(rowToStart + 1, 1, 4, 2).setValues(data);
   }
         
   var getCoordinates = function(latitude, longitude){
@@ -159,20 +210,17 @@ var SheetManager = (function(sheet){
     formResponseSheet.appendRow([date, location, institution, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
   }
   
-  function getMultipleValues(varnameX, varnameY) {
-    var returnedValues = { x: getValues(varnameX), y: getValues(varnameY) };
-    
-    return returnedValues;
-  }
-  
   return {
+    getID: getID,
     getVariables: getVariables,
     destroyCharts: destroyCharts,
     getValues: getValues,
     getMultipleValues: getMultipleValues,
+    getQuery: getQuery,
     getCoordinates: getCoordinates,
     addFormSubmission: addFormSubmission,
-    addChart: addChart
+    addChart: addChart,
+    addStats: addStats
   };
   
 })(SpreadsheetApp.getActiveSheet());

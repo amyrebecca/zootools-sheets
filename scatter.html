@@ -10,14 +10,15 @@
       <h1>Scatter Plot Helper</h1>
     </div>
     <div class="block">
-      You may change the independent (X) and dependent (Y) variables below, then press Plot to draw or redraw the plot.
+      <p>You may change the independent (X) and dependent (Y) variables below, then press Plot to draw or redraw the plot.</p>
+      <button class="button green" onclick="getVariables()">Refresh</button>
     </div>
     <div class="block">
       <? columnDefs = clientGetVariables(); ?>
       <fieldset>
       <legend>X Variable</legend>
       <div class="block form-group collapse" id="xDef">
-        <select id="xVar" style="width: 100%;" oninput="updateSelection('x')" disabled>
+        <select id="xVar" data-select="variable" style="width: 100%;" oninput="updateSelection('x')" disabled>
           <? for(var i = 0; i < columnDefs.length; i++) { ?>
             <option><?= columnDefs[i].name ?></option>
           <? } ?>
@@ -46,7 +47,7 @@
       <fieldset>
       <legend>Y Variable</legend>
       <div class="block form-group collapse" id="yDef">
-        <select id="yVar" style="width: 100%;" oninput="updateSelection('y')" disabled>
+        <select id="yVar" data-select="variable" style="width: 100%;" oninput="updateSelection('y')" disabled>
           <? for(var i = 0; i < columnDefs.length; i++) { ?>
             <option><?= columnDefs[i].name ?></option>
           <? } ?>
@@ -73,11 +74,20 @@
       </div>
       </fieldset>
     </div>
+    <div class="trendline-option-container">
+      <label for="trendlineSelector">Trendline</label>
+      <select id="trendlineSelector" name="trendline" onclick="updateSelection('trendlines')">
+        <option value="none" selected>None</option>
+        <option value="linear">Linear</option>
+        <option value="exponential">Exponential</option>
+        <option value="polynomial">Polynomial</option>
+      </select>
+    </div>
     <div id="chart-preview" style="width: 100%"></div>
     <div class="action-button-bar" style="text-align: center; ">
       <div id="status" style="display: block; margin: 1em;"></div>
       <button type="button" id="updateBtn" class="button action" onclick="clientChangeSelection()" disabled>Plot</button>
-      <button type="button" id="sendToSheetBtn" class="button create" onclick="sendToSheet()" disabled>Send to Sheet</button>
+      <button type="button" id="sendToSheetBtn" class="button create" onclick="clientSendToSheet()" disabled>Send to Sheet</button>
       <button type="button" class="button" onclick="google.script.host.close()">Close</button>
     </div>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>

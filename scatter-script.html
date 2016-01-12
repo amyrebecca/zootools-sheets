@@ -2,12 +2,25 @@
 // Setup and utility functions
 var columnDefs;
 var config = null;
-var store = null;
 var chart = null;
 var $ = function(sel){ return document.querySelector(sel); };
 var clean = function(node){ return !!node.value ? parseFloat(node.value) : null; };
-var enable = function(node){ node.removeAttribute('disabled'); }
-var disable = function(node){ node.setAttribute('disabled', true); }
+var enable = function(node){ node.removeAttribute('disabled'); };
+var disable = function(node){ node.setAttribute('disabled', true); };
+
+function showStatus(msg, classId) {
+  var status = $('#status'); 
+  status.className = ""
+  status.innerHTML = msg;
+  if (classId) {
+    status.classList.add(classId);
+  }
+}
+
+function failureHandler(err) {
+  console.error(err);
+  showStatus('Something went wrong: ' + err, 'error');
+}
 
 // Load the Google Visualization library
 google.load("visualization", "1", {packages:["corechart"]});
@@ -17,24 +30,51 @@ google.setOnLoadCallback(loadChart);
 function loadChart() {
   chart = new google.visualization.ScatterChart($('#chart-preview'));
 } 
+
 // use async call to determine initial state of dropdown lists
 // from contents of chart cells
-google.script.run.withSuccessHandler(function(res){
-  console.log('res', res);
-  var refs = {};
-  for(var idx in res){
-    // Handle if user is not on a sheet with data! Response returns empty string for names
-    if (res.length === 1) {
-      showStatus('No variables to choose from. Close and reopen helper on sheet with data.');
-    }
- 
-    refs[res[idx].name] = res[idx];
+function getVariables() {
+  showStatus('Getting variables...');
+  google.script.run
+    .withSuccessHandler(function(res){
+      var refs = {};
+      for(var idx in res) {
+        refs[res[idx].name] = res[idx];
+      }
+      columnDefs = refs;
+    
+      // Handle if user is not on a sheet with no data
+      if (res.length === 0) {
+        showStatus('No variables to choose from.');
+      }
+      
+      if (res !== columnDefs) {
+        addVariableOptions()
+      }
+      enable($('#xVar'));
+      enable($('#yVar'));
+      enable($('#updateBtn'));
+      showStatus('');
+    })
+    .withFailureHandler(failureHandler)
+    .clientGetVariables();
+}
+
+getVariables();
+
+function addVariableOptions() {
+  var options = '';
+  var selects = document.querySelectorAll('select[data-select="variable"]');
+  
+  for (var key in columnDefs) {
+    var newOption = '<option>' + columnDefs[key].name + '</option>';
+    options += newOption;
   }
-  columnDefs = refs;
-  enable($('#xVar'));
-  enable($('#yVar'));
-  enable($('#updateBtn'));
-}).clientGetVariables();
+  
+  for (var i = 0; i < selects.length; i++) {
+    selects[i].innerHTML = options;
+  }
+}
 
 function applyState(config){
   disable($('#xMin')); disable($('#xMax'));
@@ -47,6 +87,7 @@ function applyState(config){
   $('#yVar').value = config.y.variable;
   $('#invertY').checked = config.y.axes.invert;
   $('#logY').checked = config.y.axes.log;
+  $('#trendlineSelector').value = config.trendlines;
   
   if(config.x.range){
     $('#xScaleSpecific').checked = true;
@@ -82,7 +123,8 @@ function extractState(){
       variable: $('#yVar').value,
       axes: { invert: $('#invertY').checked, log: $('#logY').checked },
       range: $('#yScaleDefault').checked ? null : { min: clean($('#yMin')), max: clean($('#yMax')) }
-    }
+    },
+    trendlines: $('#trendlineSelector').value
   };
 
   return res;
@@ -92,7 +134,7 @@ function extractState(){
 // able to submit (plotting X vs. X just makes no sense)
 function updateSelection(src){
     var state = extractState();
-    if(src){
+    if (src) {
       var target = state[src];
       var defRow = columnDefs[target.variable];
       target.axes.invert = defRow.invert;
@@ -102,8 +144,15 @@ function updateSelection(src){
         target.range = { min: defRow.min, max: defRow.max };
       }
     }
+
     applyState(state);
-  updateBtn.removeAttribute('disabled');
+    updateBtn.removeAttribute('disabled');
+}
+
+function toggleVar(varName){
+  var elemId = varName + 'Def';
+    
+  document.getElementById(elemId).classList.toggle('collapse');
 }
 
 // update the chart from the client's selected variables
@@ -151,7 +200,8 @@ function buildChartOptions(state) {
   if (state.x.axes.log === true) { options.hAxis.logScale = true; }
   if (state.y.axes.invert === true) { options.vAxis.direction = -1; }
   if (state.y.axes.log === true) { options.vAxis.logScale = true; }
-  
+  if (state.trendlines !== "none") { options.trendlines = state.trendlines; }
+
   return options;
 }
 
@@ -161,7 +211,7 @@ function previewChart(spreadsheetValues) {
   var data = google.visualization.arrayToDataTable(load);
   var options = buildChartOptions(state);
   var sendToSheetBtn = $('#sendToSheetBtn');
-  
+
   disable(sendToSheetBtn);
   
   // Add event listener
@@ -173,7 +223,7 @@ function previewChart(spreadsheetValues) {
   chart.draw(data, options);
 }
 
-function sendToSheet() {
+function clientSendToSheet() {
   var state = extractState();
   showStatus('Sending...');
   google.script.run
@@ -182,28 +232,6 @@ function sendToSheet() {
     })
     .withFailureHandler(failureHandler)
     .clientAddChart(state, 'scatter');
-}
-
-var expand = { x: false, y: false };
-
-function toggleVar(varName){
-  var elemId = varName + 'Def';
-    
-    document.getElementById(elemId).classList.toggle('collapse');
-}
-
-function showStatus(msg, classId) {
-  var status = $('#status'); 
-  status.className = ""
-  status.innerHTML = msg;
-  if (classId) {
-    status.classList.add(classId);
-  }
-}
-
-function failureHandler(err) {
-  console.error(err);
-  showStatus('Something went wrong: ' + err, 'error');
 }
 
 </script>
