@@ -84,7 +84,7 @@ var SheetManager = (function(sheet){
     return augmented;
   }
   
-  var setupNamedSheet = function(sheetName) {
+  var setupNamedSheet = function(sheetName, callback) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
     
     if (sheet === undefined || sheet === null) {
@@ -92,8 +92,8 @@ var SheetManager = (function(sheet){
     } else {
       SpreadsheetApp.setActiveSheet(sheet);
     }
-    
-    return sheet;
+
+    callback();
   }
   
   var addChart = function(config, type) {
@@ -120,10 +120,12 @@ var SheetManager = (function(sheet){
   }
   
   var addStats = function(data) {
-    var sheet = setupNamedSheet('Statistics');
-    var rowToStart = sheet.getLastRow();
+    setupNamedSheet('Statistics', function() {
+      var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Statistics');
+      var rowToStart = sheet.getLastRow();
 
-    sheet.getRange(rowToStart + 1, 1, 4, 2).setValues(data);
+      sheet.getRange(rowToStart + 1, 1, 4, 2).setValues(data);                                      
+    });
   }
         
   var getCoordinates = function(latitude, longitude){
