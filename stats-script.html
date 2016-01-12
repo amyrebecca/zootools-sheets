@@ -68,24 +68,26 @@ function addVariableOptions() {
 
 function calculateNew(){
 	var varName = $('#varName').value;
-    var resultsList = $('#resultList');
+  var resultsList = $('#resultList');
+  showStatus('Calculating...');
 	google.script.run
-      .withSuccessHandler(function(res){
-		summary = {
-			name: varName,
-			min: math.round(math.min(res),3),
-			max: math.round(math.max(res),3),
-			mean: math.round(math.mean(res),3),
-			stdev: math.round(math.std(res),3)
-		}
+    .withSuccessHandler(function(res){
+		  summary = {
+			  name: varName,
+			  min: math.round(math.min(res),3),
+			  max: math.round(math.max(res),3),
+			  mean: math.round(math.mean(res),3),
+			  stdev: math.round(math.std(res),3)
+		  }
 
-		resultsList.innerHTML = statTemplate(summary);
-        resultsList.classList.remove('hide');
-        resultsList.classList.add('show');
-        enable($('#addToSheetBtn'));
+		  resultsList.innerHTML = statTemplate(summary);
+      resultsList.classList.remove('hide');
+      resultsList.classList.add('show');
+      enable($('#addToSheetBtn'));
+      showStatus('');
 	  })
-      .withFailureHandler(failureHandler)
-      .clientGetValues(varName);
+    .withFailureHandler(failureHandler)
+    .clientGetValues(varName);
 }
 
 var compile = function(selector){
