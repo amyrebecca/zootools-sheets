@@ -3,10 +3,8 @@ var UIManager = (function(){
     registerMenu: function(){
       var ui = SpreadsheetApp.getUi();
       ui.createMenu('Zoo Tools')
-          .addItem('Scatter Plot Helper', 'clientShowScatterSidebar')
-          .addItem('Bar Chart Helper', 'clientShowSidebar')
-          .addItem('Histogram Helper', 'clientShowSidebar')
-          .addItem('Summary Stats Helper', 'clientShowSidebar')
+          .addItem('Scatter Plot Helper', 'clientShowScatter')
+          .addItem('Summary Stats Helper', 'clientShowStats')
           .addSubMenu(ui.createMenu('Map')
             .addItem('Map Helper', 'clientShowMapDialog')
             .addItem('Student Location Survey', 'clientShowFormDialog'))

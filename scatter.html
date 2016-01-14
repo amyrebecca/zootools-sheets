@@ -10,66 +10,87 @@
       <h1>Scatter Plot Helper</h1>
     </div>
     <div class="block">
-      You may change the independent (X) and dependent (Y) variables below, then press Update to redraw the plot.
+      <p>You may change the independent (X) and dependent (Y) variables below, then press Plot to draw or redraw the plot.</p>
+      <button class="button green" onclick="getVariables()">Refresh</button>
     </div>
     <div class="block">
       <? columnDefs = clientGetVariables(); ?>
       <fieldset>
       <legend>X Variable</legend>
       <div class="block form-group collapse" id="xDef">
-        <select id="xVar" style="width: 100%;" oninput="updateSelection('x')" disabled>
+        <select id="xVar" data-select="variable" style="width: 100%;" oninput="updateSelection('x')" disabled>
           <? for(var i = 0; i < columnDefs.length; i++) { ?>
             <option><?= columnDefs[i].name ?></option>
           <? } ?>
         </select>
         <div class="extended">
-          <p><strong>Axis</strong></p>
-          <div style="float: right; width: 50%;"><input type="checkbox" id="logX" onclick="updateSelection()"><label for="logX">Logarithmic</label></div>
-          <div><input type="checkbox" id="invertX" onclick="updateSelection()"/><label for="invertX">Invert</label></div>
-        </div>
-        <div class="extended" id="xRange">
-          <p><strong>Range</strong></p>
-          <p><input type="radio" id="xScaleDefault" name="xScale" onclick="updateSelection()" checked><label for="xScaleDefault">Auto</label></p>
-          <p><input type="radio" id="xScaleSpecific" name="xScale" onclick="updateSelection()"><label for="xScaleSpecific">Specified</label></p>
-          <div style="text-indent: 1.5em;">
-            <div style="text-align: justify"><input type="text" pattern="\d*" id="xMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="text" pattern="\d*" id="xMax" style="width: 30%; " disabled /></div>
+          <div>
+            <p><strong>Axis</strong></p>
+            <div style="float: right; width: 50%;"><input type="checkbox" id="logX" onclick="updateSelection()"><label for="logX">Logarithmic</label></div>
+            <div><input type="checkbox" id="invertX" onclick="updateSelection()"/><label for="invertX">Invert</label></div>
+          </div>
+          <div id="xRange">
+            <p><strong>Range</strong></p>
+            <p><input type="radio" id="xScaleDefault" name="xScale" onclick="updateSelection()" checked><label for="xScaleDefault">Auto</label></p>
+            <p><input type="radio" id="xScaleSpecific" name="xScale" onclick="updateSelection()"><label for="xScaleSpecific">Specified</label></p>
+            <div style="text-indent: 1.5em;">
+              <div style="text-align: justify"><input type="text" pattern="\d*" id="xMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="text" pattern="\d*" id="xMax" style="width: 30%; " disabled /></div>
+            </div>
           </div>
         </div>
-        <a href="javascript:void(0);"><span class="toggle toggle-more" onclick="toggleVar('x')">More &#9662;</span></a>
-        <a href="javascript:void(0);"><span class="toggle toggle-less" onclick="toggleVar('x')">Less &#9652;</span></a>
+        <div class="toggle-buttons">
+          <button type="button" class="toggle toggle-more" onclick="toggleVar('x')">More &#9662;</button>
+          <button type="button" class="toggle toggle-less" onclick="toggleVar('x')">Less &#9652;</button>
+        </div>
       </div>
       </fieldset>
       <fieldset>
       <legend>Y Variable</legend>
       <div class="block form-group collapse" id="yDef">
-        <select id="yVar" style="width: 100%;" oninput="updateSelection('y')" disabled>
+        <select id="yVar" data-select="variable" style="width: 100%;" oninput="updateSelection('y')" disabled>
           <? for(var i = 0; i < columnDefs.length; i++) { ?>
             <option><?= columnDefs[i].name ?></option>
           <? } ?>
         </select>
         <div class="extended">
-          <p><strong>Axis</strong></p>
-          <div style="float: right; width: 50%;"><input type="checkbox" id="logY" onclick="updateSelection()"><label for="logY">Logarithmic</label></div>
-          <div><input type="checkbox" id="invertY" onclick="updateSelection()"/><label for="invertY">Invert</label></div>
-        </div>
-        <div class="extended" id="xRange">
-          <p><strong>Range</strong></p>
-          <p><input type="radio" id="yScaleDefault" name="yScale" onclick="updateSelection()" checked><label for="yScaleDefault">Auto</label></p>
-          <p><input type="radio" id="yScaleSpecific" name="yScale" onclick="updateSelection()"><label for="yScaleSpecific">Specified</label></p>
-          <div style="text-indent: 1.5em;">
-            <div style="text-align: justify"><input type="text" pattern="\d*" id="yMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="text" pattern="\d*" id="yMax" style="width: 30%; " disabled /></div>
+          <div>
+            <p><strong>Axis</strong></p>
+            <div style="float: right; width: 50%;"><input type="checkbox" id="logY" onclick="updateSelection()"><label for="logY">Logarithmic</label></div>
+            <div><input type="checkbox" id="invertY" onclick="updateSelection()"/><label for="invertY">Invert</label></div>
+          </div>
+          <div id="xRange">
+            <p><strong>Range</strong></p>
+            <p><input type="radio" id="yScaleDefault" name="yScale" onclick="updateSelection()" checked><label for="yScaleDefault">Auto</label></p>
+            <p><input type="radio" id="yScaleSpecific" name="yScale" onclick="updateSelection()"><label for="yScaleSpecific">Specified</label></p>
+            <div style="text-indent: 1.5em;">
+              <div style="text-align: justify"><input type="text" pattern="\d*" id="yMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="text" pattern="\d*" id="yMax" style="width: 30%; " disabled /></div>
+            </div>
           </div>
         </div>
-        <a href="javascript:void(0);"><span class="toggle toggle-more" onclick="toggleVar('y')">More &#9662;</span></a>
-        <a href="javascript:void(0);"><span class="toggle toggle-less" onclick="toggleVar('y')">Less &#9652;</span></a>
+        <div class="toggle-buttons">
+          <button type="button" class="toggle toggle-more" onclick="toggleVar('y')">More &#9662;</button>
+          <button type="button" class="toggle toggle-less" onclick="toggleVar('y')">Less &#9652;</button>
+        </div>
       </div>
       </fieldset>
     </div>
-    <div class="block form-group" style="text-align: center; ">
-      <button id="updateBtn" class="action" onclick="clientChangeSelection()" disabled>Update</button>
-      <button onclick="google.script.host.close()">Close</button>
+    <div class="trendline-option-container">
+      <label for="trendlineSelector">Trendline</label>
+      <select id="trendlineSelector" name="trendline" onclick="updateSelection('trendlines')">
+        <option value="none" selected>None</option>
+        <option value="linear">Linear</option>
+        <option value="exponential">Exponential</option>
+        <option value="polynomial">Polynomial</option>
+      </select>
     </div>
-    
+    <div id="chart-preview" style="width: 100%"></div>
+    <div class="action-button-bar" style="text-align: center; ">
+      <div id="status" style="display: block; margin: 1em;"></div>
+      <button type="button" id="updateBtn" class="button action" onclick="clientChangeSelection()" disabled>Plot</button>
+      <button type="button" id="sendToSheetBtn" class="button create" onclick="clientSendToSheet()" disabled>Send to Sheet</button>
+      <button type="button" class="button" onclick="google.script.host.close()">Close</button>
+    </div>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <?!= include('scatter-script'); ?>
   </body>
 </html>

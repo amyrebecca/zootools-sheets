@@ -1,20 +1,68 @@
 <style type="text/css">
+  /* Button reset */
+  button, button:focus, button:hover {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    line-height: inherit;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    text-decoration: none
+  }
+  
+  .button.create {
+    padding: 0 0.25em;
+  }
+  
+  .show { display: block; } 
+  .hide { display: none; }
+  
   fieldset{ margin-bottom: 2em; } 
   legend{ margin-left: -0.4em; }
-  .collapse .extended{ display: none; }
-  .extended{ display: block; }
-  .toggle{ font-size: 0.9em; float: right; margin-top: 1em; cursor: pointer; }
+  
+  .collapse .extended { 
+    max-height: 0;
+  }
+    
+  .extended {  
+    max-height: 200px;
+    overflow-y: hidden;
+    transition: all .5s ease-in-out;
+    -webkit-transition: all .5s ease-in-out;
+  }
+  
+  .toggle-buttons {
+    float: right;
+    position: relative;
+    width: 100%;
+  } 
+  
+  .toggle, .toggle:hover, .toggle:focus { 
+    float: right;
+    font-size: 0.9em;  
+    margin-top: 1em; 
+    cursor: pointer; 
+  }
+  
   .toggle-more{ display: none; }
   .toggle-less{ }
-  .collapse .toggle-more{ display: block; }
-  .collapse .toggle-less{ display: none; }
+  
+  .collapse .toggle-more { 
+    display: block;
+  }
+  
+  .collapse .toggle-less { 
+    display: none; 
+  }
   .preinit fieldset{ display: none; }
   
   .dialog {
     margin: 0;
   }
   
-  .dialog h6 {
+ .dialog h6 {
     margin: 0 0 0.5em 0;
   }
 
@@ -42,5 +90,13 @@
   
   .dialog .dialog-button-bar {
     margin: 10px 0;
+  }
+  
+  .stats-table td {
+    text-align: center;
+  }
+  
+  .stats-table th {
+    padding: 0.5em 0;
   }
 </style>

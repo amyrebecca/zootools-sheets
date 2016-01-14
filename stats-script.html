@@ -4,20 +4,90 @@
 var columnDefs = null;
 var template = null;
 var statTemplate = null;
+var summary = null;
+var $ = function(sel){ return document.querySelector(sel); };
+var enable = function(node){ node.removeAttribute('disabled'); }
+var disable = function(node){ node.setAttribute('disabled', true); }
+
+function showStatus(msg, classId) {
+  var status = $('#status'); 
+  status.className = ""
+  status.innerHTML = msg;
+  if (classId) {
+    status.classList.add(classId);
+  }
+}
+
+function failureHandler(err) {
+  console.error(err);
+  showStatus('Something went wrong: ' + err, 'error');
+}
+
+// use async call to determine initial state of dropdown lists
+// from contents of chart cells
+function getVariables() {
+  showStatus('Getting variables...');
+  google.script.run
+    .withSuccessHandler(function(res){
+      var refs = {};
+      for(var idx in res){
+        refs[res[idx].name] = res[idx];
+      }
+      columnDefs = refs;
+    
+      // Handle if user is not on a sheet with no data
+      if (res.length == 0) {
+        showStatus('No variables to choose from.');
+      }
+      
+      if (res != columnDefs) {
+        addVariableOptions()
+      }
+      showStatus('');
+      enable($('#calcBtn'));
+    })
+    .withFailureHandler(failureHandler)
+    .clientGetVariables();
+}
+
+getVariables();
+
+function addVariableOptions() {
+  var options = '';
+  var selects = document.querySelectorAll('select');
+  
+  for (var key in columnDefs) {
+    var newOption = '<option>' + columnDefs[key].name + '</option>';
+    options += newOption;
+  }
+  
+  for (var i = 0; i < selects.length; i++) {
+    selects[i].innerHTML = options;
+  }
+}
 
 function calculateNew(){
-	var varName = document.querySelector('#varName').value;
-	google.script.run.withSuccessHandler(function(res){
-		var summary = {
-			name: varName,
-			min: math.round(math.min(res),7),
-			max: math.round(math.max(res),7),
-			mean: math.round(math.mean(res),7),
-			stdev: math.round(math.std(res),7)
-		}
+	var varName = $('#varName').value;
+  var resultsList = $('#resultList');
+  showStatus('Calculating...');
+	google.script.run
+    .withSuccessHandler(function(res){
+		  summary = {
+			  name: varName,
+			  min: math.round(math.min(res),3),
+			  max: math.round(math.max(res),3),
+			  mean: math.round(math.mean(res),3),
+			  stdev: math.round(math.std(res),3)
+		  }
 
-		document.querySelector('#resultList').innerHTML += statTemplate(summary);
-	}).clientGetValues(varName);
+		  resultsList.innerHTML = statTemplate(summary);
+      resultsList.classList.remove('hide');
+      resultsList.classList.add('show');
+      enable($('#addToSheetBtn'));
+      showStatus('');
+	  })
+    .withFailureHandler(failureHandler)
+    .clientGetValues(varName);
 }
 
 var compile = function(selector){
@@ -50,7 +120,22 @@ var compile = function(selector){
 };
 
 var statTemplate = compile('#result');
-document.querySelector('#resultList').className = '';
+
+function clientAddToSheet() {
+  var dataTable = [
+    [summary.name + " Min", summary.min],
+    [summary.name + " Max", summary.max],
+    [summary.name + " Mean", summary.mean],
+    [summary.name + " Std. Dev.", summary.stdev]
+  ];
+  showStatus('Sending...');
+  
+  google.script.run
+    .withSuccessHandler(function() {
+      showStatus('');
+    })
+    .withFailureHandler(failureHandler)
+    .clientAddStats(dataTable);
+}
 
 </script>
-

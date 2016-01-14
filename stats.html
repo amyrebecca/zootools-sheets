@@ -12,51 +12,53 @@
     <div class="block form-group">
       <p>Calculate summary statistics for selected variables.</p>
     </div>
-    <div class="preinit" id="resultList">
+    <div class="preinit" id="resultList" class="hide">
 
-    <div class="block form-group item result">
-        <table style="margin-left: 0.2em; width: 100%;">
+    <div class="block form-group" id="result">
+        <table class="stats-table" style="margin-left: 0.2em; width: 100%;" summary="The minimum, maximum, mean, and standard deviation (row headings) of the selected variable.">
           <colgroup>
-            <col style="width: 45%;" />
-            <col style="width: 55%;" />
+            <col style="width: 25%;" />
+            <col style="width: 75%;" />
           </colgroup>
+          <caption><strong>{{name}}</strong></caption>
           <tbody>
             <tr>
-              <td><strong>{{name}} Min</strong></td>
+              <th scope="row"><strong>Min</strong></th>
               <td> {{min}}</td>
             </tr>
             <tr>
-              <td><strong>{{name}} Max</strong></td>
+              <th scope="row"><strong>Max</strong></th>
               <td> {{max}}</td>
             </tr>
             <tr>
-              <td><strong>{{name}} Mean</strong></td>
+              <th scope="row"><strong>Mean</strong></th>
               <td> {{mean}} </td>
             </tr>
             <tr>
-              <td><strong>{{name}} Std. Dev.</strong></td>
+              <th scope="row"><strong>Std. Dev.</strong></th>
               <td> {{stdev}} </td>
             </tr>
           </tbody>
         </table>
     </div>
-
     </div>
     
     <p />
     <? columnDefs = clientGetVariables(); ?>
     <div class="block form-group">
-    <select id="varName" style="width: 100%;" >
-    <? for(var i = 0; i < columnDefs.length; i++) { ?>
-    <option><?= columnDefs[i].name ?></option>
-    <? } ?>
-    </select>
+      <select id="varName" style="width: 70%;" >
+        <? for(var i = 0; i < columnDefs.length; i++) { ?>
+        <option><?= columnDefs[i].name ?></option>
+        <? } ?>
+      </select>
+      <button class="button green" onclick="getVariables()">Refresh</button>
     </div> 
     <div class="block form-group" style="text-align: center; ">
-      <button id="calcBtn" class="action" onclick="calculateNew()">Calculate</button>
-      <button onclick="google.script.host.close()">Close</button>
+      <div id="status" style="display: block; margin: 1em;"></div>
+      <button id="calcBtn" class="button action" onclick="calculateNew()" disabled>Calculate</button>
+      <button id="addToSheetBtn" class="button create" onclick="clientAddToSheet()" disabled>Add to Sheet</button>
+      <button class="button" onclick="google.script.host.close()">Close</button>
     </div>      
     <?!= include('stats-script'); ?>
   </body>
 </html>
-

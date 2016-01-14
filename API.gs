@@ -10,6 +10,10 @@ function clientSetConfiguration(config){
   SheetManager.updateChart(config);
 }
 
+function clientGetSpreadsheetID() {
+  return SheetManager.getID();
+}
+
 function clientGetVariables(){ 
   return SheetManager.getVariables(); 
 };
@@ -42,10 +46,26 @@ function clientGetCoordinates(latitude, longitude){
   return SheetManager.getCoordinates(latitude, longitude);
 };
 
-function clientGetValues(varname){
-  return SheetManager.getValues(varname);
+function clientGetValues(varName){
+  return SheetManager.getValues(varName);
 };
+
+function clientGetMultipleValues(varNameX, varNameY) {
+  return SheetManager.getMultipleValues(varNameX, varNameY);
+}
+
+function clientQuery(varName1, varName2) {
+  return SheetManager.getQuery(varName1, varName2);
+} 
 
 function clientAddFormSubmission(institution, institutionAddress, location, locationAddress){
   return SheetManager.addFormSubmission(institution, institutionAddress, location, locationAddress);
 };
+
+function clientAddChart(config, type) {
+  return SheetManager.addChart(config, type);
+}
+
+function clientAddStats(data) {
+  return SheetManager.addStats(data);
+}
