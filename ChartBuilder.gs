@@ -47,7 +47,38 @@ var ChartBuilder = (function() {
     sheet.insertChart(chart);
   }
   
+  var addColumnChart = function(data, config) {
+    // setup pseudo-histogram data range in sheet
+    var xRange, yRange;
+    var columnChartDataSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Histogram Chart Data');
+    var numColumns = data[0].length;
+    var numRows = data.length;
+    var columnToStart = columnChartDataSheet.getLastColumn() + 1;
+    var range = columnChartDataSheet.getRange(1, columnToStart, numRows, numColumns);
+    range.setValues(data);
+    xRange = columnChartDataSheet.getRange(1, columnToStart, numRows, 1);
+    yRange = columnChartDataSheet.getRange(1, columnToStart + 1, numRows, 1);
+    
+    // setup pseudo-histogram chart using column chart
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Charts');
+    var offset = determineOffset();
+    var chart = sheet.newChart().asColumnChart();
+    chart.setTitle('Frequency vs ' + config.x.variable)
+      .setYAxisTitle('Frequency')
+      .setXAxisTitle(config.x.variable)
+      .addRange(xRange)
+      .addRange(yRange)
+      .setOption('legend.position', 'none')
+      .setOption('bars.groupWidth', '100%')
+      .setPosition(3, 2, 0, offset);
+    
+    chart = chart.build();
+    sheet.insertChart(chart);
+    SpreadsheetApp.setActiveSheet(sheet);
+  }
+  
   return {
-    addScatterChart: addScatterChart
+    addScatterChart: addScatterChart,
+    addColumnChart: addColumnChart
   };
 })();

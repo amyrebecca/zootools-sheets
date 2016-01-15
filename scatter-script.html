@@ -151,8 +151,15 @@ function updateSelection(src){
 
 function toggleVar(varName){
   var elemId = varName + 'Def';
-    
-  document.getElementById(elemId).classList.toggle('collapse');
+  var extensionEl = $('div[data-options="' + varName + '"]');
+
+  if (extensionEl.getAttribute("aria-hidden") === 'true') {
+    extensionEl.setAttribute("aria-hidden", "false");
+  } else {
+    extensionEl.setAttribute("aria-hidden", "true");
+  }
+  
+  $("#" + elemId).classList.toggle('collapse');
 }
 
 // update the chart from the client's selected variables
@@ -231,7 +238,7 @@ function clientSendToSheet() {
       showStatus('');
     })
     .withFailureHandler(failureHandler)
-    .clientAddChart(state, 'scatter');
+    .clientAddChart(state, null, 'scatter');
 }
 
 </script>

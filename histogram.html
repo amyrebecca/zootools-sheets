@@ -5,13 +5,42 @@
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
     <?!= include('styles'); ?>
   </head>
-  <body>
+  <body class="sidebar">
     <div class="block">
+      <h1>Histogram Helper</h1>
     </div>
-    <div class="block form-group" style="text-align: center; ">
-      <button id="updateBtn" class="action" onclick="clientChangeSelection()" disabled>Update</button>
-      <button onclick="google.script.host.close()">Close</button>
+    <div class="block">
+      You may change the histogram variable below, then press Plot to draw or redraw the plot.
     </div>
+    <div class="block">
+      <? columnDefs = clientGetVariables(); ?>
+      <fieldset>
+      <legend>Histogram Variable</legend>
+      <div class="block form-group collapse" id="xDef">
+        <select id="xVar" data-select="variable" style="width: 70%;" oninput="updateSelection('x')" disabled>
+          <? for(var i = 0; i < columnDefs.length; i++) { ?>
+            <option><?= columnDefs[i].name ?></option>
+          <? } ?>
+        </select>
+        <button class="button green" onclick="getVariables()">Refresh</button>
+        <div class="extended" aria-hidden="true" data-options="x">
+          <p>options</p>
+        </div>
+        <div class="toggle-buttons">
+          <button type="button" class="toggle toggle-more" onclick="toggleVar('x')">More &#9662;</button>
+          <button type="button" class="toggle toggle-less" onclick="toggleVar('x')">Less &#9652;</button>
+        </div>
+      </div>
+      </fieldset>
+    </div>
+    <div id="chart-preview" style="width: 100%"></div>
+    <div class="action-button-bar" style="text-align: center; ">
+      <div id="status" style="display: block; margin: 1em;"></div>
+      <button type="button" id="updateBtn" class="button action" onclick="clientChangeSelection()" disabled>Plot</button>
+      <button type="button" id="sendToSheetBtn" class="button create" onclick="clientSendToSheet()" disabled>Send to Sheet</button>
+      <button type="button" class="button" onclick="google.script.host.close()">Close</button>
+    </div>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     
     <?!= include('histogram-script'); ?>
   </body>
