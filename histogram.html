@@ -24,7 +24,9 @@
         </select>
         <button class="button green" onclick="getVariables()">Refresh</button>
         <div class="extended" aria-hidden="true" data-options="x">
-          <p>options</p>
+          <div>
+            <p><label>Bucket Number: <input id="bucketNum" type="number" min="5" max="10" value="5" onclick="updateSelection()"></label></p>
+          </div>
         </div>
         <div class="toggle-buttons">
           <button type="button" class="toggle toggle-more" onclick="toggleVar('x')">More &#9662;</button>

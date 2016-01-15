@@ -78,13 +78,15 @@ function addVariableOptions() {
 
 function applyState(config){
   $('#xVar').value = config.x.variable;
+  $('#bucketNum').value = config.bucketNum;
 }
 
 function extractState(){
   var res = {
     x: {
       variable: $('#xVar').value
-    }
+    },
+    bucketNum: $('#bucketNum').value
   };
 
   return res;
@@ -120,7 +122,6 @@ function clientChangeSelection(){
     
     google.script.run
       .withSuccessHandler(function(res) {
-        console.log('res', res);
         showStatus('');
         previewChart(res);
       })
@@ -134,7 +135,7 @@ function setupDataTable(spreadsheetValues) {
   var table = [[state.x.variable, 'Frequency']];
   var min = math.min(spreadsheetValues);
   var max = math.max(spreadsheetValues);
-  var bucketNum = 5;
+  var bucketNum = state.bucketNum;
   var bucketSize = math.round((max-min)/bucketNum);
   
   var rangeStart;
@@ -233,5 +234,3 @@ function clientSendToSheet() {
     .clientAddChart(state, data, 'column');
 }
 </script>
-
-
