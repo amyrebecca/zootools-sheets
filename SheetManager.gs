@@ -157,7 +157,7 @@ var SheetManager = (function(sheet){
     return coordinates;
   }
   
-  function getFormResponseSheet() {
+  var getFormResponseSheet = function() {
     var sheetName = 'Student Responses';
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
     var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
@@ -171,11 +171,11 @@ var SheetManager = (function(sheet){
        headerRow.setValues([['DateTime', 'Where are you from?', 'What is your institution?', 'Student latitude', 'Student longitude', 'Institution latitude', 'Institution longitude', 'Calculated Distance']]);
        sheet.setFrozenRows(1); // Freeze header row
     }
- 
+    protectSheet(sheet); //Add sheet protection
     return sheet;
   }
   
-  function getDate() {
+  var getDate = function() {
     var formattedDate;
     var date = new Date();
   
@@ -193,7 +193,7 @@ var SheetManager = (function(sheet){
     return formattedDate;
   }
 
-  function geolocate(geocoder, location) {
+  var geolocate = function(geocoder, location) {
     var latLongResults = [];
     var ui = SpreadsheetApp.getUi()
   
@@ -213,17 +213,43 @@ var SheetManager = (function(sheet){
     return latLongResults;
   }
   
-  function addFormSubmission(institution, institutionAddress, location, locationAddress) {
+  var addFormSubmission = function(institution, institutionAddress, location, locationAddress) {
+
+
+    // Setup latitude and longitude headers if needed
+    var formResponseSheet = getFormResponseSheet();
+    
+    addFormRow(institution, institutionAddress, location, locationAddress, formResponseSheet);
+  }
+  
+  var addFormRow = function(institution, institutionAddress, location, locationAddress, sheet) {
     var geocoder = Maps.newGeocoder(),
         date = getDate(),   
         institutionGeocoded = geolocate(geocoder, institutionAddress),
         locationGeocoded = geolocate(geocoder, locationAddress);
-
-    // Setup latitude and longitude headers if needed
-    var formResponseSheet = getFormResponseSheet();
-    var rowPositionToStart = formResponseSheet.getLastRow() + 1;
     
-    formResponseSheet.appendRow([date, location, institution, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
+
+    unProtectSheet(sheet); // Remote sheet protection
+    sheet.appendRow([date, location, institution, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
+    protectSheet(sheet); // Add sheet protection
+  }
+  
+  var protectSheet = function(sheet) {
+    var user = Session.getEffectiveUser();
+    var protection = sheet.protect();
+    
+    protection.removeEditors(protection.getEditors());
+    if (protection.canDomainEdit()) {
+      protection.setDomainEdit(false);
+    }
+  }
+  
+  var unProtectSheet = function(sheet) {
+    var protection = sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET)[0];
+
+    if (protection) {
+      protection.remove(); 
+    } 
   }
   
   return {

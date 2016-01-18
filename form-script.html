@@ -53,27 +53,21 @@
     showStatus('Working...');
     // Send the value to the server and handle the response.
     google.script.run
-      .withSuccessHandler(onSuccess)
-      .withFailureHandler(onFailure)
+      .withSuccessHandler(successHandler)
+      .withFailureHandler(failureHandler)
       .withUserObject(this)
       .clientAddFormSubmission(institution, institutionAddress, location, locationAddress);
   }
   
-  function onSuccess(){
+  function successHandler(){
     google.script.host.close()
   }
   
-  function onFailure(msg, element){
-    showStatus('Execution failed: ' + msg, 'error');
-    element.disabled = false;
+  function failureHandler(err) {
+    console.error(err);
+    showStatus('Something went wrong: ' + err, 'error');
   }
-  /**
-   * Displays the given status message in the dialog.
-   *
-   * @param {String} msg The status message to display.
-   * @param {String} classId The message type (class id) that the message
-   *   should be displayed as.
-   */
+
   function showStatus(msg, classId) {
     var status = $('#status'); 
     status.className = ""
