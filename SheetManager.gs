@@ -86,9 +86,10 @@ var SheetManager = (function(sheet){
   
   var setupNamedSheet = function(sheetName) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+    var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
     
     if (sheet === undefined || sheet === null) {
-      SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName);
+      SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName, sheets.length + 1);
     } else {
       SpreadsheetApp.setActiveSheet(sheet);
     }
@@ -109,7 +110,7 @@ var SheetManager = (function(sheet){
     }
     
     if (data) {
-      var columnChartDataSheet = setupNamedSheet('Histogram Chart Data', true);
+      var columnChartDataSheet = setupNamedSheet('Histogram Chart Data');
     }
     
     switch (type) {
@@ -129,8 +130,13 @@ var SheetManager = (function(sheet){
   }
   
   var addStats = function(data) {
-    var sheet = setupNamedSheet('Statistics');
-    var rowToStart = sheet.getLastRow();
+    setupNamedSheet('Statistics');    
+    addStatsValues(data);
+  }
+  
+  var addStatsValues = function(data) {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Statistics');
+    var rowToStart = sheet.getLastRow() + 1;
 
     sheet.getRange(rowToStart + 1, 1, 4, 2).setValues(data);
   }
@@ -151,12 +157,13 @@ var SheetManager = (function(sheet){
     return coordinates;
   }
   
-  function getFormResponseSheet() {
+  var getFormResponseSheet = function() {
     var sheetName = 'Student Responses';
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-
+    var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+    
     if (sheet === undefined || sheet === null) {
-       sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName);
+       sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName, sheets.length + 1);
        var lastColumnWithContent = sheet.getLastColumn();
 
        // Setup headers for new sheet
@@ -164,11 +171,11 @@ var SheetManager = (function(sheet){
        headerRow.setValues([['DateTime', 'Where are you from?', 'What is your institution?', 'Student latitude', 'Student longitude', 'Institution latitude', 'Institution longitude', 'Calculated Distance']]);
        sheet.setFrozenRows(1); // Freeze header row
     }
- 
+    protectSheet(sheet); //Add sheet protection
     return sheet;
   }
   
-  function getDate() {
+  var getDate = function() {
     var formattedDate;
     var date = new Date();
   
@@ -186,7 +193,7 @@ var SheetManager = (function(sheet){
     return formattedDate;
   }
 
-  function geolocate(geocoder, location) {
+  var geolocate = function(geocoder, location) {
     var latLongResults = [];
     var ui = SpreadsheetApp.getUi()
   
@@ -206,17 +213,43 @@ var SheetManager = (function(sheet){
     return latLongResults;
   }
   
-  function addFormSubmission(institution, institutionAddress, location, locationAddress) {
+  var addFormSubmission = function(institution, institutionAddress, location, locationAddress) {
+
+
+    // Setup latitude and longitude headers if needed
+    var formResponseSheet = getFormResponseSheet();
+    
+    addFormRow(institution, institutionAddress, location, locationAddress, formResponseSheet);
+  }
+  
+  var addFormRow = function(institution, institutionAddress, location, locationAddress, sheet) {
     var geocoder = Maps.newGeocoder(),
         date = getDate(),   
         institutionGeocoded = geolocate(geocoder, institutionAddress),
         locationGeocoded = geolocate(geocoder, locationAddress);
-
-    // Setup latitude and longitude headers if needed
-    var formResponseSheet = getFormResponseSheet();
-    var rowPositionToStart = formResponseSheet.getLastRow() + 1;
     
-    formResponseSheet.appendRow([date, location, institution, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
+
+    unProtectSheet(sheet); // Remote sheet protection
+    sheet.appendRow([date, location, institution, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
+    protectSheet(sheet); // Add sheet protection
+  }
+  
+  var protectSheet = function(sheet) {
+    var user = Session.getEffectiveUser();
+    var protection = sheet.protect();
+    
+    protection.removeEditors(protection.getEditors());
+    if (protection.canDomainEdit()) {
+      protection.setDomainEdit(false);
+    }
+  }
+  
+  var unProtectSheet = function(sheet) {
+    var protection = sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET)[0];
+
+    if (protection) {
+      protection.remove(); 
+    } 
   }
   
   return {

@@ -10,11 +10,13 @@ var enable = function(node){ node.removeAttribute('disabled'); }
 var disable = function(node){ node.setAttribute('disabled', true); }
 
 function showStatus(msg, classId) {
-  var status = $('#status'); 
-  status.className = ""
-  status.innerHTML = msg;
-  if (classId) {
-    status.classList.add(classId);
+  var status = document.querySelectorAll('div[data-ui="status"');
+  for (var i = 0; i < status.length; i++) {
+    status[i].className = ""
+    status[i].innerHTML = msg;
+    if (classId) {
+      status[i].classList.add(classId);
+    }
   }
 }
 
@@ -36,15 +38,16 @@ function getVariables() {
       columnDefs = refs;
     
       // Handle if user is not on a sheet with no data
-      if (res.length == 0) {
+      if (res.length === 0) {
         showStatus('No variables to choose from.');
+        disable($('#calcBtn'));
+      } else {
+        showStatus('');
+        enable($('#calcBtn'));
       }
       
-      if (res != columnDefs) {
-        addVariableOptions()
-      }
-      showStatus('');
-      enable($('#calcBtn'));
+      if (res != columnDefs) { addVariableOptions() }
+
     })
     .withFailureHandler(failureHandler)
     .clientGetVariables();
@@ -67,54 +70,52 @@ function addVariableOptions() {
 }
 
 function calculateNew(){
-	var varName = $('#varName').value;
-  var resultsList = $('#resultList');
-  showStatus('Calculating...');
-	google.script.run
-    .withSuccessHandler(function(res){
-		  summary = {
-			  name: varName,
-			  min: math.round(math.min(res),3),
-			  max: math.round(math.max(res),3),
-			  mean: math.round(math.mean(res),3),
-			  stdev: math.round(math.std(res),3)
-		  }
+  var varName = $('#varName').value;
+    var resultsList = $('#resultList');
+  google.script.run
+      .withSuccessHandler(function(res){
+    summary = {
+      name: varName,
+      min: math.round(math.min(res),3),
+      max: math.round(math.max(res),3),
+      mean: math.round(math.mean(res),3),
+      stdev: math.round(math.std(res),3)
+    }
 
-		  resultsList.innerHTML = statTemplate(summary);
-      resultsList.classList.remove('hide');
-      resultsList.classList.add('show');
-      enable($('#addToSheetBtn'));
-      showStatus('');
-	  })
-    .withFailureHandler(failureHandler)
-    .clientGetValues(varName);
+    resultsList.innerHTML = statTemplate(summary);
+        resultsList.classList.remove('hide');
+        resultsList.classList.add('show');
+        enable($('#addToSheetBtn'));
+    })
+      .withFailureHandler(failureHandler)
+      .clientGetValues(varName);
 }
 
 var compile = function(selector){
-	var r = /(\{\{.+?\}\})/;
-	var elem = document.querySelector(selector);
-	var markup = elem.outerHTML;
-	elem.remove();
-	markup = markup.replace(/\s+/,' ');
+  var r = /(\{\{.+?\}\})/;
+  var elem = document.querySelector(selector);
+  var markup = elem.outerHTML;
+  elem.remove();
+  markup = markup.replace(/\s+/,' ');
 
-	var fragments = markup.split(r);
+  var fragments = markup.split(r);
 
-	var template = (function(tpl){
-		return function(obj){
-			var r = /(\{\{.+?\}\})/;
-			var accum = [];
-			for(var idx in fragments){
-				var fragment = fragments[idx];
-				if(r.test(fragment)){
-					fragment = fragment.replace(/(\{\{)|(\}\})/g,'');
-					accum.push(obj[fragment]);
-				} else {
-					accum.push(fragment);
-				}
-			}
-			return accum.join('');
-		};
-	})(fragments);
+  var template = (function(tpl){
+    return function(obj){
+      var r = /(\{\{.+?\}\})/;
+      var accum = [];
+      for(var idx in fragments){
+        var fragment = fragments[idx];
+        if(r.test(fragment)){
+          fragment = fragment.replace(/(\{\{)|(\}\})/g,'');
+          accum.push(obj[fragment]);
+        } else {
+          accum.push(fragment);
+        }
+      }
+      return accum.join('');
+    };
+  })(fragments);
 
     return template;
 };
@@ -132,7 +133,14 @@ function clientAddToSheet() {
   
   google.script.run
     .withSuccessHandler(function() {
+      var resultsList = $('#resultList')
+      resultsList.classList.remove('show');
+      resultsList.classList.add('hide');
+      
+      
+      disable($('#addToSheetBtn'));
       showStatus('');
+      getVariables();
     })
     .withFailureHandler(failureHandler)
     .clientAddStats(dataTable);

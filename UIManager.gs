@@ -6,9 +6,8 @@ var UIManager = (function(){
           .addItem('Scatter Plot Helper', 'clientShowScatter')
           .addItem('Histogram Helper', 'clientShowHistogram')
           .addItem('Summary Stats Helper', 'clientShowStats')
-          .addSubMenu(ui.createMenu('Map')
-            .addItem('Map Helper', 'clientShowMapDialog')
-            .addItem('Student Location Survey', 'clientShowFormDialog'))
+          .addItem('Map Helper', 'clientShowMapDialog')
+          .addItem('Student Location Survey', 'clientShowFormDialog')
           .addToUi();
     },
     showSidebar: function(which){

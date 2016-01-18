@@ -1,19 +1,20 @@
 <script type="text/javascript">
 // Setup and utility functions
-var columnDefs;
+var columnDefs, chartWrapper;
 var config = null;
-var chart = null;
 var $ = function(sel){ return document.querySelector(sel); };
 var clean = function(node){ return !!node.value ? parseFloat(node.value) : null; };
 var enable = function(node){ node.removeAttribute('disabled'); };
 var disable = function(node){ node.setAttribute('disabled', true); };
 
 function showStatus(msg, classId) {
-  var status = $('#status'); 
-  status.className = ""
-  status.innerHTML = msg;
-  if (classId) {
-    status.classList.add(classId);
+  var status = document.querySelectorAll('div[data-ui="status"');
+  for (var i = 0; i < status.length; i++) {
+    status[i].className = ""
+    status[i].innerHTML = msg;
+    if (classId) {
+      status[i].classList.add(classId);
+    }
   }
 }
 
@@ -28,7 +29,7 @@ google.setOnLoadCallback(loadChart);
 
 // Instantiate the chart
 function loadChart() {
-  chart = new google.visualization.ScatterChart($('#chart-preview'));
+  chartWrapper = new google.visualization.ChartWrapper();
 } 
 
 // use async call to determine initial state of dropdown lists
@@ -42,19 +43,21 @@ function getVariables() {
         refs[res[idx].name] = res[idx];
       }
       columnDefs = refs;
-    
+
       // Handle if user is not on a sheet with no data
       if (res.length === 0) {
         showStatus('No variables to choose from.');
+        disable($('#xVar'));
+        disable($('#yVar'));
+        disable('#updateBtn');
+      } else {
+        enable($('#xVar'));
+        enable($('#yVar'));
+        enable($('#updateBtn'));
+        showStatus('');
       }
       
-      if (res !== columnDefs) {
-        addVariableOptions()
-      }
-      enable($('#xVar'));
-      enable($('#yVar'));
-      enable($('#updateBtn'));
-      showStatus('');
+      if (res !== columnDefs) { addVariableOptions() }
     })
     .withFailureHandler(failureHandler)
     .clientGetVariables();
@@ -149,6 +152,24 @@ function updateSelection(src){
     updateBtn.removeAttribute('disabled');
 }
 
+function resetState() {
+  $('#xScaleDefault').checked = true;
+  $('#xScaleSpecific').checked = false;
+  $('#invertX').checked = false;
+  $('#logX').checked = false;
+  $('#xMin').value = '';
+  $('#xMax').value = '';
+  $('#yScaleDefault').checked = true;
+  $('#yScaleSpecific'.checked = false);
+  $('#invertY').checked = false;
+  $('#logY').checked = false;
+  $('#yMin').value = '';
+  $('#yMax').value = '';
+  
+  var state = extractState();
+  applyState(state);
+}
+
 function toggleVar(varName){
   var elemId = varName + 'Def';
   var extensionEl = $('div[data-options="' + varName + '"]');
@@ -199,7 +220,7 @@ function buildChartOptions(state) {
     legend: { position: 'none' }
   }
   
-  if (state.x.range && state.x.range.min) { options.hAxis.minValue = state.x.range.min; } 
+  if (state.x.range && state.x.range.min) { options.hAxis.minValue = state.x.range.min } 
   if (state.x.range && state.x.range.max) { options.hAxis.maxValue = state.x.range.max; }
   if (state.y.range && state.y.range.min) { options.vAxis.minValue = state.y.range.min; }
   if (state.y.range && state.y.range.max) { options.vAxis.maxValue = state.y.range.max; }
@@ -221,13 +242,18 @@ function previewChart(spreadsheetValues) {
 
   disable(sendToSheetBtn);
   
+  chartWrapper.setChartType('ScatterChart');
+  chartWrapper.setDataTable(data);
+  chartWrapper.setOptions(options);
+  chartWrapper.setContainerId('chart-preview');
+    
   // Add event listener
-  google.visualization.events.addListener(chart, 'ready', function(){
+  google.visualization.events.addListener(chartWrapper, 'ready', function(){
     enable(sendToSheetBtn);
   });
   
   // Draw the chart
-  chart.draw(data, options);
+  chartWrapper.draw();
 }
 
 function clientSendToSheet() {
@@ -236,6 +262,11 @@ function clientSendToSheet() {
   google.script.run
     .withSuccessHandler(function(res){
       showStatus('');
+      $('#chart-preview').innerHTML = '';
+      chartWrapper = new google.visualization.ChartWrapper();
+      resetState();
+      getVariables();
+      disable($('#sendToSheetBtn'));
     })
     .withFailureHandler(failureHandler)
     .clientAddChart(state, null, 'scatter');
