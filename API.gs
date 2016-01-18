@@ -62,8 +62,8 @@ function clientAddFormSubmission(institution, institutionAddress, location, loca
   return SheetManager.addFormSubmission(institution, institutionAddress, location, locationAddress);
 };
 
-function clientAddChart(config, type) {
-  return SheetManager.addChart(config, type);
+function clientAddChart(config, data, type) {
+  return SheetManager.addChart(config, data, type);
 }
 
 function clientAddStats(data) {

@@ -4,6 +4,7 @@ var UIManager = (function(){
       var ui = SpreadsheetApp.getUi();
       ui.createMenu('Zoo Tools')
           .addItem('Scatter Plot Helper', 'clientShowScatter')
+          .addItem('Histogram Helper', 'clientShowHistogram')
           .addItem('Summary Stats Helper', 'clientShowStats')
           .addSubMenu(ui.createMenu('Map')
             .addItem('Map Helper', 'clientShowMapDialog')

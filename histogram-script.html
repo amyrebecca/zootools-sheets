@@ -1,2 +1,236 @@
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.4.2/math.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 <script type="text/javascript">
+// Setup and utility functions
+var columnDefs, chartWrapper, data;
+var config = null;
+var $ = function(sel){ return document.querySelector(sel); };
+var clean = function(node){ return !!node.value ? parseFloat(node.value) : null; };
+var enable = function(node){ node.removeAttribute('disabled'); }
+var disable = function(node){ node.setAttribute('disabled', true); }
+
+function showStatus(msg, classId) {
+  var status = $('#status'); 
+  status.className = ""
+  status.innerHTML = msg;
+  if (classId) {
+    status.classList.add(classId);
+  }
+}
+
+function failureHandler(err) {
+  console.error(err);
+  showStatus('Something went wrong: ' + err, 'error');
+}
+
+// Load the Google Visualization library
+google.load("visualization", "1", {packages:["corechart"]});
+google.setOnLoadCallback(loadChart);
+
+// Instantiate the chart
+function loadChart() {
+  chartWrapper = new google.visualization.ChartWrapper();
+} 
+
+// use async call to determine initial state of dropdown lists
+// from contents of chart cells
+function getVariables() {
+  showStatus('Getting variables...');
+  google.script.run
+    .withSuccessHandler(function(res){
+      var refs = {};
+      for(var idx in res) {
+        refs[res[idx].name] = res[idx];
+      }
+      columnDefs = refs;
+    
+      // Handle if user is not on a sheet with no data
+      if (res.length === 0) {
+        showStatus('No variables to choose from.');
+      }
+      
+      if (res !== columnDefs) {
+        addVariableOptions()
+      }
+      enable($('#xVar'));
+      enable($('#updateBtn'));
+      showStatus('');
+    })
+    .withFailureHandler(failureHandler)
+    .clientGetVariables();
+}
+
+getVariables();
+
+function addVariableOptions() {
+  var options = '';
+  var selects = document.querySelectorAll('select[data-select="variable"]');
+  
+  for (var key in columnDefs) {
+    var newOption = '<option>' + columnDefs[key].name + '</option>';
+    options += newOption;
+  }
+  
+  for (var i = 0; i < selects.length; i++) {
+    selects[i].innerHTML = options;
+  }
+}
+
+function applyState(config){
+  $('#xVar').value = config.x.variable;
+  $('#bucketNum').value = config.bucketNum;
+}
+
+function extractState(){
+  var res = {
+    x: {
+      variable: $('#xVar').value
+    },
+    bucketNum: $('#bucketNum').value
+  };
+
+  return res;
+}
+
+// every time the user changes a dropdown, we check to see if they should be
+// able to submit (plotting X vs. X just makes no sense)
+function updateSelection(src){
+  var state = extractState();
+    
+  applyState(state);
+  updateBtn.removeAttribute('disabled');
+}
+
+function toggleVar(varName){
+  var elemId = varName + 'Def';
+  var extensionEl = $('div[data-options="' + varName + '"]');
+
+  if (extensionEl.getAttribute("aria-hidden") === 'true') {
+    extensionEl.setAttribute("aria-hidden", "false");
+  } else {
+    extensionEl.setAttribute("aria-hidden", "true");
+  }
+  
+  $("#" + elemId).classList.toggle('collapse');
+}
+
+// update the chart from the client's selected variables
+function clientChangeSelection(){
+    var xVar = $('#xVar').value;
+    
+    showStatus('Drawing Histogram...');
+    
+    google.script.run
+      .withSuccessHandler(function(res) {
+        showStatus('');
+        previewChart(res);
+      })
+      .withFailureHandler(failureHandler)
+      .clientGetValues(xVar);
+}
+
+// Use response from sheet to setup data in format expected by Charts API for scatter plots
+function setupDataTable(spreadsheetValues) {
+  var state = extractState();
+  var table = [[state.x.variable, 'Frequency']];
+  var min = math.min(spreadsheetValues);
+  var max = math.max(spreadsheetValues);
+  var bucketNum = state.bucketNum;
+  var bucketSize = math.round((max-min)/bucketNum);
+  
+  var rangeStart;
+  if (min < 0) {
+    rangeStart = min;
+  } else {
+    rangeStart = 0;
+  }
+  var bucketRanges = _.range(rangeStart, max, bucketSize);
+  bucketRanges.push(math.round(max)); //Add in max value 
+
+    
+  var hAxisValues = [];
+  
+  for (var i = 0; i < bucketRanges.length; i++) {
+    var rangeMin, rangeMax;
+    if (i === 0) {
+      rangeMin = bucketRanges[i];
+      rangeMax = bucketRanges[i+1];
+    } else {
+      rangeMin = bucketRanges[i]+1;
+      rangeMax = bucketRanges[i+1];
+    }
+    if (bucketRanges[i+1]) {
+      var obj = {
+        count: 0,
+        rangeMin: rangeMin,
+        rangeMax: rangeMax
+      }
+      hAxisValues.push(obj);
+    }
+  }
+  
+
+  _.each(spreadsheetValues, function(value, index, list) {
+    var num = math.round(value);
+    _.each(hAxisValues, function(obj, index, list) {
+      if (num >= obj.rangeMin && num <= obj.rangeMax) {
+        var count = obj.count;
+        count++
+        obj.count = count;
+      }
+    })
+  });
+  
+
+  for (var i = 0; i < hAxisValues.length; i++) {
+    var row = [hAxisValues[i].rangeMin + '-' + hAxisValues[i].rangeMax, hAxisValues[i].count];
+    table.push(row);
+  }
+  
+  return table;
+}
+
+function buildChartOptions(state) {
+  options = {
+    legend: { position: 'none' },
+    bar: { groupWidth: '100%' }
+  }
+  
+  return options;
+}
+
+function previewChart(spreadsheetValues) {
+  data = setupDataTable(spreadsheetValues);
+  var dataTable = google.visualization.arrayToDataTable(data);
+  var state = extractState();
+  var options = buildChartOptions(state);
+  var sendToSheetBtn = $('#sendToSheetBtn');
+  
+  disable(sendToSheetBtn); 
+  
+  chartWrapper.setChartType('ColumnChart');
+  chartWrapper.setDataTable(dataTable);
+  chartWrapper.setOptions(options);
+  chartWrapper.setContainerId('chart-preview');
+
+  // Add event listener
+  google.visualization.events.addListener(chartWrapper, 'ready', function(){
+    enable(sendToSheetBtn);
+  });
+  
+  // Draw the chart
+  chartWrapper.draw()
+}
+
+function clientSendToSheet() {
+  var state = extractState();
+
+  showStatus('Sending...');
+  google.script.run
+    .withSuccessHandler(function(res){
+      showStatus('');
+    })
+    .withFailureHandler(failureHandler)
+    .clientAddChart(state, data, 'column');
+}
 </script>

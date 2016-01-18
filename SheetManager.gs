@@ -84,7 +84,7 @@ var SheetManager = (function(sheet){
     return augmented;
   }
   
-  var setupNamedSheet = function(sheetName, callback) {
+  var setupNamedSheet = function(sheetName) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
     
     if (sheet === undefined || sheet === null) {
@@ -92,22 +92,31 @@ var SheetManager = (function(sheet){
     } else {
       SpreadsheetApp.setActiveSheet(sheet);
     }
-
-    callback();
+    
+    return sheet;
   }
   
-  var addChart = function(config, type) {
-    var yRange;
+  var addChart = function(config, data, type) {
+    var xRange, yRange;
     var sheet = setupNamedSheet('Charts');
     
-    var xRange = fetchRange(config.x.variable);
+    if (config.x) {
+      xRange = fetchRange(config.x.variable);
+    }
+
     if (config.y) {
       yRange = fetchRange(config.y.variable);
+    }
+    
+    if (data) {
+      var columnChartDataSheet = setupNamedSheet('Histogram Chart Data', true);
     }
     
     switch (type) {
       case "scatter":
         return ChartBuilder.addScatterChart(xRange, yRange, config);
+      case "column":
+        return ChartBuilder.addColumnChart(data, config);
     }
   }
   
@@ -120,12 +129,10 @@ var SheetManager = (function(sheet){
   }
   
   var addStats = function(data) {
-    setupNamedSheet('Statistics', function() {
-      var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Statistics');
-      var rowToStart = sheet.getLastRow();
+    var sheet = setupNamedSheet('Statistics');
+    var rowToStart = sheet.getLastRow();
 
-      sheet.getRange(rowToStart + 1, 1, 4, 2).setValues(data);                                      
-    });
+    sheet.getRange(rowToStart + 1, 1, 4, 2).setValues(data);
   }
         
   var getCoordinates = function(latitude, longitude){
