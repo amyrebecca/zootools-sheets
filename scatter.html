@@ -11,7 +11,7 @@
     </div>
     <div class="block">
       <p>You may change the independent (X) and dependent (Y) variables below, then press Plot to draw or redraw the plot.</p>
-      <button class="button green" onclick="getVariables()">Refresh</button>
+      <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
     </div>
     <div class="block">
       <? columnDefs = clientGetVariables(); ?>
@@ -23,7 +23,7 @@
             <option><?= columnDefs[i].name ?></option>
           <? } ?>
         </select>
-        <div class="extended">
+        <div class="extended" aria-hidden="true" data-options="x">
           <div>
             <p><strong>Axis</strong></p>
             <div style="float: right; width: 50%;"><input type="checkbox" id="logX" onclick="updateSelection()"><label for="logX">Logarithmic</label></div>
@@ -34,7 +34,7 @@
             <p><input type="radio" id="xScaleDefault" name="xScale" onclick="updateSelection()" checked><label for="xScaleDefault">Auto</label></p>
             <p><input type="radio" id="xScaleSpecific" name="xScale" onclick="updateSelection()"><label for="xScaleSpecific">Specified</label></p>
             <div style="text-indent: 1.5em;">
-              <div style="text-align: justify"><input type="text" pattern="\d*" id="xMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="text" pattern="\d*" id="xMax" style="width: 30%; " disabled /></div>
+              <div style="text-align: justify"><input type="number" pattern="\d*" id="xMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="number" pattern="\d*" id="xMax" style="width: 30%; " disabled /></div>
             </div>
           </div>
         </div>
@@ -52,7 +52,7 @@
             <option><?= columnDefs[i].name ?></option>
           <? } ?>
         </select>
-        <div class="extended">
+        <div class="extended" aria-hidden="true" data-options="y">
           <div>
             <p><strong>Axis</strong></p>
             <div style="float: right; width: 50%;"><input type="checkbox" id="logY" onclick="updateSelection()"><label for="logY">Logarithmic</label></div>
@@ -63,7 +63,7 @@
             <p><input type="radio" id="yScaleDefault" name="yScale" onclick="updateSelection()" checked><label for="yScaleDefault">Auto</label></p>
             <p><input type="radio" id="yScaleSpecific" name="yScale" onclick="updateSelection()"><label for="yScaleSpecific">Specified</label></p>
             <div style="text-indent: 1.5em;">
-              <div style="text-align: justify"><input type="text" pattern="\d*" id="yMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="text" pattern="\d*" id="yMax" style="width: 30%; " disabled /></div>
+              <div style="text-align: justify"><input type="number" pattern="\d*" id="yMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="number" pattern="\d*" id="yMax" style="width: 30%; " disabled /></div>
             </div>
           </div>
         </div>
@@ -84,8 +84,9 @@
       </select>
     </div>
     <div id="chart-preview" style="width: 100%"></div>
+    <div><p><button class="button green" onclick="getVariables()">Refresh</button></p></div>
     <div class="action-button-bar" style="text-align: center; ">
-      <div id="status" style="display: block; margin: 1em;"></div>
+      <div data-ui="status" style="display: block; margin: 1em;"></div>
       <button type="button" id="updateBtn" class="button action" onclick="clientChangeSelection()" disabled>Plot</button>
       <button type="button" id="sendToSheetBtn" class="button create" onclick="clientSendToSheet()" disabled>Send to Sheet</button>
       <button type="button" class="button" onclick="google.script.host.close()">Close</button>

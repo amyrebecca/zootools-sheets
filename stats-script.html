@@ -1,141 +1,65 @@
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/2.4.2/math.min.js"></script>
-<script type="text/javascript">
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
+    <?!= include('styles'); ?>
+  </head>
+  <body class="sidebar">
+    <div class="block">
+      <h1>Summary Stats</h1>
+    </div>
+    <div class="block form-group">
+      <p>Calculate summary statistics for selected variables.</p>
+      <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
+    </div>
+    <div class="preinit" id="resultList" class="hide">
 
-var columnDefs = null;
-var template = null;
-var statTemplate = null;
-var summary = null;
-var $ = function(sel){ return document.querySelector(sel); };
-var enable = function(node){ node.removeAttribute('disabled'); }
-var disable = function(node){ node.setAttribute('disabled', true); }
-
-function showStatus(msg, classId) {
-  var status = $('#status'); 
-  status.className = ""
-  status.innerHTML = msg;
-  if (classId) {
-    status.classList.add(classId);
-  }
-}
-
-function failureHandler(err) {
-  console.error(err);
-  showStatus('Something went wrong: ' + err, 'error');
-}
-
-// use async call to determine initial state of dropdown lists
-// from contents of chart cells
-function getVariables() {
-  showStatus('Getting variables...');
-  google.script.run
-    .withSuccessHandler(function(res){
-      var refs = {};
-      for(var idx in res){
-        refs[res[idx].name] = res[idx];
-      }
-      columnDefs = refs;
+    <div class="block form-group" id="result">
+        <table class="stats-table" style="margin-left: 0.2em; width: 100%;" summary="The minimum, maximum, mean, and standard deviation (row headings) of the selected variable.">
+          <colgroup>
+            <col style="width: 25%;" />
+            <col style="width: 75%;" />
+          </colgroup>
+          <caption><strong>{{name}}</strong></caption>
+          <tbody>
+            <tr>
+              <th scope="row"><strong>Min</strong></th>
+              <td> {{min}}</td>
+            </tr>
+            <tr>
+              <th scope="row"><strong>Max</strong></th>
+              <td> {{max}}</td>
+            </tr>
+            <tr>
+              <th scope="row"><strong>Mean</strong></th>
+              <td> {{mean}} </td>
+            </tr>
+            <tr>
+              <th scope="row"><strong>Std. Dev.</strong></th>
+              <td> {{stdev}} </td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+    </div>
     
-      // Handle if user is not on a sheet with no data
-      if (res.length == 0) {
-        showStatus('No variables to choose from.');
-      }
-      
-      if (res != columnDefs) {
-        addVariableOptions()
-      }
-      showStatus('');
-      enable($('#calcBtn'));
-    })
-    .withFailureHandler(failureHandler)
-    .clientGetVariables();
-}
-
-getVariables();
-
-function addVariableOptions() {
-  var options = '';
-  var selects = document.querySelectorAll('select');
-  
-  for (var key in columnDefs) {
-    var newOption = '<option>' + columnDefs[key].name + '</option>';
-    options += newOption;
-  }
-  
-  for (var i = 0; i < selects.length; i++) {
-    selects[i].innerHTML = options;
-  }
-}
-
-function calculateNew(){
-	var varName = $('#varName').value;
-  var resultsList = $('#resultList');
-  showStatus('Calculating...');
-	google.script.run
-    .withSuccessHandler(function(res){
-		  summary = {
-			  name: varName,
-			  min: math.round(math.min(res),3),
-			  max: math.round(math.max(res),3),
-			  mean: math.round(math.mean(res),3),
-			  stdev: math.round(math.std(res),3)
-		  }
-
-		  resultsList.innerHTML = statTemplate(summary);
-      resultsList.classList.remove('hide');
-      resultsList.classList.add('show');
-      enable($('#addToSheetBtn'));
-      showStatus('');
-	  })
-    .withFailureHandler(failureHandler)
-    .clientGetValues(varName);
-}
-
-var compile = function(selector){
-	var r = /(\{\{.+?\}\})/;
-	var elem = document.querySelector(selector);
-	var markup = elem.outerHTML;
-	elem.remove();
-	markup = markup.replace(/\s+/,' ');
-
-	var fragments = markup.split(r);
-
-	var template = (function(tpl){
-		return function(obj){
-			var r = /(\{\{.+?\}\})/;
-			var accum = [];
-			for(var idx in fragments){
-				var fragment = fragments[idx];
-				if(r.test(fragment)){
-					fragment = fragment.replace(/(\{\{)|(\}\})/g,'');
-					accum.push(obj[fragment]);
-				} else {
-					accum.push(fragment);
-				}
-			}
-			return accum.join('');
-		};
-	})(fragments);
-
-    return template;
-};
-
-var statTemplate = compile('#result');
-
-function clientAddToSheet() {
-  var dataTable = [
-    [summary.name + " Min", summary.min],
-    [summary.name + " Max", summary.max],
-    [summary.name + " Mean", summary.mean],
-    [summary.name + " Std. Dev.", summary.stdev]
-  ];
-  showStatus('Sending...');
-  
-  google.script.run
-    .withSuccessHandler(function() {
-      showStatus('');
-    })
-    .withFailureHandler(failureHandler)
-    .clientAddStats(dataTable);
-}
-
-</script>
+    <p />
+    <? columnDefs = clientGetVariables(); ?>
+    <div class="inline-button-block form-group">
+      <select id="varName" style="width: 70%;" >
+        <? for(var i = 0; i < columnDefs.length; i++) { ?>
+        <option><?= columnDefs[i].name ?></option>
+        <? } ?>
+      </select>
+      <button class="button green" onclick="getVariables()">Refresh</button>
+    </div> 
+    <div class="block form-group" style="text-align: center; ">
+      <div data-ui="status" id="status" style="display: block; margin: 1em;"></div>
+      <button id="calcBtn" class="button action" onclick="calculateNew()" disabled>Calculate</button>
+      <button id="addToSheetBtn" class="button create" onclick="clientAddToSheet()" disabled>Add to Sheet</button>
+      <button class="button" onclick="google.script.host.close()">Close</button>
+    </div>      
+    <?!= include('stats-script'); ?>
+  </body>
+</html>

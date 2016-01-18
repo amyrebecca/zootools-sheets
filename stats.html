@@ -11,6 +11,7 @@
     </div>
     <div class="block form-group">
       <p>Calculate summary statistics for selected variables.</p>
+      <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
     </div>
     <div class="preinit" id="resultList" class="hide">
 
@@ -45,7 +46,7 @@
     
     <p />
     <? columnDefs = clientGetVariables(); ?>
-    <div class="block form-group">
+    <div class="inline-button-block form-group">
       <select id="varName" style="width: 70%;" >
         <? for(var i = 0; i < columnDefs.length; i++) { ?>
         <option><?= columnDefs[i].name ?></option>
@@ -54,7 +55,7 @@
       <button class="button green" onclick="getVariables()">Refresh</button>
     </div> 
     <div class="block form-group" style="text-align: center; ">
-      <div id="status" style="display: block; margin: 1em;"></div>
+      <div data-ui="status" id="status" style="display: block; margin: 1em;"></div>
       <button id="calcBtn" class="button action" onclick="calculateNew()" disabled>Calculate</button>
       <button id="addToSheetBtn" class="button create" onclick="clientAddToSheet()" disabled>Add to Sheet</button>
       <button class="button" onclick="google.script.host.close()">Close</button>

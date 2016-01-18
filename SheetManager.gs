@@ -86,9 +86,10 @@ var SheetManager = (function(sheet){
   
   var setupNamedSheet = function(sheetName) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+    var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
     
     if (sheet === undefined || sheet === null) {
-      SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName);
+      SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName, sheets.length + 1);
     } else {
       SpreadsheetApp.setActiveSheet(sheet);
     }
@@ -109,7 +110,7 @@ var SheetManager = (function(sheet){
     }
     
     if (data) {
-      var columnChartDataSheet = setupNamedSheet('Histogram Chart Data', true);
+      var columnChartDataSheet = setupNamedSheet('Histogram Chart Data');
     }
     
     switch (type) {
@@ -129,8 +130,13 @@ var SheetManager = (function(sheet){
   }
   
   var addStats = function(data) {
-    var sheet = setupNamedSheet('Statistics');
-    var rowToStart = sheet.getLastRow();
+    setupNamedSheet('Statistics');    
+    addStatsValues(data);
+  }
+  
+  var addStatsValues = function(data) {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Statistics');
+    var rowToStart = sheet.getLastRow() + 1;
 
     sheet.getRange(rowToStart + 1, 1, 4, 2).setValues(data);
   }
@@ -154,9 +160,10 @@ var SheetManager = (function(sheet){
   function getFormResponseSheet() {
     var sheetName = 'Student Responses';
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-
+    var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+    
     if (sheet === undefined || sheet === null) {
-       sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName);
+       sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName, sheets.length + 1);
        var lastColumnWithContent = sheet.getLastColumn();
 
        // Setup headers for new sheet

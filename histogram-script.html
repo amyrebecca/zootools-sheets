@@ -10,11 +10,13 @@ var enable = function(node){ node.removeAttribute('disabled'); }
 var disable = function(node){ node.setAttribute('disabled', true); }
 
 function showStatus(msg, classId) {
-  var status = $('#status'); 
-  status.className = ""
-  status.innerHTML = msg;
-  if (classId) {
-    status.classList.add(classId);
+  var status = document.querySelectorAll('div[data-ui="status"');
+  for (var i = 0; i < status.length; i++) {
+    status[i].className = ""
+    status[i].innerHTML = msg;
+    if (classId) {
+      status[i].classList.add(classId);
+    }
   }
 }
 
@@ -47,14 +49,15 @@ function getVariables() {
       // Handle if user is not on a sheet with no data
       if (res.length === 0) {
         showStatus('No variables to choose from.');
+        disable($('#xVar'));
+        disable('#updateBtn');
+      } else {
+        enable($('#xVar'));
+        enable($('#updateBtn'));
+        showStatus('');
       }
       
-      if (res !== columnDefs) {
-        addVariableOptions()
-      }
-      enable($('#xVar'));
-      enable($('#updateBtn'));
-      showStatus('');
+      if (res !== columnDefs) { addVariableOptions() }
     })
     .withFailureHandler(failureHandler)
     .clientGetVariables();
@@ -99,6 +102,13 @@ function updateSelection(src){
     
   applyState(state);
   updateBtn.removeAttribute('disabled');
+}
+
+function resetState() {
+  $('#bucketNum').value = 5;
+  
+  var state = extractState();
+  applyState(state);
 }
 
 function toggleVar(varName){
@@ -229,8 +239,15 @@ function clientSendToSheet() {
   google.script.run
     .withSuccessHandler(function(res){
       showStatus('');
+      $('#chart-preview').innerHTML = '';
+      chartWrapper = new google.visualization.ChartWrapper();
+      resetState();
+      getVariables();
+      disable($('#sendToSheetBtn'));
     })
     .withFailureHandler(failureHandler)
     .clientAddChart(state, data, 'column');
 }
 </script>
+
+
