@@ -22,7 +22,18 @@
       {types: ['geocode']});
   }
   
+  // Add onfocus event to inputs after document is loaded
+  document.addEventListener("DOMContentLoaded", function(event) { 
+    var locationInputs = document.querySelectorAll('input[data-input="location"]');
+    
+    for (var i = 0; i < locationInputs.length; i++) {
+      locationInputs[i].addEventListener('focus', geolocate);
+    } 
+  });
+  
   function geolocate(event) {
+    var el = event.target;
+    
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function(position) {
         var geolocation = {
@@ -33,8 +44,10 @@
           center: geolocation,
           radius: position.coords.accuracy
         });
-        autocomplete[event.srcElement.id].setBounds(circle.getBounds());
-      });
+        autocomplete[el.id].setBounds(circle.getBounds());
+        // Remove onfocus listener to keep Firefox from continuously firing it. 
+        el.removeEventListener('focus', geolocate);
+      }, failureHandler, {timeout: 10000});
     }
   }
   /**

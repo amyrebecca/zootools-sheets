@@ -1,15 +1,6 @@
 // these need to be exposed as bare functions so that the Apps Script
 // scripting environment / host will proxy them to the client side
 
-function clientGetConfiguration(){ 
-  return ConfigurationManager.getConfiguration(); 
-};
-
-function clientSetConfiguration(config){ 
-  ConfigurationManager.setConfiguration(config);
-  SheetManager.updateChart(config);
-}
-
 function clientGetSpreadsheetID() {
   return SheetManager.getID();
 }
