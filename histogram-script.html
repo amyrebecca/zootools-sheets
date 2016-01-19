@@ -10,7 +10,7 @@ var enable = function(node){ node.removeAttribute('disabled'); }
 var disable = function(node){ node.setAttribute('disabled', true); }
 
 function showStatus(msg, classId) {
-  var status = document.querySelectorAll('div[data-ui="status"');
+  var status = document.querySelectorAll('div[data-ui="status"]');
   for (var i = 0; i < status.length; i++) {
     status[i].className = ""
     status[i].innerHTML = msg;
@@ -249,5 +249,4 @@ function clientSendToSheet() {
     .clientAddChart(state, data, 'column');
 }
 </script>
-
 
