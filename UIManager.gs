@@ -17,7 +17,7 @@ var UIManager = (function(){
           .setSandboxMode(HtmlService.SandboxMode.IFRAME)
           .setTitle('Zoo Tools');
   
-      SpreadsheetApp.getUi() // Or DocumentApp or FormApp.
+      SpreadsheetApp.getUi()
           .showSidebar(html);
     },
     showDialog: function(menuItem){
@@ -40,6 +40,11 @@ var UIManager = (function(){
         .setHeight(dialog[menuItem].height)
         .setSandboxMode(HtmlService.SandboxMode.IFRAME);
       SpreadsheetApp.getUi().showModalDialog(ui, dialog[menuItem].title);
+    },
+    showGenericDialog: function(prompt) {
+      var ui = SpreadsheetApp.getUi();
+      
+      ui.alert(prompt);
     }
   }
 })();
