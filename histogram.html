@@ -10,7 +10,7 @@
       <h1>Histogram Helper</h1>
     </div>
     <div class="block">
-      <p class="instructions">You may change the histogram variable below, then press <code class="button-like action">Plot</code> to draw or redraw the plot. Use <code class="button-like green">Refresh Data</code> to refresh the available variables in the drop down menu.</p>
+      <p class="instructions">You may change the histogram variable below, then press <code class="button-like action">Plot</code> to draw or redraw the plot. Use <code class="button-like action">Refresh Data</code> to refresh the available variables in the drop down menu.</p>
       <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
     </div>
     <div class="block">
@@ -23,7 +23,7 @@
             <option><?= columnDefs[i].name ?></option>
           <? } ?>
         </select>
-        <button class="button green" onclick="getVariables()">Refresh Data</button>
+        <button class="button action" onclick="getVariables()">Refresh Data</button>
         <div class="extended" aria-hidden="true" data-options="x">
           <div>
             <p><label>Bucket Number: <input id="bucketNum" type="number" min="5" max="10" value="5" onclick="updateSelection()"></label></p>
@@ -39,9 +39,11 @@
     <div id="chart-preview" style="width: 100%"></div>
     <div class="action-button-bar" style="text-align: center; ">
       <div data-ui="status" id="status" style="display: block; margin: 1em;"></div>
-      <button type="button" id="updateBtn" class="button action" onclick="clientChangeSelection()" disabled>Plot</button>
-      <button type="button" id="sendToSheetBtn" class="button create" onclick="clientSendToSheet()" disabled>Send to Sheet</button>
-      <button type="button" class="button" onclick="google.script.host.close()">Close</button>
+      <div class="inline-button-block">
+        <button type="button" id="updateBtn" class="button action" onclick="clientChangeSelection()" disabled>Plot</button>
+        <button type="button" id="sendToSheetBtn" class="button create" onclick="clientSendToSheet()" disabled>Send to Sheet</button>
+        <button type="button" class="button" onclick="google.script.host.close()">Close</button>
+      </div>
     </div>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     

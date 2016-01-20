@@ -10,7 +10,7 @@
       <h1>Summary Stats</h1>
     </div>
     <div class="block form-group">
-      <p class="instructions">Calculate summary statistics for selected variables by pressing <code class="button-like action">Calculate</code>. Use <code class="button-like green">Refresh Data</code> to refresh the available variables in the drop down menu.</p>
+      <p class="instructions">Calculate summary statistics for selected variables by pressing <code class="button-like action">Calculate</code>. Use <code class="button-like action">Refresh Data</code> to refresh the available variables in the drop down menu.</p>
       <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
     </div>
     <div class="preinit" id="resultList" class="hide">
@@ -52,13 +52,15 @@
         <option><?= columnDefs[i].name ?></option>
         <? } ?>
       </select>
-      <button class="button green" onclick="getVariables()">Refresh Data</button>
+      <button class="button action" onclick="getVariables()">Refresh Data</button>
     </div> 
     <div class="block form-group" style="text-align: center; ">
       <div data-ui="status" id="status" style="display: block; margin: 1em;"></div>
-      <button id="calcBtn" class="button action" onclick="calculateNew()" disabled>Calculate</button>
-      <button id="addToSheetBtn" class="button create" onclick="clientAddToSheet()" disabled>Add to Sheet</button>
-      <button class="button" onclick="google.script.host.close()">Close</button>
+      <div class="inline-button-block">
+        <button id="calcBtn" class="button action" onclick="calculateNew()" disabled>Calculate</button>
+        <button id="addToSheetBtn" class="button create" onclick="clientAddToSheet()" disabled>Add to Sheet</button>
+        <button class="button" onclick="google.script.host.close()">Close</button>
+      </div>
     </div>      
     <?!= include('stats-script'); ?>
   </body>
