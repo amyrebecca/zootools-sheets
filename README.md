@@ -11,7 +11,7 @@ It is developed with:
 
 ## Usage
 
-The add-on can be installed [via link]().
+The add-on can be installed [via link](https://chrome.google.com/webstore/detail/zoo-tools-for-sheets/bnodkbhblaaopkdmlhaglnfnogahbkfe?hl=en-US&gl=US&authuser=0).
 
 More information about the curriculum and course activities is found on the [course landing page](http://zooniverse.github.io/intro-2-astro/).
 
