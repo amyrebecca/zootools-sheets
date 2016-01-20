@@ -83,7 +83,9 @@
     // Send the value to the server and handle the response.
     if (institutionAddress && locationAddress) {
       google.script.run
-        .withSuccessHandler(successHandler)
+        .withSuccessHandler(function() {
+          showCompletionMsg();
+        })
         .withFailureHandler(failureHandler)
         .withUserObject(this)
         .clientAddFormSubmission(institution, institutionAddress, location, locationAddress);
@@ -94,8 +96,12 @@
 
   }
   
-  function successHandler(){
-    google.script.host.close()
+  function showCompletionMsg(){
+    var completionMsg = "Thank you for submitting your response. Please now close the browser tab with the Google spreadsheet.";
+    google.script.run
+      .withSuccessHandler(function() { google.script.host.close(); })
+      .withFailureHandler(function(error){ console.error(error); })
+      .clientShowGenericDialog(completionMsg);
   }
   
   function failureHandler(err) {

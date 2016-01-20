@@ -60,3 +60,7 @@ function clientAddChart(config, data, type) {
 function clientAddStats(data) {
   return SheetManager.addStats(data);
 }
+
+function clientShowGenericDialog(prompt) {
+  return UIManager.showGenericDialog(prompt);
+}
