@@ -4,6 +4,7 @@
     location: null
   };
   
+  var isFirefox = typeof InstallTrigger !== 'undefined';
   // Selector function
   var $ = function(sel){ return document.querySelector(sel); };
   $('#form-submit').addEventListener('click', onSubmitClick);
@@ -27,7 +28,12 @@
     var locationInputs = document.querySelectorAll('input[data-input="location"]');
     
     for (var i = 0; i < locationInputs.length; i++) {
-      locationInputs[i].addEventListener('focus', geolocate);
+      if (isFirefox) {
+        locationInputs[i].addEventListener('click', geolocate);
+        locationInputs[i].addEventListener('onkeydown', geolocate);
+      } else {
+        locationInputs[i].addEventListener('focus', geolocate);
+      } 
     } 
   });
   
@@ -45,8 +51,6 @@
           radius: position.coords.accuracy
         });
         autocomplete[el.id].setBounds(circle.getBounds());
-        // Remove onfocus listener to keep Firefox from continuously firing it. 
-        el.removeEventListener('focus', geolocate);
       }, failureHandler, {timeout: 10000});
     }
   }
@@ -56,20 +60,38 @@
   function onSubmitClick() {
     this.disabled = true;
     // Gather any information that needs to be sent to the server here.
+    var institutionAddress, locationAddress;
     var institution = $('#institution').value;
     var institutionPlace = autocomplete.institution.getPlaces();
-    var institutionAddress = institutionPlace[0].formatted_address || institution; // Send something to the geocoder in case the getPlaces() call fails
     var location = $('#location').value;
     var locationPlace = autocomplete.location.getPlaces();
-    var locationAddress = locationPlace[0].formatted_address || location; // Send something to the geocoder in case the getPlaces() call fails
-
+    
+    // Send something to the geocoder in case the getPlaces() call fails
+    if (institutionPlace) {
+      institutionAddress = institutionPlace[0].formatted_address;
+    } else {
+      institutionAddress = institution;
+    }
+    
+    if (locationPlace) {
+      locationAddress = locationPlace[0].formatted_address;
+    } else {
+      locationAddress = location;
+    } 
+    
     showStatus('Working...');
     // Send the value to the server and handle the response.
-    google.script.run
-      .withSuccessHandler(successHandler)
-      .withFailureHandler(failureHandler)
-      .withUserObject(this)
-      .clientAddFormSubmission(institution, institutionAddress, location, locationAddress);
+    if (institutionAddress && locationAddress) {
+      google.script.run
+        .withSuccessHandler(successHandler)
+        .withFailureHandler(failureHandler)
+        .withUserObject(this)
+        .clientAddFormSubmission(institution, institutionAddress, location, locationAddress);
+    } else {
+      showStatus('Please complete the form with valid values.', 'error');
+      $('#form-submit').disabled = false;
+    }
+
   }
   
   function successHandler(){
@@ -90,5 +112,3 @@
     }
   }
 </script>
-
-

@@ -36,7 +36,7 @@
     google.script.run
       .withSuccessHandler(
         function(res) {
-          getGoogleMap(event, res);
+          getGoogleMap(null, res);
           showStatus(null);
         }
       ).clientGetCoordinates(latitude, longitude)

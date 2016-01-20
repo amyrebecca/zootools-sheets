@@ -33,7 +33,6 @@ var ChartBuilder = (function() {
     if(config.y.range && config.y.range.min){ chart.setOption('vAxis.minValue',config.y.range.min); }
     if(config.y.range && config.y.range.max){ chart.setOption('vAxis.maxValue',config.y.range.max); }
     if(config.trendlines !== 'none'){ 
-      Logger.log('config.trendlines: %s', config.trendlines);
       var options = {
         0: {
           type: config.trendlines,
