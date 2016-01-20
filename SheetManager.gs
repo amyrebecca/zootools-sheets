@@ -170,8 +170,10 @@ var SheetManager = (function(sheet){
        var headerRow = sheet.getRange(1, lastColumnWithContent + 1, 1, 8);
        headerRow.setValues([['DateTime', 'Where are you from?', 'What is your institution?', 'Student latitude', 'Student longitude', 'Institution latitude', 'Institution longitude', 'Calculated Distance']]);
        sheet.setFrozenRows(1); // Freeze header row
+    } else {
+      SpreadsheetApp.setActiveSheet(sheet);
     }
-    protectSheet(sheet); //Add sheet protection
+    
     return sheet;
   }
   
@@ -228,29 +230,9 @@ var SheetManager = (function(sheet){
         institutionGeocoded = geolocate(geocoder, institutionAddress),
         locationGeocoded = geolocate(geocoder, locationAddress);
     
-
-    unProtectSheet(sheet); // Remote sheet protection
     sheet.appendRow([date, location, institution, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
-    protectSheet(sheet); // Add sheet protection
   }
   
-  var protectSheet = function(sheet) {
-    var user = Session.getEffectiveUser();
-    var protection = sheet.protect();
-    
-    protection.removeEditors(protection.getEditors());
-    if (protection.canDomainEdit()) {
-      protection.setDomainEdit(false);
-    }
-  }
-  
-  var unProtectSheet = function(sheet) {
-    var protection = sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET)[0];
-
-    if (protection) {
-      protection.remove(); 
-    } 
-  }
   
   return {
     getID: getID,
