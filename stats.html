@@ -10,7 +10,7 @@
       <h1>Summary Stats</h1>
     </div>
     <div class="block form-group">
-      <p>Calculate summary statistics for selected variables.</p>
+      <p class="instructions">Calculate summary statistics for selected variables by pressing <code class="button-like action">Calculate</code>. Use <code class="button-like green">Refresh Data</code> to refresh the available variables in the drop down menu.</p>
       <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
     </div>
     <div class="preinit" id="resultList" class="hide">
@@ -52,7 +52,7 @@
         <option><?= columnDefs[i].name ?></option>
         <? } ?>
       </select>
-      <button class="button green" onclick="getVariables()">Refresh</button>
+      <button class="button green" onclick="getVariables()">Refresh Data</button>
     </div> 
     <div class="block form-group" style="text-align: center; ">
       <div data-ui="status" id="status" style="display: block; margin: 1em;"></div>

@@ -10,7 +10,7 @@
       <h1>Scatter Plot Helper</h1>
     </div>
     <div class="block">
-      <p>You may change the independent (X) and dependent (Y) variables below, then press Plot to draw or redraw the plot.</p>
+      <p class="instructions">You may change the independent (X) and dependent (Y) variables below, then press <code class="button-like action">Plot</code> to draw or redraw the plot. Use <code class="button-like green">Refresh Data</code> to refresh the available variables in the drop down menus.</p>
       <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
     </div>
     <div class="block">
@@ -34,7 +34,9 @@
             <p><input type="radio" id="xScaleDefault" name="xScale" onclick="updateSelection()" checked><label for="xScaleDefault">Auto</label></p>
             <p><input type="radio" id="xScaleSpecific" name="xScale" onclick="updateSelection()"><label for="xScaleSpecific">Specified</label></p>
             <div style="text-indent: 1.5em;">
-              <div style="text-align: justify"><input type="number" pattern="\d*" id="xMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="number" pattern="\d*" id="xMax" style="width: 30%; " disabled /></div>
+              <div style="text-align: justify">
+                <input title="Specified range may not be available in chart preview, but will display once sent to the spreadsheet." type="number" pattern="\d*" id="xMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input title="Specified range may not be available in chart preview, but will display once sent to the spreadsheet." type="number" pattern="\d*" id="xMax" style="width: 30%; " disabled />
+              </div>
             </div>
           </div>
         </div>
@@ -74,6 +76,7 @@
       </div>
       </fieldset>
     </div>
+    <div style="text-align: center; width: 100%;"><p><button class="button green" onclick="getVariables()">Refresh Data</button></p></div>
     <div class="trendline-option-container">
       <label for="trendlineSelector">Trendline</label>
       <select id="trendlineSelector" name="trendline" onclick="updateSelection('trendlines')">
@@ -84,7 +87,6 @@
       </select>
     </div>
     <div id="chart-preview" style="width: 100%"></div>
-    <div><p><button class="button green" onclick="getVariables()">Refresh</button></p></div>
     <div class="action-button-bar" style="text-align: center; ">
       <div data-ui="status" style="display: block; margin: 1em;"></div>
       <button type="button" id="updateBtn" class="button action" onclick="clientChangeSelection()" disabled>Plot</button>
