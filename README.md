@@ -6,8 +6,8 @@ Zoo Tools for Google Sheets is a custom Google Sheets add-on originally develope
 
 It is developed with:
 - [Google Apps Script](https://developers.google.com/apps-script/)
-- (math.js library)[http://mathjs.org/]
-- (underscore.js library)[http://underscorejs.org/]
+- [math.js library](http://mathjs.org/)
+- [underscore.js library](http://underscorejs.org/)
 
 ## Usage
 
@@ -23,4 +23,4 @@ When submitting issues please be as descriptive as possible. Include browser and
 
 ### Pull Requests
 
-If you want to add to the development of this add-on, please submit a pull request. Unfortunately there isn't a good way to develop this add-on locally. You will need to pull down this repo and setup and copy the contents of the files into a Google Sheet you've setup for development. Please test any new features in all of the latest browser version as well as following Google's [test add-on](https://developers.google.com/apps-script/add-ons/test) guidelines.
+If you want to add to the development of this add-on, please fork and submit a pull request. Unfortunately there isn't a good way to develop this add-on locally. You will need to pull down this repo and setup and copy the contents of the files into a Google Sheet you've setup for development. Please test any new features in all of the latest browser version as well as following Google's [test add-on](https://developers.google.com/apps-script/add-ons/test) guidelines.
