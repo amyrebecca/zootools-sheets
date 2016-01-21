@@ -1,11 +1,11 @@
-var SheetManager = (function(sheet){
+var SheetManager = (function(){
  
   var getID = function() {
     return SpreadsheetApp.getActiveSpreadsheet().getId();
   }
   
   var getValues = function(varName){
-    var data = sheet.getDataRange().getValues();
+    var data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
     for(var colIdx = 0; colIdx < data[0].length; colIdx++){
       if(data[0][colIdx]==varName) break;
     }
@@ -15,7 +15,7 @@ var SheetManager = (function(sheet){
       rowIdx++;
     } while(data[rowIdx] && data[rowIdx][colIdx]);
   
-    return sheet.getRange(2, colIdx+1, rowIdx-1).getValues().map(function(e){ return e[0]; });
+    return SpreadsheetApp.getActiveSheet().getRange(2, colIdx+1, rowIdx-1).getValues().map(function(e){ return e[0]; });
   }
   
   var getMultipleValues = function(varNameX, varNameY) {
@@ -25,7 +25,7 @@ var SheetManager = (function(sheet){
   }
   
   var fetchRange = function(varName){
-    var data = sheet.getDataRange().getValues();
+    var data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
     for(var colIdx = 0; colIdx < data[0].length; colIdx++){
       if(data[0][colIdx]==varName) break;
     }
@@ -35,7 +35,7 @@ var SheetManager = (function(sheet){
       rowIdx++;
     } while(data[rowIdx] && data[rowIdx][colIdx]);
   
-    return sheet.getRange(1, colIdx+1, rowIdx-1);
+    return SpreadsheetApp.getActiveSheet().getRange(1, colIdx+1, rowIdx-1);
   }
   
   var getQuery = function(varName1, varName2) {
@@ -99,8 +99,6 @@ var SheetManager = (function(sheet){
   
   var addChart = function(config, data, type) {
     var xRange, yRange;
-    var sheet = setupNamedSheet('Charts');
-    
     if (config.x) {
       xRange = fetchRange(config.x.variable);
     }
@@ -110,8 +108,10 @@ var SheetManager = (function(sheet){
     }
     
     if (data) {
-      var columnChartDataSheet = setupNamedSheet('Histogram Chart Data');
+      setupNamedSheet('Histogram Chart Data');
     }
+    
+    setupNamedSheet('Charts');
     
     switch (type) {
       case "scatter":
@@ -168,7 +168,7 @@ var SheetManager = (function(sheet){
 
        // Setup headers for new sheet
        var headerRow = sheet.getRange(1, lastColumnWithContent + 1, 1, 8);
-       headerRow.setValues([['DateTime', 'Where are you from?', 'What is your institution?', 'Student latitude', 'Student longitude', 'Institution latitude', 'Institution longitude', 'Calculated Distance']]);
+       headerRow.setValues([['DateTime', 'Where are you from?', 'What is your institution?', 'Student latitude', 'Student longitude', 'Institution latitude', 'Institution longitude', 'Calculated Distance in km']]);
        sheet.setFrozenRows(1); // Freeze header row
     } else {
       SpreadsheetApp.setActiveSheet(sheet);
@@ -247,4 +247,4 @@ var SheetManager = (function(sheet){
     addStats: addStats
   };
   
-})(SpreadsheetApp.getActiveSheet());
+})();

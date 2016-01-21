@@ -13,6 +13,7 @@
       <p class="instructions">Calculate summary statistics for selected variables by pressing <code class="button-like action">Calculate</code>. Use <code class="button-like action">Refresh Data</code> to refresh the available variables in the drop down menu.</p>
       <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
     </div>
+    <div style="text-align: center; width: 100%;"><button class="button action" onclick="getVariables()">Refresh Data</button></div>
     <div class="preinit" id="resultList" class="hide">
 
     <div class="block form-group" id="result">
@@ -46,13 +47,12 @@
     
     <p />
     <? columnDefs = clientGetVariables(); ?>
-    <div class="inline-button-block form-group">
-      <select id="varName" style="width: 70%;" >
+    <div class="form-group">
+      <select id="varName" style="width: 100%;" >
         <? for(var i = 0; i < columnDefs.length; i++) { ?>
         <option><?= columnDefs[i].name ?></option>
         <? } ?>
       </select>
-      <button class="button action" onclick="getVariables()">Refresh Data</button>
     </div> 
     <div class="block form-group" style="text-align: center; ">
       <div data-ui="status" id="status" style="display: block; margin: 1em;"></div>
