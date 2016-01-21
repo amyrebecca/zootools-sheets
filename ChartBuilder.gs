@@ -74,7 +74,6 @@ var ChartBuilder = (function() {
     
     chart = chart.build();
     sheet.insertChart(chart);
-    SpreadsheetApp.setActiveSheet(sheet);
   }
   
   return {

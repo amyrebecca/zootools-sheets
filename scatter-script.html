@@ -160,11 +160,12 @@ function resetState() {
   $('#xMin').value = '';
   $('#xMax').value = '';
   $('#yScaleDefault').checked = true;
-  $('#yScaleSpecific'.checked = false);
+  $('#yScaleSpecific').checked = false;
   $('#invertY').checked = false;
   $('#logY').checked = false;
   $('#yMin').value = '';
   $('#yMax').value = '';
+  $('#trendlineSelector').value = 'none';
   
   var state = extractState();
   applyState(state);

@@ -1,7 +1,16 @@
+/**
+ * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
+ */
+
+// Ensure onOpen is called when add-on is first installed
+function onInstall(e) {
+  onOpen(e);
+}
+
 // when opening the file, destroy existing charts and
 // regenerate them from the configuration, after loading
 // the menu items and the sidebar
-function onOpen() {
+function onOpen(e) {
   UIManager.registerMenu();
 }
 

@@ -2,7 +2,7 @@ var UIManager = (function(){
   return {
     registerMenu: function(){
       var ui = SpreadsheetApp.getUi();
-      ui.createMenu('Zoo Tools')
+      ui.createAddonMenu()
           .addItem('Scatter Plot Helper', 'clientShowScatter')
           .addItem('Histogram Helper', 'clientShowHistogram')
           .addItem('Summary Stats Helper', 'clientShowStats')
