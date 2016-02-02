@@ -46,7 +46,7 @@ function getVariables() {
 
       // Handle if user is not on a sheet with no data
       if (res.length === 0) {
-        showStatus('No variables to choose from.');
+        showStatus('No variables to choose from.', 'error');
         disable($('#xVar'));
         disable($('#yVar'));
         disable($('#updateBtn'));
@@ -186,9 +186,10 @@ function toggleVar(varName){
 
 // update the chart from the client's selected variables
 function clientChangeSelection(){
-    var xVar = $('#xVar').value;
-    var yVar = $('#yVar').value;
+  var xVar = $('#xVar').value;
+  var yVar = $('#yVar').value;
     
+  if (xVar != yVar) {
     showStatus('Drawing Plot...');
     
     google.script.run
@@ -197,7 +198,11 @@ function clientChangeSelection(){
         previewChart(res);
       })
       .withFailureHandler(failureHandler)
-      .clientGetMultipleValues(xVar, yVar);
+      .clientGetMultipleValues(xVar, yVar);  
+  } else {
+    showStatus('X and Y variables are the same selection. Please update your variable selections so that they are not the same', 'error'); 
+  }
+
 }
 
 // Use response from sheet to setup data in format expected by Charts API for scatter plots
