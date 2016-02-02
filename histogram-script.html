@@ -48,7 +48,7 @@ function getVariables() {
     
       // Handle if user is not on a sheet with no data
       if (res.length === 0) {
-        showStatus('No variables to choose from.');
+        showStatus('No variables to choose from.', 'error');
         disable($('#xVar'));
         disable($('#updateBtn'));
       } else {
