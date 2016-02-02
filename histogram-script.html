@@ -141,12 +141,13 @@ function clientChangeSelection(){
 
 // Use response from sheet to setup data in format expected by Charts API for scatter plots
 function setupDataTable(spreadsheetValues) {
+  var min, max;
   var state = extractState();
   var table = [[state.x.variable, 'Frequency']];
-  var min = math.min(spreadsheetValues);
-  var max = math.max(spreadsheetValues);
+  try { min = math.min(spreadsheetValues) } catch (e) { failureHandler(e) };
+  try { max = math.max(spreadsheetValues) } catch (e) { failureHandler(e) };
   var bucketNum = state.bucketNum;
-  var bucketSize = math.round((max-min)/bucketNum);
+  var bucketSize = (max-min)/bucketNum;
   
   var rangeStart;
   if (min < 0) {
@@ -166,7 +167,7 @@ function setupDataTable(spreadsheetValues) {
       rangeMin = bucketRanges[i];
       rangeMax = bucketRanges[i+1];
     } else {
-      rangeMin = bucketRanges[i]+1;
+      rangeMin = bucketRanges[i];
       rangeMax = bucketRanges[i+1];
     }
     if (bucketRanges[i+1]) {
@@ -181,9 +182,8 @@ function setupDataTable(spreadsheetValues) {
   
 
   _.each(spreadsheetValues, function(value, index, list) {
-    var num = math.round(value);
     _.each(hAxisValues, function(obj, index, list) {
-      if (num >= obj.rangeMin && num <= obj.rangeMax) {
+      if (value >= obj.rangeMin && value <= obj.rangeMax) {
         var count = obj.count;
         count++
         obj.count = count;
