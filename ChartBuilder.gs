@@ -42,7 +42,7 @@ var ChartBuilder = (function() {
       };
       chart.setOption('trendlines', options);
     } 
-    
+
     chart = chart.build();
     sheet.insertChart(chart);
   }
@@ -56,9 +56,9 @@ var ChartBuilder = (function() {
     var columnToStart = columnChartDataSheet.getLastColumn() + 1;
     var range = columnChartDataSheet.getRange(1, columnToStart, numRows, numColumns);
     range.setValues(data);
-    xRange = columnChartDataSheet.getRange(1, columnToStart, numRows, 1);
+    xRange = columnChartDataSheet.getRange(1, columnToStart, numRows, 1).setNumberFormat('@STRING@');
     yRange = columnChartDataSheet.getRange(1, columnToStart + 1, numRows, 1);
-    
+
     // setup pseudo-histogram chart using column chart
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Charts');
     var offset = determineOffset();
@@ -69,9 +69,10 @@ var ChartBuilder = (function() {
       .addRange(xRange)
       .addRange(yRange)
       .setOption('legend.position', 'none')
-      .setOption('bars.groupWidth', '100%')
+      .setOption('bar.groupWidth', '100%')
       .setPosition(3, 2, 0, offset);
     
+    //SpreadsheetApp.getUi().alert(chart.getOptions());
     chart = chart.build();
     sheet.insertChart(chart);
   }

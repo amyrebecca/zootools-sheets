@@ -156,7 +156,7 @@ function setupDataTable(spreadsheetValues) {
     rangeStart = 0;
   }
   var bucketRanges = _.range(rangeStart, max, bucketSize);
-  bucketRanges.push(math.round(max)); //Add in max value 
+  bucketRanges.push(max); //Add in max value 
 
     
   var hAxisValues = [];
@@ -174,7 +174,8 @@ function setupDataTable(spreadsheetValues) {
       var obj = {
         count: 0,
         rangeMin: rangeMin,
-        rangeMax: rangeMax
+        rangeMax: rangeMax,
+        median: math.median(rangeMin, rangeMax)
       }
       hAxisValues.push(obj);
     }
@@ -183,27 +184,38 @@ function setupDataTable(spreadsheetValues) {
 
   _.each(spreadsheetValues, function(value, index, list) {
     _.each(hAxisValues, function(obj, index, list) {
-      if (value >= obj.rangeMin && value <= obj.rangeMax) {
-        var count = obj.count;
-        count++
-        obj.count = count;
+      // Prevent a value being counted twice if it happens to equal a range boundary
+      if (value === obj.rangeMin) {
+        if (value >= obj.rangeMin && value < obj.rangeMax) {
+          var count = obj.count;
+          count++
+          obj.count = count;
+        }
+      } else {
+        if (value > obj.rangeMin && value <= obj.rangeMax) {
+          var count = obj.count;
+          count++
+          obj.count = count;
+        }
       }
     })
   });
   
-
   for (var i = 0; i < hAxisValues.length; i++) {
-    var row = [hAxisValues[i].rangeMin + '-' + hAxisValues[i].rangeMax, hAxisValues[i].count];
+    var medianLabel = math.round(hAxisValues[i].median, 2).toString();
+    var row = [medianLabel+ " ", hAxisValues[i].count];
     table.push(row);
   }
-  
+
   return table;
 }
 
 function buildChartOptions(state) {
   options = {
     legend: { position: 'none' },
-    bar: { groupWidth: '100%' }
+    bar: { groupWidth: '100%' },
+    hAxis: { title: state.x.variable },
+    vAxis: { title: "Frequency" }
   }
   
   return options;
