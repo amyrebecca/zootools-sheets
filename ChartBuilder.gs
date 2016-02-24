@@ -47,7 +47,7 @@ var ChartBuilder = (function() {
     sheet.insertChart(chart);
   }
   
-  var addColumnChart = function(data, config) {
+  var addHistogramChart = function(data, config) {
     // setup pseudo-histogram data range in sheet
     var xRange, yRange;
     var columnChartDataSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Histogram Chart Data');
@@ -72,13 +72,38 @@ var ChartBuilder = (function() {
       .setOption('bar.groupWidth', '100%')
       .setPosition(3, 2, 0, offset);
     
-    //SpreadsheetApp.getUi().alert(chart.getOptions());
+    chart = chart.build();
+    sheet.insertChart(chart);
+  }
+  
+  var addColumnChart = function(data, config) {
+    var chartDataRange;
+    var galaxyDataSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Galaxy Column Chart Data');
+    var numColumns = data[0].length;
+    var numRows = data.length;
+    var columnToStart = galaxyDataSheet.getLastColumn() + 1;
+    var range = galaxyDataSheet.getRange(1, columnToStart, numRows, numColumns);
+    range.setValues(data);
+    chartDataRange = galaxyDataSheet.getRange(1, columnToStart, numRows, numColumns);
+    
+    // Setup column chart
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Charts');
+    var offset = determineOffset();
+    var chart = sheet.newChart().asColumnChart();
+    chart.setTitle('Galaxy ' + config.x.variable)
+      .setYAxisTitle('Count of Votes')
+      .addRange(chartDataRange)
+      .setOption('legend.position', 'none')
+      .setOption('bar.groupWidth', '100%')
+      .setPosition(3, 2, 0, offset);
+    
     chart = chart.build();
     sheet.insertChart(chart);
   }
   
   return {
     addScatterChart: addScatterChart,
+    addHistogramChart: addHistogramChart,
     addColumnChart: addColumnChart
   };
 })();
