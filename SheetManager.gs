@@ -158,7 +158,7 @@ var SheetManager = (function(){
       case "scatter":
         return ChartBuilder.addScatterChart(xRange, yRange, config);
       case "histogram":
-        return ChartBuilder.addColumnChart(data, config);
+        return ChartBuilder.addHistogramChart(data, config);
       case "column":
         return ChartBuilder.addColumnChart(data, config);
     }
