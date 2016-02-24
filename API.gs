@@ -9,6 +9,10 @@ function clientGetVariables(){
   return SheetManager.getVariables(); 
 };
 
+function clientGetRowIds(){
+  return SheetManager.getRowIds();
+}
+
 function clientShowStats(){
   return UIManager.showSidebar('stats'); 
 }
@@ -21,8 +25,8 @@ function clientShowHistogram(){
   return UIManager.showSidebar('histogram'); 
 }
 
-function clientShowBar(){
-  return UIManager.showSidebar('bar'); 
+function clientShowGalaxyColumn(){
+  return UIManager.showSidebar('galaxy-column'); 
 }
 
 function clientShowMapDialog(){
@@ -44,6 +48,10 @@ function clientGetValues(varName){
 function clientGetMultipleValues(varNameX, varNameY) {
   return SheetManager.getMultipleValues(varNameX, varNameY);
 }
+
+function clientGetRowValues(varName) {
+  return SheetManager.getRowValues(varName);
+};
 
 function clientQuery(varName1, varName2) {
   return SheetManager.getQuery(varName1, varName2);

@@ -24,6 +24,26 @@ var SheetManager = (function(){
     return returnedValues;
   }
   
+  var getRowValues = function(varName) {
+    var selectedRowIndex;
+    var sheet = SpreadsheetApp.getActiveSheet();
+    var rowIdValues = sheet.getRange(2, 1, sheet.getLastRow(), 1).getValues();
+    var flattenedRow = [];
+    
+    for (var i = 0; i < rowIdValues.length; i++) {
+      if (typeof(rowIdValues[i][0]) === 'number') {
+        flattenedRow.push(rowIdValues[i][0].toString());
+      } else {
+        flattenedRow.push(rowIdValues[i][0]);
+      }
+    }
+
+    if (flattenedRow.indexOf(varName) > -1) {
+      selectedRowIndex = flattenedRow.indexOf(varName);
+    }
+    return {headers: sheet.getRange(1, 2, 1, sheet.getLastColumn() - 1).getValues(), values: sheet.getRange(selectedRowIndex + 2, 2, 1, sheet.getLastColumn() - 1).getValues()};
+  }
+  
   var fetchRange = function(varName){
     var data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
     for(var colIdx = 0; colIdx < data[0].length; colIdx++){
@@ -84,6 +104,22 @@ var SheetManager = (function(){
     return augmented;
   }
   
+  // Custom for Activity 2
+  var getRowIds = function(){
+    var data;
+    var sheet = SpreadsheetApp.getActiveSheet();
+    if (sheet.getLastRow()) {
+      data = sheet.getRange(2, 1, sheet.getLastRow(), 1).getValues();
+    }
+    
+    var augmented = [];
+    for(var idx in data){
+      augmented.push({name: data[idx]});
+    }
+    
+    return augmented;
+  }
+  
   var setupNamedSheet = function(sheetName) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
     var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
@@ -99,6 +135,7 @@ var SheetManager = (function(){
   
   var addChart = function(config, data, type) {
     var xRange, yRange;
+    var sheet = SpreadsheetApp.getActiveSheet();
     if (config.x) {
       xRange = fetchRange(config.x.variable);
     }
@@ -108,14 +145,20 @@ var SheetManager = (function(){
     }
     
     if (data) {
-      setupNamedSheet('Histogram Chart Data');
+      if (type === 'histogram') {
+        setupNamedSheet('Histogram Chart Data');
+      } else {
+        setupNamedSheet('Galaxy Column Chart Data');
+      }
     }
-    
+
     setupNamedSheet('Charts');
-    
+
     switch (type) {
       case "scatter":
         return ChartBuilder.addScatterChart(xRange, yRange, config);
+      case "histogram":
+        return ChartBuilder.addColumnChart(data, config);
       case "column":
         return ChartBuilder.addColumnChart(data, config);
     }
@@ -216,8 +259,6 @@ var SheetManager = (function(){
   }
   
   var addFormSubmission = function(institution, institutionAddress, location, locationAddress) {
-
-
     // Setup latitude and longitude headers if needed
     var formResponseSheet = getFormResponseSheet();
     
@@ -240,6 +281,8 @@ var SheetManager = (function(){
     destroyCharts: destroyCharts,
     getValues: getValues,
     getMultipleValues: getMultipleValues,
+    getRowValues: getRowValues,
+    getRowIds: getRowIds,
     getQuery: getQuery,
     getCoordinates: getCoordinates,
     addFormSubmission: addFormSubmission,
