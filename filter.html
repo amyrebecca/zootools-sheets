@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
     <?!= include('styles'); ?>
   </head>
-  <body class="sidebar">
+  <body class="sidebar filter">
     <div class="block">
       <h1>Data Filter</h1>
     </div>
@@ -27,7 +27,7 @@
             <option><?= columnDefs[i].name ?></option>
             <? } ?>
           </select>
-          <select id="firstFilterOperator">
+          <select class="select-operator" id="firstFilterOperator">
             <option value="=">=</option>
             <option value="!=">&#8800;</option>
             <option value="<"><</option>
@@ -56,7 +56,7 @@
             <option><?= columnDefs[i].name ?></option>
             <? } ?>
           </select>
-          <select id="secondFilterOperator" disabled>
+          <select class="select-operator" id="secondFilterOperator" disabled>
             <option value="=">=</option>
             <option value="!=">&#8800;</option>
             <option value="<"><</option>
