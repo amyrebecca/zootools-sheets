@@ -3,7 +3,7 @@
 
 function clientGetSpreadsheetID() {
   return SheetManager.getID();
-}
+};
 
 function clientGetVariables(){ 
   return SheetManager.getVariables(); 
@@ -11,23 +11,27 @@ function clientGetVariables(){
 
 function clientGetRowIds(){
   return SheetManager.getRowIds();
-}
+};
 
 function clientShowStats(){
   return UIManager.showSidebar('stats'); 
-}
+};
 
 function clientShowScatter(){
   return UIManager.showSidebar('scatter'); 
-}
+};
 
 function clientShowHistogram(){
   return UIManager.showSidebar('histogram'); 
-}
+};
 
 function clientShowGalaxyColumn(){
   return UIManager.showSidebar('galaxy-column'); 
-}
+};
+
+function clientShowFilter(){
+  return UIManager.showSidebar('filter');
+};
 
 function clientShowMapDialog(){
   return UIManager.showDialog('map');
@@ -47,15 +51,19 @@ function clientGetValues(varName){
 
 function clientGetMultipleValues(varNameX, varNameY) {
   return SheetManager.getMultipleValues(varNameX, varNameY);
-}
+};
 
 function clientGetRowValues(varName) {
   return SheetManager.getRowValues(varName);
 };
 
-function clientQuery(varName1, varName2) {
+function clientGetA1Notation(varName) {
+  return SheetManager.getA1Notation(varName);
+};
+
+function clientGetQuery(varName1, varName2) {
   return SheetManager.getQuery(varName1, varName2);
-} 
+}; 
 
 function clientAddFormSubmission(institution, institutionAddress, location, locationAddress){
   return SheetManager.addFormSubmission(institution, institutionAddress, location, locationAddress);
@@ -63,12 +71,16 @@ function clientAddFormSubmission(institution, institutionAddress, location, loca
 
 function clientAddChart(config, data, type) {
   return SheetManager.addChart(config, data, type);
-}
+};
 
 function clientAddStats(data) {
   return SheetManager.addStats(data);
-}
+};
 
 function clientShowGenericDialog(prompt) {
   return UIManager.showGenericDialog(prompt);
-}
+};
+
+function clientFilterData(A1Notation) {
+  return SheetManager.filterData(A1Notation);
+};

@@ -1,0 +1,169 @@
+<script type="text/javascript">
+
+var columnDefs = null;
+var canSubmit = false;
+var $ = function(sel){ return document.querySelector(sel); };
+var enable = function(node){ node.removeAttribute('disabled'); }
+var disable = function(node){ node.setAttribute('disabled', true); }
+
+function showStatus(msg, classId) {
+  var status = document.querySelectorAll('div[data-ui="status"]');
+  for (var i = 0; i < status.length; i++) {
+    status[i].className = ""
+    status[i].innerHTML = msg;
+    if (classId) {
+      status[i].classList.add(classId);
+    }
+  }
+}
+
+function failureHandler(err) {
+  console.error(err);
+  showStatus('Something went wrong: ' + err, 'error');
+}
+
+// use async call to determine initial state of dropdown lists
+// from contents of chart cells
+function getVariables() {
+  showStatus('Getting variables...');
+  google.script.run
+    .withSuccessHandler(function(res){
+      var refs = {};
+      for(var idx in res){
+        refs[res[idx].name] = res[idx];
+      }
+      columnDefs = refs;
+    
+      // Handle if user is not on a sheet with no data
+      if (res.length === 0) {
+        showStatus('No variables to choose from.', 'error');
+        disable($('#filterBtn'));
+      } else {
+        showStatus('');
+        enable($('#filterBtn'));
+      }
+      
+      if (res != columnDefs) { addVariableOptions() }
+
+    })
+    .withFailureHandler(failureHandler)
+    .clientGetVariables();
+}
+
+getVariables();
+
+function addVariableOptions() {
+  var options = '';
+  var selects = document.querySelectorAll('select[data-select="variable"]');
+  
+  for (var key in columnDefs) {
+    var newOption = '<option>' + columnDefs[key].name + '</option>';
+    options += newOption;
+  }
+  
+  for (var i = 0; i < selects.length; i++) {
+    selects[i].innerHTML = options;
+  }
+}
+
+function getRange() {
+  var varName1 = $('#varName1').value;
+  var varName2 = $('#varName2').value;
+  google.script.run
+    .withSuccessHandler(function(res) {
+      showStatus('Processing...');
+      console.log('query', res);
+      filterData(res);
+    })
+    .withFailureHandler(failureHandler)
+    .clientGetQuery(varName1, varName2);
+}
+
+function enableSecondFilter() {
+  enable($('#varName2'));
+  enable($('#secondFilterOperator'));
+  enable($('#secondFilterValue'));
+}
+
+function testValue(input, operator) {
+  if (/^\d+$/.test(input)) {
+    canSubmit = true;
+    return "";
+  } else {
+    if (operator === ">" || operator === "<" || operator === ">=" || operator == "<=") {
+      canSubmit = false;
+      showStatus('Input must be a number with ' + operator + '.', 'error');
+    } else {
+      canSubmit = true;
+    }
+    return "'";
+  }
+}
+
+function createA1Formula(inputValues, sheetData) {
+  var A1Notation, isFirstNumber, isSecondNumber;
+  
+  isFirstNumber = testValue(inputValues.first.input, inputValues.first.operator);
+  
+  if (inputValues.second.input.length > 0) {
+    isSecondNumber = testValue(inputValues.second.input, inputValues.second.operator);
+    var secondColumnSyntax;
+    if (sheetData.columnOne !== sheetData.columnTwo) {
+      secondColumnSyntax = "," + sheetData.columnTwo;
+    } else {
+      secondColumnSyntax = "";
+    }
+    
+    A1Notation = "QUERY('" + sheetData.sheetName + "'!" + sheetData.columnOne + ":" + sheetData.columnTwo; // Sheet reference
+    A1Notation += ', "select ' + sheetData.columnOne + secondColumnSyntax; // Select columns
+    A1Notation += " where " + sheetData.columnOne + " " + inputValues.first.operator + " " + isFirstNumber + inputValues.first.input + isFirstNumber; // Logic for first input
+    A1Notation += " " + inputValues.second.boolean + " " + sheetData.columnTwo + " " + inputValues.second.operator + " " + isSecondNumber + inputValues.second.input + isSecondNumber + '", 1)'; // Logic for second input
+  } else {
+    A1Notation = "QUERY('" + sheetData.sheetName + "'!" + sheetData.columnOne + ":" + sheetData.columnOne; // Sheet reference
+    A1Notation += ', "select ' + sheetData.columnOne; // Select columns
+    A1Notation += " where " + sheetData.columnOne + " " + inputValues.first.operator + " " + isFirstNumber + inputValues.first.input + isFirstNumber; // Logic for first input
+    A1Notation += '", 1)';
+  }
+  
+  return A1Notation;
+}
+
+function filterData(sheetData) {
+  var firstFilterOperator = $('#firstFilterOperator').value;
+  var firstFilterValue = $('#firstFilterValue').value;
+  var boolean = $('#boolean').value;
+  var secondFilterOperator = $('#secondFilterOperator').value;
+  var secondFilterValue = $('#secondFilterValue').value;
+  var inputValues, A1Formula;
+
+  inputValues = {
+    first: { 
+      input: firstFilterValue,
+      operator: firstFilterOperator
+    },
+    second: {
+      input: secondFilterValue,
+      operator: secondFilterOperator,
+      boolean: boolean
+    }
+  };
+  
+  A1Formula = createA1Formula(inputValues, sheetData);
+  
+  if (canSubmit) {
+    google.script.run
+      .withSuccessHandler(function(res){
+        showStatus('');
+        getVariables();
+        disable($('#secondFilterValue'));
+        disable($('#secondFilterOperator'));
+        $('#firstFilterValue').value = '';
+        $('#secondFilterValue').value = '';
+        $('#boolean').value = 'select an option';
+      })
+      .withFailureHandler(failureHandler)
+      .clientFilterData(A1Formula);
+  }
+}
+
+</script>

@@ -58,6 +58,14 @@ var SheetManager = (function(){
     return SpreadsheetApp.getActiveSheet().getRange(1, colIdx+1, rowIdx-1);
   }
   
+  var getA1Notation = function(varName) {
+    var A1Notation = {
+      sheetName: SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName(),
+      range: fetchRange(varName).getA1Notation()
+    };
+    return A1Notation;
+  }
+  
   var getQuery = function(varName1, varName2) {
     var A1Notation, firstA1, secondA1, endRow;
     var query = {};
@@ -80,6 +88,7 @@ var SheetManager = (function(){
     }
     
     query.columnOne = firstA1[0];
+    query.sheetName = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName();
     
     return query;
   }
@@ -133,6 +142,18 @@ var SheetManager = (function(){
     return sheet;
   }
   
+  var filterData = function(A1Notation) {
+    var filteredDataSheet = setupNamedSheet('Filtered Data');
+    addFilteredData(A1Notation);
+  }
+  
+  var addFilteredData = function(A1Notation) {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Filtered Data');
+    var rangeToInsert = sheet.getRange(1, sheet.getLastColumn() + 1);
+    
+    rangeToInsert.setFormula(A1Notation);
+  }
+  
   var addChart = function(config, data, type) {
     var xRange, yRange;
     var sheet = SpreadsheetApp.getActiveSheet();
@@ -158,7 +179,7 @@ var SheetManager = (function(){
       case "scatter":
         return ChartBuilder.addScatterChart(xRange, yRange, config);
       case "histogram":
-        return ChartBuilder.addColumnChart(data, config);
+        return ChartBuilder.addHistogramChart(data, config);
       case "column":
         return ChartBuilder.addColumnChart(data, config);
     }
@@ -283,11 +304,13 @@ var SheetManager = (function(){
     getMultipleValues: getMultipleValues,
     getRowValues: getRowValues,
     getRowIds: getRowIds,
+    getA1Notation: getA1Notation,
     getQuery: getQuery,
     getCoordinates: getCoordinates,
     addFormSubmission: addFormSubmission,
     addChart: addChart,
-    addStats: addStats
+    addStats: addStats,
+    filterData: filterData
   };
   
 })();

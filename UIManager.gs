@@ -7,6 +7,7 @@ var UIManager = (function(){
           .addItem('Histogram Helper', 'clientShowHistogram')
           .addItem('Summary Stats Helper', 'clientShowStats')
           .addItem('Galaxy Column Chart Helper', 'clientShowGalaxyColumn')
+          .addItem('Data Filter Helper', 'clientShowFilter')
           .addItem('Map Helper', 'clientShowMapDialog')
           .addItem('Student Location Survey', 'clientShowFormDialog')
           .addToUi();
