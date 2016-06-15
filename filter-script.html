@@ -72,7 +72,6 @@ function getRange() {
   google.script.run
     .withSuccessHandler(function(res) {
       showStatus('Processing...');
-      console.log('query', res);
       filterData(res);
     })
     .withFailureHandler(failureHandler)
@@ -86,7 +85,7 @@ function enableSecondFilter() {
 }
 
 function testValue(input, operator) {
-  if (/^\d+$/.test(input)) {
+  if (/^\-?\d+\.?\d+?$/.test(input)) {
     canSubmit = true;
     return "";
   } else {
@@ -101,8 +100,6 @@ function testValue(input, operator) {
 }
 
 function determineOperatorSyntax (typeSyntax, operator) {
-
-
   if (typeSyntax === "'") {
     if (operator === "=") {
       return { operator: " contains ", not: "" };
@@ -115,21 +112,20 @@ function determineOperatorSyntax (typeSyntax, operator) {
 }
 
 function createA1Formula(inputValues, sheetData) {
-  var A1Notation, isFirstNumber, isSecondNumber;
+  var A1Notation, isFirstNumber, isSecondNumber, firstOperatorSyntax, secondOperatorSyntax, secondColumnSyntax;
   
   isFirstNumber = testValue(inputValues.first.input, inputValues.first.operator);
-  
+  firstOperatorSyntax = determineOperatorSyntax(isFirstNumber, inputValues.first.operator);
+
   if (inputValues.second.input.length > 0) {
     isSecondNumber = testValue(inputValues.second.input, inputValues.second.operator);
-    var secondColumnSyntax, firstOperatorSyntax, secondOperatorSyntax;
     
     if (sheetData.columnOne !== sheetData.columnTwo) {
       secondColumnSyntax = "," + sheetData.columnTwo;
     } else {
       secondColumnSyntax = "";
     }
-    
-    firstOperatorSyntax = determineOperatorSyntax(isFirstNumber, inputValues.first.operator);
+        
     secondOperatorSyntax = determineOperatorSyntax(isSecondNumber, inputValues.second.operator);
     
     A1Notation = "QUERY('" + sheetData.sheetName + "'!" + sheetData.columnOne + ":" + sheetData.columnTwo; // Sheet reference
@@ -139,7 +135,7 @@ function createA1Formula(inputValues, sheetData) {
   } else {
     A1Notation = "QUERY('" + sheetData.sheetName + "'!" + sheetData.columnOne + ":" + sheetData.columnOne; // Sheet reference
     A1Notation += ', "select ' + sheetData.columnOne; // Select columns
-    A1Notation += " where " + sheetData.columnOne + " " + inputValues.first.operator + " " + isFirstNumber + inputValues.first.input + isFirstNumber; // Logic for first input
+    A1Notation += " where " + firstOperatorSyntax.not + sheetData.columnOne + firstOperatorSyntax.operator + isFirstNumber + inputValues.first.input + isFirstNumber; // Logic for first input
     A1Notation += '", 1)';
   }
   
