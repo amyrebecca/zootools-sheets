@@ -144,7 +144,6 @@ function createA1Formula(inputValues, sheetData) {
     columnHeaderSyntax = allColumns.join(',');
     firstColumnInRange = allColumns[0];
     lastColumnInRange = allColumns[allColumns.length - 1];
-    console.log('lastColumnInRange', lastColumnInRange);
   } else {
     columnHeaderSyntax = sheetData.columnOne;
     firstColumnInRange = sheetData.columnOne;
@@ -212,6 +211,7 @@ function filterData(sheetData) {
         resetFilter('first');
         resetFilter('second');
         $('#boolean').value = 'select an option';
+        $('#compareAllColumnsInput').checked = false;
       })
       .withFailureHandler(failureHandler)
       .clientFilterData(A1Formula);
