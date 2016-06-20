@@ -1,7 +1,7 @@
 <script type="text/javascript">
-
 var columnDefs = null;
 var canSubmit = false;
+var allColumns = [];
 var $ = function(sel){ return document.querySelector(sel); };
 var enable = function(node){ node.removeAttribute('disabled'); }
 var disable = function(node){ node.setAttribute('disabled', true); }
@@ -38,9 +38,11 @@ function getVariables() {
       if (res.length === 0) {
         showStatus('No variables to choose from.', 'error');
         disable($('#filterBtn'));
+        disable($('#compareAllColumnsInput'));
       } else {
         showStatus('');
         enable($('#filterBtn'));
+        enable($('#compareAllColumnsInput'));
       }
       
       if (res != columnDefs) { addVariableOptions() }
@@ -78,17 +80,33 @@ function getRange() {
     .clientGetQuery(varName1, varName2);
 }
 
+function getAllColumns(event) {
+  var checked = $('#compareAllColumnsInput').checked;
+  var columnHeaders = document.querySelectorAll('select[data-select="variable"]')[0];
+  
+  if (checked) {
+    for (var i = 0; i < columnHeaders.length; i++) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          allColumns.push(res.columnOne);
+        })
+        .withFailureHandler(failureHandler)
+        .clientGetQuery(columnHeaders[i].value, null);
+    }
+  } else {
+    allColumns = [];
+  }
+}
+
 function enableSecondFilter() {
   enable($('#varName2'));
   enable($('#secondFilterOperator'));
   enable($('#secondFilterValue'));
+  enable($('#resetSecondButton'));
 }
 
 function testValue(input, operator) {
-  if (/^\-?\d+\.?\d+?$/.test(input)) {
-    canSubmit = true;
-    return "";
-  } else {
+  if (isNaN(input)) {
     if (operator === ">" || operator === "<" || operator === ">=" || operator == "<=") {
       canSubmit = false;
       showStatus('Input must be a number with ' + operator + '.', 'error');
@@ -96,6 +114,9 @@ function testValue(input, operator) {
       canSubmit = true;
     }
     return "'";
+  } else {
+    canSubmit = true;
+    return "";
   }
 }
 
@@ -112,7 +133,23 @@ function determineOperatorSyntax (typeSyntax, operator) {
 }
 
 function createA1Formula(inputValues, sheetData) {
-  var A1Notation, isFirstNumber, isSecondNumber, firstOperatorSyntax, secondOperatorSyntax, secondColumnSyntax;
+  var A1Notation, isFirstNumber, isSecondNumber, firstOperatorSyntax, secondOperatorSyntax, secondColumnSyntax, columnHeaderSyntax, firstColumnInRange, lastColumnInRange;
+  
+  if (allColumns.length > 0) {
+    allColumns.sort(function(a, b) {
+      if (a < b) return -1;
+      if (a > b) return 1;
+    });
+    
+    columnHeaderSyntax = allColumns.join(',');
+    firstColumnInRange = allColumns[0];
+    lastColumnInRange = allColumns[allColumns.length - 1];
+    console.log('lastColumnInRange', lastColumnInRange);
+  } else {
+    columnHeaderSyntax = sheetData.columnOne;
+    firstColumnInRange = sheetData.columnOne;
+    lastColumnInRange = sheetData.columnOne;
+  }
   
   isFirstNumber = testValue(inputValues.first.input, inputValues.first.operator);
   firstOperatorSyntax = determineOperatorSyntax(isFirstNumber, inputValues.first.operator);
@@ -120,21 +157,20 @@ function createA1Formula(inputValues, sheetData) {
   if (inputValues.second.input.length > 0) {
     isSecondNumber = testValue(inputValues.second.input, inputValues.second.operator);
     
-    if (sheetData.columnOne !== sheetData.columnTwo) {
-      secondColumnSyntax = "," + sheetData.columnTwo;
-    } else {
-      secondColumnSyntax = "";
+    if (sheetData.columnOne !== sheetData.columnTwo && allColumns.length === 0) {
+      columnHeaderSyntax = sheetData.columnOne + "," + sheetData.columnTwo;
+      lastColumnInRange = sheetData.columnTwo;
     }
         
     secondOperatorSyntax = determineOperatorSyntax(isSecondNumber, inputValues.second.operator);
     
-    A1Notation = "QUERY('" + sheetData.sheetName + "'!" + sheetData.columnOne + ":" + sheetData.columnTwo; // Sheet reference
-    A1Notation += ', "select ' + sheetData.columnOne + secondColumnSyntax; // Select columns
+    A1Notation = "QUERY('" + sheetData.sheetName + "'!" + firstColumnInRange + ":" + lastColumnInRange; // Sheet reference
+    A1Notation += ', "select ' + columnHeaderSyntax; // Select columns
     A1Notation += " where " + firstOperatorSyntax.not + sheetData.columnOne + firstOperatorSyntax.operator + isFirstNumber + inputValues.first.input + isFirstNumber; // Logic for first input
     A1Notation += " " + inputValues.second.boolean + secondOperatorSyntax.not + " " + sheetData.columnTwo + secondOperatorSyntax.operator + isSecondNumber + inputValues.second.input + isSecondNumber + '", 1)'; // Logic for second input
   } else {
-    A1Notation = "QUERY('" + sheetData.sheetName + "'!" + sheetData.columnOne + ":" + sheetData.columnOne; // Sheet reference
-    A1Notation += ', "select ' + sheetData.columnOne; // Select columns
+    A1Notation = "QUERY('" + sheetData.sheetName + "'!" + firstColumnInRange + ":" + lastColumnInRange; // Sheet reference
+    A1Notation += ', "select ' + columnHeaderSyntax; // Select columns
     A1Notation += " where " + firstOperatorSyntax.not + sheetData.columnOne + firstOperatorSyntax.operator + isFirstNumber + inputValues.first.input + isFirstNumber; // Logic for first input
     A1Notation += '", 1)';
   }
@@ -172,13 +208,19 @@ function filterData(sheetData) {
         disable($('#varName2'));
         disable($('#secondFilterValue'));
         disable($('#secondFilterOperator'));
-        $('#firstFilterValue').value = '';
-        $('#secondFilterValue').value = '';
+        disable($('#resetSecondButton'));
+        resetFilter('first');
+        resetFilter('second');
         $('#boolean').value = 'select an option';
       })
       .withFailureHandler(failureHandler)
       .clientFilterData(A1Formula);
   }
+}
+
+function resetFilter(which) {
+  $('#' + which + 'FilterValue').value = '';
+  $('#' + which + 'FilterOperator').value = '=';
 }
 
 </script>

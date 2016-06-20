@@ -20,7 +20,7 @@
 
     <? columnDefs = clientGetVariables(); ?>
     <div class="form-group">
-      <div>
+      <div class="block">
         <fieldset>
           <legend>First Filter</legend>
           <select id="varName1" data-select="variable" style="width: 100%;">
@@ -37,9 +37,12 @@
             <option value=">=">&#8805;</option>
           </select>
           <input type="text" id="firstFilterValue" />
+          <div style="text-align: center;">
+            <button type="button" id="resetFirstButton" class="button" onclick="resetFilter('first')">Reset Filter</button>
+          </div>
         </fieldset>
       </div>
-      <div>
+      <div class="block">
         <p><small>The secondary filter is optional. Select a boolean operator to enable editing of the second filter.</small></p>
         <div style="text-align: center">
           <select id="boolean" onchange="enableSecondFilter()">
@@ -49,7 +52,7 @@
           </select>
         </div>
       </div>
-      <div>
+      <div class="block">
         <fieldset>
           <legend>Second Filter</legend>
           <select id="varName2" data-select="variable" style="width: 100%;" disabled>
@@ -66,14 +69,23 @@
             <option value=">=">&#8805;</option>
           </select>
           <input type="text" id="secondFilterValue" disabled />
+          <div style="text-align: center;">
+            <button type="button" id="resetSecondButton" class="button" onclick="resetFilter('second')" disabled>Reset Filter</button>
+          </div>
         </fieldset>
       </div>
+    </div>
+    <div class="block form-group">
+      <label>
+        <input id="compareAllColumnsInput" type="checkbox" onChange="getAllColumns()" disabled />
+        Compare filter to whole data set.
+      </label>
     </div>
     <div class="block form-group" style="text-align: center; ">
       <div data-ui="status" id="status" style="display: block; margin: 1em;"></div>
       <div class="inline-button-block">
-        <button id="filterBtn" class="button action" onclick="getRange()" disabled>Filter</button>
-        <button class="button" onclick="google.script.host.close()">Close</button>
+        <button type="button" id="filterBtn" class="button action" onclick="getRange()" disabled>Filter</button>
+        <button type="button" class="button" onclick="google.script.host.close()">Close</button>
       </div>
     </div>      
     <?!= include('filter-script'); ?>

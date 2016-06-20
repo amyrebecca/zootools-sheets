@@ -70,21 +70,13 @@ var SheetManager = (function(){
     var A1Notation, firstA1, secondA1, endRow;
     var query = {};
     firstA1 = fetchRange(varName1).getA1Notation();
-    
+
     if (varName2) {
       secondA1 = fetchRange(varName2).getA1Notation();
       query.A1Notation = [firstA1, secondA1].join(',');
       query.columnTwo = secondA1[0];
-      endRow = secondA1.split(":")[1];
-      while (/\D/.test(endRow.charAt(0)))
-        endRow = endRow.substr(1);
-      query.limit = endRow;
     } else {
       query.A1Notation = firstA1;
-      endRow = firstA1.split(":")[1];
-      while (/\D/.test(endRow.charAt(0)))
-        endRow = endRow.substr(1);
-      query.limit = endRow;
     }
     
     query.columnOne = firstA1[0];
@@ -294,7 +286,6 @@ var SheetManager = (function(){
     
     sheet.appendRow([date, location, institution, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
   }
-  
   
   return {
     getID: getID,
