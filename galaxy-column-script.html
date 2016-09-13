@@ -11,9 +11,19 @@ var disable = function(node){ node.setAttribute('disabled', true); }
 
 function showStatus(msg, classId) {
   var status = document.querySelectorAll('div[data-ui="status"]');
+  var icon = '';
+  
+  if (msg !== '' && classId === 'error') {
+    icon = '<i class="fa fa-exclamation-circle" aria-hidden="true"></i>';
+  } else if (msg !== '') {
+    icon = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>';  
+  } else {
+    icon = '';
+  }
+  
   for (var i = 0; i < status.length; i++) {
     status[i].className = ""
-    status[i].innerHTML = msg;
+    status[i].innerHTML = icon + " " + msg;
     if (classId) {
       status[i].classList.add(classId);
     }
