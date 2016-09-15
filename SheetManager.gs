@@ -42,17 +42,13 @@ var SheetManager = (function() {
   }
   
   var fetchRange = function(varName){
-    var data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
+    var activeSheet = SpreadsheetApp.getActiveSheet();
+    var data = activeSheet.getDataRange().getValues();
     for(var colIdx = 0; colIdx < data[0].length; colIdx++){
       if(data[0][colIdx]==varName) break;
     }
-
-    var rowIdx = 1;
-    do{
-      rowIdx++;
-    } while(data[rowIdx] && data[rowIdx][colIdx]);
   
-    return SpreadsheetApp.getActiveSheet().getRange(1, colIdx+1, rowIdx-1);
+    return activeSheet.getRange(1, colIdx+1, activeSheet.getDataRange().getLastRow() - 1);
   }
   
   var getA1Notation = function(varName) {
