@@ -1,21 +1,18 @@
-var SheetManager = (function(){
- 
+var SheetManager = (function() {
+  
   var getID = function() {
     return SpreadsheetApp.getActiveSpreadsheet().getId();
   }
   
   var getValues = function(varName){
-    var data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
-    for(var colIdx = 0; colIdx < data[0].length; colIdx++){
-      if(data[0][colIdx]==varName) break;
+    var activeSheet = SpreadsheetApp.getActiveSheet();
+    var data = activeSheet.getDataRange().getValues();
+    
+    for (var colIdx = 0; colIdx < data[0].length; colIdx++) {
+      if(data[0][colIdx] === varName) break;
     }
 
-    var rowIdx = 1;
-    do{
-      rowIdx++;
-    } while(data[rowIdx] && data[rowIdx][colIdx]);
-  
-    return SpreadsheetApp.getActiveSheet().getRange(2, colIdx+1, rowIdx-1).getValues().map(function(e){ return e[0]; });
+    return activeSheet.getRange(2, colIdx+1, activeSheet.getDataRange().getLastRow() - 1).getValues().map(function(e){ return e[0]; });
   }
   
   var getMultipleValues = function(varNameX, varNameY) {
