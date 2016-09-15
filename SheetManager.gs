@@ -134,14 +134,22 @@ var SheetManager = (function(){
     return sheet;
   }
   
-  var filterData = function(A1Notation) {
-    var filteredDataSheet = setupNamedSheet('Filtered Data');
-    addFilteredData(A1Notation);
+  var setupUniqueNamedSheet = function(sheetName) {
+    var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+    var randomString = (Math.random()*1e32).toString(36);
+    var newSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName + '-' + randomString, sheets.length + 1);
+    
+    return newSheet;
   }
   
-  var addFilteredData = function(A1Notation) {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Filtered Data');
-    var rangeToInsert = sheet.getRange(1, sheet.getLastColumn() + 1);
+  var filterData = function(A1Notation) {
+    var randomString = (Math.random()*1e32).toString(36);
+    var filteredDataSheet = setupUniqueNamedSheet('Filtered Data');
+    addFilteredData(A1Notation, filteredDataSheet);
+  }
+  
+  var addFilteredData = function(A1Notation, filteredDataSheet) {
+    var rangeToInsert = filteredDataSheet.getRange(1, filteredDataSheet.getLastColumn() + 1);
     
     rangeToInsert.setFormula(A1Notation);
   }
@@ -286,6 +294,7 @@ var SheetManager = (function(){
     
     sheet.appendRow([date, location, institution, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
   }
+  
   
   return {
     getID: getID,

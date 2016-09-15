@@ -83,6 +83,8 @@ function getRange() {
   var varName2 = $('#varName2').value;
   
   showStatus('Processing...');
+  disable($('#filterBtn'));
+  
   google.script.run
     .withSuccessHandler(function(res) {
       filterData(res);
@@ -214,6 +216,7 @@ function filterData(sheetData) {
     google.script.run
       .withSuccessHandler(function(res){
         showStatus('');
+        enable($('#filterBtn'));
         getVariables();
         disable($('#varName2'));
         disable($('#secondFilterValue'));
