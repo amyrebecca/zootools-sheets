@@ -1,21 +1,18 @@
-var SheetManager = (function(){
- 
+var SheetManager = (function() {
+  
   var getID = function() {
     return SpreadsheetApp.getActiveSpreadsheet().getId();
   }
   
   var getValues = function(varName){
-    var data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
-    for(var colIdx = 0; colIdx < data[0].length; colIdx++){
-      if(data[0][colIdx]==varName) break;
+    var activeSheet = SpreadsheetApp.getActiveSheet();
+    var data = activeSheet.getDataRange().getValues();
+    
+    for (var colIdx = 0; colIdx < data[0].length; colIdx++) {
+      if(data[0][colIdx] === varName) break;
     }
 
-    var rowIdx = 1;
-    do{
-      rowIdx++;
-    } while(data[rowIdx] && data[rowIdx][colIdx]);
-  
-    return SpreadsheetApp.getActiveSheet().getRange(2, colIdx+1, rowIdx-1).getValues().map(function(e){ return e[0]; });
+    return activeSheet.getRange(2, colIdx+1, activeSheet.getDataRange().getLastRow() - 1).getValues().map(function(e){ return e[0]; });
   }
   
   var getMultipleValues = function(varNameX, varNameY) {
@@ -45,17 +42,13 @@ var SheetManager = (function(){
   }
   
   var fetchRange = function(varName){
-    var data = SpreadsheetApp.getActiveSheet().getDataRange().getValues();
+    var activeSheet = SpreadsheetApp.getActiveSheet();
+    var data = activeSheet.getDataRange().getValues();
     for(var colIdx = 0; colIdx < data[0].length; colIdx++){
       if(data[0][colIdx]==varName) break;
     }
-
-    var rowIdx = 1;
-    do{
-      rowIdx++;
-    } while(data[rowIdx] && data[rowIdx][colIdx]);
   
-    return SpreadsheetApp.getActiveSheet().getRange(1, colIdx+1, rowIdx-1);
+    return activeSheet.getRange(1, colIdx+1, activeSheet.getDataRange().getLastRow() - 1);
   }
   
   var getA1Notation = function(varName) {
@@ -134,14 +127,22 @@ var SheetManager = (function(){
     return sheet;
   }
   
-  var filterData = function(A1Notation) {
-    var filteredDataSheet = setupNamedSheet('Filtered Data');
-    addFilteredData(A1Notation);
+  var setupUniqueNamedSheet = function(sheetName) {
+    var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+    var randomString = (Math.random()*1e32).toString(36);
+    var newSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName + '-' + randomString, sheets.length + 1);
+    
+    return newSheet;
   }
   
-  var addFilteredData = function(A1Notation) {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Filtered Data');
-    var rangeToInsert = sheet.getRange(1, sheet.getLastColumn() + 1);
+  var filterData = function(A1Notation) {
+    var randomString = (Math.random()*1e32).toString(36);
+    var filteredDataSheet = setupUniqueNamedSheet('Filtered Data');
+    addFilteredData(A1Notation, filteredDataSheet);
+  }
+  
+  var addFilteredData = function(A1Notation, filteredDataSheet) {
+    var rangeToInsert = filteredDataSheet.getRange(1, filteredDataSheet.getLastColumn() + 1);
     
     rangeToInsert.setFormula(A1Notation);
   }
@@ -286,6 +287,7 @@ var SheetManager = (function(){
     
     sheet.appendRow([date, location, institution, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
   }
+  
   
   return {
     getID: getID,
