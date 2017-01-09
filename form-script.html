@@ -65,6 +65,7 @@
     var institutionPlace = autocomplete.institution.getPlaces();
     var location = $('#location').value;
     var locationPlace = autocomplete.location.getPlaces();
+    var eyeColor = $('#eye-color').value;
     
     // Send something to the geocoder in case the getPlaces() call fails
     if (institutionPlace) {
@@ -88,7 +89,7 @@
         })
         .withFailureHandler(failureHandler)
         .withUserObject(this)
-        .clientAddFormSubmission(institution, institutionAddress, location, locationAddress);
+        .clientAddFormSubmission(institution, institutionAddress, location, locationAddress, eyeColor);
     } else {
       showStatus('Please complete the form with valid values.', 'error');
       $('#form-submit').disabled = false;
@@ -118,3 +119,5 @@
     }
   }
 </script>
+
+
