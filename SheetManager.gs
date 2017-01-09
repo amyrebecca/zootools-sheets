@@ -9,7 +9,8 @@ var SheetManager = (function() {
     var data = activeSheet.getDataRange().getValues();
     
     for (var colIdx = 0; colIdx < data[0].length; colIdx++) {
-      if(data[0][colIdx] === varName) break;
+      var value = data[0][colIdx].trim();
+      if(value === varName) break;
     }
 
     return activeSheet.getRange(2, colIdx+1, activeSheet.getDataRange().getLastRow() - 1).getValues().map(function(e){ return e[0]; });
