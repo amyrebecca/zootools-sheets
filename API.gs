@@ -65,8 +65,8 @@ function clientGetQuery(varName1, varName2) {
   return SheetManager.getQuery(varName1, varName2);
 }; 
 
-function clientAddFormSubmission(institution, institutionAddress, location, locationAddress){
-  return SheetManager.addFormSubmission(institution, institutionAddress, location, locationAddress);
+function clientAddFormSubmission(institution, institutionAddress, location, locationAddress, eyeColor){
+  return SheetManager.addFormSubmission(institution, institutionAddress, location, locationAddress, eyeColor);
 };
 
 function clientAddChart(config, data, type) {

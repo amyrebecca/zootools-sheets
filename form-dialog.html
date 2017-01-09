@@ -14,14 +14,26 @@
       <div class="block dialog-elements">
         <label>
           Your Institution:
+          <input data-input="location" class="width-100 survey-question" name="institution" id="institution" type="text"
+          placeholder="Enter a institution name or address" required>
         </label>
-        <input data-input="location" class="width-100" name="institution" id="institution" type="text"
-        placeholder="Enter a institution name or address">
+        <br>
         <label>
           Where you are from:
+          <input data-input="location" class="width-100 survey-question" name="location" id="location" type="text"
+          placeholder="Enter a city name and state or country or a full address" required>
         </label>
-        <input data-input="location" class="width-100" name="location" id="location" type="text"
-        placeholder="Enter a city name and state or country or a full address">
+        <br>
+        <label>
+          What is your eye color? (For follow up activity)
+          <select class="width-100 survey-question" id="eye-color" required>
+            <option disabled selected style="display: none;">select an option</option>
+            <option value="blue">blue</option>
+            <option value="brown">brown</option>
+            <option value="green">green</option>
+            <option value="other">other</option>
+          </select>
+        </label>
       </div>
       <div class="block dialog-button-bar">
           <button class="button action" id="form-submit">Submit</button>
@@ -30,10 +42,8 @@
     </div>
 
     <!-- Use a templated HTML printing scriptlet to import JavaScript. -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&signed_in=true&libraries=places&callback=initAutocomplete"
+    <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=places&callback=initAutocomplete"
         async defer></script>
     <?!= include('form-script') ?>
   </body>
 </html>
-
-

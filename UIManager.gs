@@ -30,9 +30,14 @@ var UIManager = (function(){
           title: 'Google Map'
         },
         form: {
-          height: 215,
+          height: 280,
           width: 400,
           title: 'Student Location Survey'
+        },
+        working: {
+          height: 100,
+          width: 100,
+          title: 'Working...'
         }
       };
       

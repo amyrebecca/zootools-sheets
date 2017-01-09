@@ -225,7 +225,7 @@ var SheetManager = (function() {
 
        // Setup headers for new sheet
        var headerRow = sheet.getRange(1, lastColumnWithContent + 1, 1, 8);
-       headerRow.setValues([['DateTime', 'Where are you from?', 'What is your institution?', 'Student latitude', 'Student longitude', 'Institution latitude', 'Institution longitude', 'Calculated Distance in km']]);
+       headerRow.setValues([['DateTime', 'Where are you from?', 'What is your institution?', 'Student eye color', 'Student latitude', 'Student longitude', 'Institution latitude', 'Institution longitude', 'Calculated Distance in km']]);
        sheet.setFrozenRows(1); // Freeze header row
     } else {
       SpreadsheetApp.setActiveSheet(sheet);
@@ -272,20 +272,20 @@ var SheetManager = (function() {
     return latLongResults;
   }
   
-  var addFormSubmission = function(institution, institutionAddress, location, locationAddress) {
+  var addFormSubmission = function(institution, institutionAddress, location, locationAddress, eyeColor) {
     // Setup latitude and longitude headers if needed
     var formResponseSheet = getFormResponseSheet();
     
-    addFormRow(institution, institutionAddress, location, locationAddress, formResponseSheet);
+    addFormRow(institution, institutionAddress, location, locationAddress, eyeColor, formResponseSheet);
   }
   
-  var addFormRow = function(institution, institutionAddress, location, locationAddress, sheet) {
+  var addFormRow = function(institution, institutionAddress, location, locationAddress, eyeColor, sheet) {
     var geocoder = Maps.newGeocoder(),
         date = getDate(),   
         institutionGeocoded = geolocate(geocoder, institutionAddress),
         locationGeocoded = geolocate(geocoder, locationAddress);
     
-    sheet.appendRow([date, location, institution, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
+    sheet.appendRow([date, location, institution, eyeColor, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
   }
   
   
