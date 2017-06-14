@@ -18,15 +18,12 @@
       <button class="button action" onclick="getVariables()">Refresh Data</button>
     </div>
 
-    <? columnDefs = clientGetColumnVariables(); ?>
     <div class="form-group">
       <div class="block">
         <fieldset>
           <legend>First Filter</legend>
           <select id="varName1" data-select="variable" style="width: 100%;">
-            <? for(var i = 0; i < columnDefs.length; i++) { ?>
-            <option><?= columnDefs[i].name ?></option>
-            <? } ?>
+            <option></option>
           </select>
           <select class="select-operator" id="firstFilterOperator">
             <option value="=">=</option>
@@ -56,9 +53,7 @@
         <fieldset>
           <legend>Second Filter</legend>
           <select id="varName2" data-select="variable" style="width: 100%;" disabled>
-            <? for(var i = 0; i < columnDefs.length; i++) { ?>
-            <option><?= columnDefs[i].name ?></option>
-            <? } ?>
+            <option></option>
           </select>
           <select class="select-operator" id="secondFilterOperator" disabled>
             <option value="=">=</option>

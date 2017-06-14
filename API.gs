@@ -29,24 +29,12 @@ function clientShowPie(){
   return UIManager.showSidebar('pie'); 
 };
 
-function clientShowGalaxyColumn(){
-  return UIManager.showSidebar('galaxy-column'); 
-};
-
 function clientShowFilter(){
   return UIManager.showSidebar('filter');
 };
 
 function clientShowMapDialog(){
   return UIManager.showDialog('map');
-};
-
-function clientShowFormDialog(){
-  return UIManager.showDialog('form');
-};
-
-function clientGetCoordinates(latitude, longitude){
-  return SheetManager.getCoordinates(latitude, longitude);
 };
 
 function clientGetColumnValues(varName){
@@ -68,10 +56,6 @@ function clientGetA1Notation(varName) {
 function clientGetQuery(varName1, varName2) {
   return SheetManager.getQuery(varName1, varName2);
 }; 
-
-function clientAddFormSubmission(institution, institutionAddress, location, locationAddress, eyeColor){
-  return SheetManager.addFormSubmission(institution, institutionAddress, location, locationAddress, eyeColor);
-};
 
 function clientAddChart(config, data, type) {
   return SheetManager.addChart(config, data, type);
