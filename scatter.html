@@ -15,25 +15,22 @@
     </div>
     <div style="text-align: center; width: 100%;"><p><button class="button action" onclick="getVariables()">Refresh Data</button></p></div>
     <div class="block">
-      <? columnDefs = clientGetVariables(); ?>
       <fieldset>
       <legend>X Variable</legend>
       <div class="block form-group collapse" id="xDef">
-        <select id="xVar" data-select="variable" style="width: 100%;" oninput="updateSelection('x')" disabled>
-          <? for(var i = 0; i < columnDefs.length; i++) { ?>
-            <option><?= columnDefs[i].name ?></option>
-          <? } ?>
+        <select id="xVar" data-select="variable" style="width: 100%;" disabled>
+          <option value="" disabled selected>Select the X variable</option>
         </select>
         <div class="extended" aria-hidden="true" data-options="x">
           <div>
             <p><strong>Axis</strong></p>
-            <div style="float: right; width: 50%;"><input type="checkbox" id="logX" onclick="updateSelection()"><label for="logX">Logarithmic</label></div>
+            <div style="float: right; width: 50%;"><input type="checkbox" id="logX"><label for="logX">Logarithmic</label></div>
             <div><input type="checkbox" id="invertX" onclick="updateSelection()"/><label for="invertX">Invert</label></div>
           </div>
           <div id="xRange">
             <p><strong>Range</strong></p>
-            <p><input type="radio" id="xScaleDefault" name="xScale" onclick="updateSelection()" checked><label for="xScaleDefault">Auto</label></p>
-            <p><input type="radio" id="xScaleSpecific" name="xScale" onclick="updateSelection()"><label for="xScaleSpecific">Specified</label></p>
+            <p><input type="radio" id="xScaleDefault" name="xScale" checked><label for="xScaleDefault">Auto</label></p>
+            <p><input type="radio" id="xScaleSpecific" name="xScale"><label for="xScaleSpecific">Specified</label></p>
             <div style="text-indent: 1.5em;">
               <div style="text-align: justify">
                 <input title="Specified range may not be available in chart preview, but will display once sent to the spreadsheet." type="number" pattern="\d*" id="xMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input title="Specified range may not be available in chart preview, but will display once sent to the spreadsheet." type="number" pattern="\d*" id="xMax" style="width: 30%; " disabled />
@@ -50,21 +47,19 @@
       <fieldset>
       <legend>Y Variable</legend>
       <div class="block form-group collapse" id="yDef">
-        <select id="yVar" data-select="variable" style="width: 100%;" oninput="updateSelection('y')" disabled>
-          <? for(var i = 0; i < columnDefs.length; i++) { ?>
-            <option><?= columnDefs[i].name ?></option>
-          <? } ?>
+        <select id="yVar" data-select="variable" style="width: 100%;" disabled>
+          <option value="" disabled selected>Select the Y variable</option>
         </select>
         <div class="extended" aria-hidden="true" data-options="y">
           <div>
             <p><strong>Axis</strong></p>
-            <div style="float: right; width: 50%;"><input type="checkbox" id="logY" onclick="updateSelection()"><label for="logY">Logarithmic</label></div>
-            <div><input type="checkbox" id="invertY" onclick="updateSelection()"/><label for="invertY">Invert</label></div>
+            <div style="float: right; width: 50%;"><input type="checkbox" id="logY"><label for="logY">Logarithmic</label></div>
+            <div><input type="checkbox" id="invertY" /><label for="invertY">Invert</label></div>
           </div>
           <div id="xRange">
             <p><strong>Range</strong></p>
-            <p><input type="radio" id="yScaleDefault" name="yScale" onclick="updateSelection()" checked><label for="yScaleDefault">Auto</label></p>
-            <p><input type="radio" id="yScaleSpecific" name="yScale" onclick="updateSelection()"><label for="yScaleSpecific">Specified</label></p>
+            <p><input type="radio" id="yScaleDefault" name="yScale" checked><label for="yScaleDefault">Auto</label></p>
+            <p><input type="radio" id="yScaleSpecific" name="yScale"><label for="yScaleSpecific">Specified</label></p>
             <div style="text-indent: 1.5em;">
               <div style="text-align: justify"><input type="number" pattern="\d*" id="yMin" style="width: 30%; " disabled/>&nbsp; to &nbsp;<input type="number" pattern="\d*" id="yMax" style="width: 30%; " disabled /></div>
             </div>
@@ -79,7 +74,7 @@
     </div>
     <div class="trendline-option-container">
       <label for="trendlineSelector">Trendline</label>
-      <select id="trendlineSelector" name="trendline" onclick="updateSelection('trendlines')">
+      <select id="trendlineSelector" name="trendline">
         <option value="none" selected>None</option>
         <option value="linear">Linear</option>
         <option value="exponential">Exponential</option>

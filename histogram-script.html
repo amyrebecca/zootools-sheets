@@ -70,7 +70,7 @@ function getVariables() {
       if (res !== columnDefs) { addVariableOptions() }
     })
     .withFailureHandler(failureHandler)
-    .clientGetVariables();
+    .clientGetColumnVariables();
 }
 
 getVariables();
@@ -146,7 +146,7 @@ function clientChangeSelection(){
         previewChart(res);
       })
       .withFailureHandler(failureHandler)
-      .clientGetValues(xVar);
+      .clientGetColumnValues(xVar);
 }
 
 // Use response from sheet to setup data in format expected by Charts API for scatter plots

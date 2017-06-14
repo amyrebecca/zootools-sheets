@@ -2,14 +2,26 @@
   // Selector function
   var $ = function(sel){ return document.querySelector(sel); };
 
-    function showStatus(msg, classId) {
-      var status = $('#status'); 
-      status.className = ""
-      status.innerHTML = msg;
-      if (classId) {
-        status.classList.add(classId);
-      }
+function showStatus(msg, classId) {
+  var status = document.querySelectorAll('div[data-ui="status"]');
+  var icon = '';
+  
+  if (msg !== '' && classId === 'error') {
+    icon = '<i class="fa fa-exclamation-circle" aria-hidden="true"></i>';
+  } else if (msg !== '') {
+    icon = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>';  
+  } else {
+    icon = '';
+  }
+  
+  for (var i = 0; i < status.length; i++) {
+    status[i].className = ""
+    status[i].innerHTML = icon + " " + msg;
+    if (classId) {
+      status[i].classList.add(classId);
     }
+  }
+}
 
   // use async call to determine initial state of dropdown lists
   // from contents of chart cells
@@ -25,7 +37,7 @@
       refs[res[idx].name] = res[idx];
     }
     columnDefs = refs;
-  }).clientGetVariables();
+  }).clientGetColumnVariables();
 
   function getCoordinates(){
     var latitude = $('#latitude').value;

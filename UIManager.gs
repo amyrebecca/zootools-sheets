@@ -5,6 +5,7 @@ var UIManager = (function(){
       ui.createAddonMenu()
           .addItem('Scatter Plot Helper', 'clientShowScatter')
           .addItem('Histogram Helper', 'clientShowHistogram')
+          .addItem('Pie Chart Helper', 'clientShowPie')
           .addItem('Summary Stats Helper', 'clientShowStats')
           .addItem('Galaxy Column Chart Helper', 'clientShowGalaxyColumn')
           .addItem('Data Filter Helper', 'clientShowFilter')

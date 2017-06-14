@@ -4,52 +4,109 @@ var SheetManager = (function() {
     return SpreadsheetApp.getActiveSpreadsheet().getId();
   }
   
-  var getValues = function(varName){
-    var activeSheet = SpreadsheetApp.getActiveSheet();
-    var data = activeSheet.getDataRange().getValues();
-    
-    for (var colIdx = 0; colIdx < data[0].length; colIdx++) {
-      var value = data[0][colIdx].trim();
-      if(value === varName) break;
+  var flatten = function(array) {
+    if (array.length > 0) {
+      return array.reduce(function(a, b) {
+        return a.concat(b);
+      });
     }
-
-    return activeSheet.getRange(2, colIdx+1, activeSheet.getDataRange().getLastRow() - 1).getValues().map(function(e){ return e[0]; });
+    
+    return array;
   }
   
-  var getMultipleValues = function(varNameX, varNameY) {
-    var returnedValues = { x: getValues(varNameX), y: getValues(varNameY) };
+  var convertArrayValuesToString = function(array) {
+    var convertedValuesArray = [];
+    for (var i = 0; i < array.length; i++) {
+      if (typeof array[i] !== 'string') {
+        convertedValuesArray.push(array[i].toString());
+      } else {
+        convertedValuesArray.push(array[i]);
+      }
+    }
+    
+    return convertedValuesArray;
+  }
+
+  var flattenAndConvert = function(array) {
+    var flattenedArray = flatten(array);
+
+    return convertArrayValuesToString(flattenedArray);
+  }
+  
+  var cleanVariableList = function(variableList) {
+    return variableList.filter(function(variable){
+      return variable;
+    });
+  }
+  
+  var findVariableIndex = function(array, varName) {
+    var index;
+    
+    if (array.indexOf(varName) > -1) {
+      index = array.indexOf(varName);
+    }
+    
+    return index;
+  }
+  
+  // Headers for the data is in the first row
+  var getColumnVariables = function(){
+    var sheet = SpreadsheetApp.getActiveSheet();
+    var data = sheet.getDataRange().getValues() || [];
+    var variableList = convertArrayValuesToString(data[0]);
+    
+    var cleanedVariables = cleanVariableList(variableList)
+    
+    return cleanedVariables;
+  }
+  
+  // Headers for the data is in the first column
+  var getRowVariables = function(){
+    var data = [];
+    var sheet = SpreadsheetApp.getActiveSheet();
+    if (sheet.getLastRow()) {
+      data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues();
+    }
+    
+    var flattenedData = flattenAndConvert(data);
+    var cleanedVariables = cleanVariableList(flattenedData);
+
+    return cleanedVariables;
+  }
+  
+  var getColumnValues = function(varName) {
+    var activeSheet = SpreadsheetApp.getActiveSheet();
+    var columnVariables = getColumnVariables();
+    var selectedColumnIndex = findVariableIndex(columnVariables, varName);
+
+    var columnValues = activeSheet.getRange(2, selectedColumnIndex + 1, activeSheet.getLastRow() - 1).getValues() || [];
+    var flattenedColumnValues = flatten(columnValues);
+    return flattenedColumnValues;
+  }
+  
+  var getMultipleColumnValues = function(varNameX, varNameY) {
+    var returnedValues = { x: getColumnValues(varNameX), y: getColumnValues(varNameY) };
     
     return returnedValues;
   }
   
   var getRowValues = function(varName) {
-    var selectedRowIndex;
     var sheet = SpreadsheetApp.getActiveSheet();
-    var rowIdValues = sheet.getRange(2, 1, sheet.getLastRow(), 1).getValues();
-    var flattenedRow = [];
-    
-    for (var i = 0; i < rowIdValues.length; i++) {
-      if (typeof(rowIdValues[i][0]) === 'number') {
-        flattenedRow.push(rowIdValues[i][0].toString());
-      } else {
-        flattenedRow.push(rowIdValues[i][0]);
-      }
-    }
+    var rowVariables = getRowVariables();
+    var selectedRowIndex = findVariableIndex(rowVariables, varName);
 
-    if (flattenedRow.indexOf(varName) > -1) {
-      selectedRowIndex = flattenedRow.indexOf(varName);
-    }
-    return {headers: sheet.getRange(1, 2, 1, sheet.getLastColumn() - 1).getValues(), values: sheet.getRange(selectedRowIndex + 2, 2, 1, sheet.getLastColumn() - 1).getValues()};
+    var rowValues = sheet.getRange(selectedRowIndex + 2, 2, 1, sheet.getLastColumn() - 2).getValues() || [];
+    var flattenedRowValues = flatten(rowValues);
+
+    return flattenedRowValues;
   }
   
   var fetchRange = function(varName){
     var activeSheet = SpreadsheetApp.getActiveSheet();
     var data = activeSheet.getDataRange().getValues();
-    for(var colIdx = 0; colIdx < data[0].length; colIdx++){
-      if(data[0][colIdx]==varName) break;
-    }
+    var selectedColumnIndex = findVariableIndex(data, varName);
   
-    return activeSheet.getRange(1, colIdx+1, activeSheet.getDataRange().getLastRow() - 1);
+    return activeSheet.getRange(1, selectedColumnIndex + 1, activeSheet.getLastRow() - 1);
   }
   
   var getA1Notation = function(varName) {
@@ -77,42 +134,6 @@ var SheetManager = (function() {
     query.sheetName = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName();
     
     return query;
-  }
-  
-  var getVariables = function(){
-    var sheet = SpreadsheetApp.getActiveSheet();
-    var data = sheet.getDataRange().getValues();
-    var variableList = data[0].sort();
-    
-    // Clean variableList
-    variableList = variableList.filter(function(v){ 
-      if (v != undefined || v != null || v.length === 0) {
-        return v
-      }
-    });
-
-    var augmented = [];
-    for(var idx in variableList){
-      augmented.push({name: variableList[idx]});
-    }
-    
-    return augmented;
-  }
-  
-  // Custom for Activity 2
-  var getRowIds = function(){
-    var data;
-    var sheet = SpreadsheetApp.getActiveSheet();
-    if (sheet.getLastRow()) {
-      data = sheet.getRange(2, 1, sheet.getLastRow(), 1).getValues();
-    }
-    
-    var augmented = [];
-    for(var idx in data){
-      augmented.push({name: data[idx]});
-    }
-    
-    return augmented;
   }
   
   var setupNamedSheet = function(sheetName) {
@@ -162,8 +183,8 @@ var SheetManager = (function() {
     if (data) {
       if (type === 'histogram') {
         setupNamedSheet('Histogram Chart Data');
-      } else {
-        setupNamedSheet('Galaxy Column Chart Data');
+      } else if (type === 'pie') {
+        setupNamedSheet('Pie Chart Data');
       }
     }
 
@@ -176,6 +197,8 @@ var SheetManager = (function() {
         return ChartBuilder.addHistogramChart(data, config);
       case "column":
         return ChartBuilder.addColumnChart(data, config);
+      case "pie":
+        return ChartBuilder.addPieChart(data, config);
     }
   }
   
@@ -292,12 +315,12 @@ var SheetManager = (function() {
   
   return {
     getID: getID,
-    getVariables: getVariables,
+    getColumnVariables: getColumnVariables,
     destroyCharts: destroyCharts,
-    getValues: getValues,
-    getMultipleValues: getMultipleValues,
+    getColumnValues: getColumnValues,
+    getMultipleColumnValues: getMultipleColumnValues,
     getRowValues: getRowValues,
-    getRowIds: getRowIds,
+    getRowVariables: getRowVariables,
     getA1Notation: getA1Notation,
     getQuery: getQuery,
     getCoordinates: getCoordinates,

@@ -69,7 +69,7 @@ function getVariables() {
 
     })
     .withFailureHandler(failureHandler)
-    .clientGetVariables();
+    .clientGetColumnVariables();
 }
 
 getVariables();
@@ -107,7 +107,7 @@ function calculateNew(){
       enable($('#addToSheetBtn'));
     })
     .withFailureHandler(failureHandler)
-    .clientGetValues(varName);
+    .clientGetColumnValues(varName);
 }
 
 var compile = function(selector){

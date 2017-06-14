@@ -5,12 +5,12 @@ function clientGetSpreadsheetID() {
   return SheetManager.getID();
 };
 
-function clientGetVariables(){ 
-  return SheetManager.getVariables(); 
+function clientGetColumnVariables(){ 
+  return SheetManager.getColumnVariables(); 
 };
 
-function clientGetRowIds(){
-  return SheetManager.getRowIds();
+function clientGetRowVariables(){
+  return SheetManager.getRowVariables();
 };
 
 function clientShowStats(){
@@ -23,6 +23,10 @@ function clientShowScatter(){
 
 function clientShowHistogram(){
   return UIManager.showSidebar('histogram'); 
+};
+
+function clientShowPie(){
+  return UIManager.showSidebar('pie'); 
 };
 
 function clientShowGalaxyColumn(){
@@ -45,12 +49,12 @@ function clientGetCoordinates(latitude, longitude){
   return SheetManager.getCoordinates(latitude, longitude);
 };
 
-function clientGetValues(varName){
-  return SheetManager.getValues(varName);
+function clientGetColumnValues(varName){
+  return SheetManager.getColumnValues(varName);
 };
 
-function clientGetMultipleValues(varNameX, varNameY) {
-  return SheetManager.getMultipleValues(varNameX, varNameY);
+function clientGetMultipleColumnValues(varNameX, varNameY) {
+  return SheetManager.getMultipleColumnValues(varNameX, varNameY);
 };
 
 function clientGetRowValues(varName) {

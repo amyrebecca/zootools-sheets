@@ -101,9 +101,32 @@ var ChartBuilder = (function() {
     sheet.insertChart(chart);
   }
   
+  var addPieChart = function(data, config) {
+    var chartDataRange;
+    var pieDataSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Pie Chart Data');
+    var numColumns = data[0].length;
+    var numRows = data.length;
+    var columnToStart = pieDataSheet.getLastColumn() + 1;
+    var range = pieDataSheet.getRange(1, columnToStart, numRows, numColumns);
+    range.setValues(data);
+    chartDataRange = pieDataSheet.getRange(1, columnToStart, numRows, numColumns);
+    
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Charts');
+    var offset = determineOffset();
+    var chart = sheet.newChart().asPieChart();
+    
+    chart.setTitle(config.title)
+      .addRange(chartDataRange)
+      .setPosition(3, 2, 0, offset);
+    
+    chart = chart.build();
+    sheet.insertChart(chart);
+  }
+  
   return {
     addScatterChart: addScatterChart,
     addHistogramChart: addHistogramChart,
-    addColumnChart: addColumnChart
+    addColumnChart: addColumnChart,
+    addPieChart: addPieChart
   };
 })();
