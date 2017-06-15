@@ -37,6 +37,10 @@ function clientShowMapDialog(){
   return UIManager.showDialog('map');
 };
 
+function clientGetCoordinates(latitude, longitude){
+  return SheetManager.getCoordinates(latitude, longitude);
+};
+
 function clientGetColumnValues(varName){
   return SheetManager.getColumnValues(varName);
 };

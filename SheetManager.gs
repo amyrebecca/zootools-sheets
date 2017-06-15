@@ -222,8 +222,8 @@ var SheetManager = (function() {
   var getCoordinates = function(latitude, longitude){
     // Latitude and longitude will already be validated from the form submission
     var coordinates = [['Lat','Long', 'Name']];
-    var latitudeValues = getValues(latitude);
-    var longitudeValues = getValues(longitude);
+    var latitudeValues = getColumnValues(latitude);
+    var longitudeValues = getColumnValues(longitude);
     
     // Setup array for use with Maps API
     for (var i = latitudeValues.length - 1; i >= 0; i--) {

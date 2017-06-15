@@ -24,8 +24,8 @@ var UIManager = (function(){
     showDialog: function(menuItem){
       var dialog = {
         map: {
-          height: 400,
-          width: 600,
+          height: 500,
+          width: 700,
           title: 'Google Map'
         },
         working: {
