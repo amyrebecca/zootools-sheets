@@ -216,7 +216,7 @@ var SheetManager = (function() {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Statistics');
     var rowToStart = sheet.getLastRow() + 1;
 
-    sheet.getRange(rowToStart + 1, 1, 4, 2).setValues(data);
+    sheet.getRange(rowToStart + 1, 1, 5, 2).setValues(data);
   }
         
   var getCoordinates = function(latitude, longitude){

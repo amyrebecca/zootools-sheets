@@ -17,7 +17,7 @@
     <div class="preinit" id="resultList" class="hide">
 
     <div class="block form-group" id="result">
-        <table class="stats-table" style="margin-left: 0.2em; width: 100%;" summary="The minimum, maximum, mean, and standard deviation (row headings) of the selected variable.">
+        <table class="stats-table" summary="The minimum, maximum, mean, and standard deviation (row headings) of the selected variable.">
           <colgroup>
             <col style="width: 25%;" />
             <col style="width: 75%;" />
@@ -37,6 +37,10 @@
               <td> {{mean}} </td>
             </tr>
             <tr>
+              <th scope="row"><strong>Median</strong></th>
+              <td> {{median}} </td>
+            </tr>
+            <tr>
               <th scope="row"><strong>Std. Dev.</strong></th>
               <td> {{stdev}} </td>
             </tr>
@@ -46,12 +50,9 @@
     </div>
     
     <p />
-    <? columnDefs = clientGetColumnVariables(); ?>
     <div class="form-group">
-      <select id="varName" style="width: 100%;" >
-        <? for(var i = 0; i < columnDefs.length; i++) { ?>
-        <option><?= columnDefs[i].name ?></option>
-        <? } ?>
+      <select id="varName" style="width: 100%;" onchange="checkSelectionState()">
+        <option value="" disabled selected>Select the variable</option>
       </select>
     </div> 
     <div class="block form-group" style="text-align: center; ">
