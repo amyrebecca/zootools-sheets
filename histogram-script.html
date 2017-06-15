@@ -1,9 +1,7 @@
 <script type="text/javascript">
 // Setup and utility functions
-var columnDefs, chartWrapper, data;
-var config = null;
+var columnDefs, chartWrapper;
 var $ = function(sel){ return document.querySelector(sel); };
-var clean = function(node){ return !!node.value ? parseFloat(node.value) : null; };
 var enable = function(node){ node.removeAttribute('disabled'); }
 var disable = function(node){ node.setAttribute('disabled', true); }
 

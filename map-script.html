@@ -1,6 +1,8 @@
 <script type="text/javascript">
-  // Selector function
-  var $ = function(sel){ return document.querySelector(sel); };
+var columnDefs;
+var $ = function(sel){ return document.querySelector(sel); };
+var enable = function(node){ node.removeAttribute('disabled'); }
+var disable = function(node){ node.setAttribute('disabled', true); }
 
 function showStatus(msg, classId) {
   var status = document.querySelectorAll('div[data-ui="status"]');
@@ -23,21 +25,60 @@ function showStatus(msg, classId) {
   }
 }
 
+function failureHandler(err) {
+  console.error(err);
+  showStatus('Something went wrong: ' + err, 'error');
+}
+
   // use async call to determine initial state of dropdown lists
   // from contents of chart cells
-  var columnDefs;
+  
 
   // Setup map visualization via Charts API
   google.load('visualization', '1.0', { 'packages': ['map'] });
   google.setOnLoadCallback(getGoogleMap);
 
-  google.script.run.withSuccessHandler(function(res){
-    var refs = {};
-    for(var idx in res){
-      refs[res[idx].name] = res[idx];
-    }
-    columnDefs = refs;
-  }).clientGetColumnVariables();
+function getVariables() {
+  showStatus('Getting variables...');
+  google.script.run
+    .withSuccessHandler(function(response){
+      columnDefs = response;
+    
+      // Handle if user is not on a sheet with no data
+      if (response.length === 0) {
+        showStatus('No variables to choose from.', 'error');
+        disable($('#latitude'));
+        disable($('#longitude'));
+        disable($('#updateBtn'));
+      } else {
+        enable($('#latitude'));
+        enable($('#longitude'));
+        enable($('#updateBtn'));
+        showStatus('');
+      }
+      
+      addVariableOptions();
+    })
+    .withFailureHandler(failureHandler)
+    .clientGetColumnVariables();
+}
+
+getVariables();
+
+function addVariableOptions() {
+  var options = '';
+  var selects = document.querySelectorAll('select[data-select="variable"]');
+  var sortedVariableDefs = columnDefs.concat().sort(function(a,b) { return a - b; });
+
+  sortedVariableDefs.forEach(function(variable) {
+    var newOption = '<option>' + variable + '</option>';
+    options += newOption;
+  });
+  
+  for (var i = 0; i < selects.length; i++) {
+    selects[i].innerHTML = options;
+  }
+}
 
   function getCoordinates(){
     var latitude = $('#latitude').value;
@@ -47,11 +88,12 @@ function showStatus(msg, classId) {
     
     google.script.run
       .withSuccessHandler(
-        function(res) {
-          getGoogleMap(null, res);
-          showStatus(null);
-        }
-      ).clientGetCoordinates(latitude, longitude)
+        function(response) {
+          getGoogleMap(null, response);
+          showStatus('');
+      })
+      .withFailureHandler(failureHandler)
+      .clientGetCoordinates(latitude, longitude)
   }
 
   function getGoogleMap(event, coordinates){
