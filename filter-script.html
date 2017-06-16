@@ -47,7 +47,6 @@ function getVariables() {
         disable($('#compareAllColumnsInput'));
       } else {
         showStatus('');
-        enable($('#filterBtn'));
         enable($('#compareAllColumnsInput'));
       }
       
@@ -59,18 +58,41 @@ function getVariables() {
 
 getVariables();
 
+function uniq(a) {
+  var seen = {};
+  return a.filter(function(item) {
+    return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+  });
+}
+
 function addVariableOptions() {
   var options = '';
   var selects = document.querySelectorAll('select[data-select="variable"]');
-  var sortedVariableDefs = columnDefs.concat().sort(function(a,b) { return a - b; });
-
-  sortedVariableDefs.forEach(function(variable) {
+  var removedDuplicates = uniq(columnDefs);
+  
+  removedDuplicates.forEach(function(variable) {
     var newOption = '<option>' + variable + '</option>';
     options += newOption;
   });
   
   for (var i = 0; i < selects.length; i++) {
-    selects[i].innerHTML = options;
+    var withPlaceholder = '';
+    if (selects[i].id === 'varName1') {
+      withPlaceholder = '<option value="" disabled selected>Select the first variable</option>' + options;
+    } else if (selects[i].id === 'varName2') {
+      withPlaceholder = '<option value="" disabled selected>Select the second variable</option>' + options;
+    }
+    selects[i].innerHTML = withPlaceholder;
+  }
+}
+
+function checkSelectionState() {
+  var varName1 = $('#varName1').value;
+  var varName2 = $('#varName2').value;
+  var booleanSelect = $('#boolean').value;
+  
+  if (varName1 && !booleanSelect || varName1  && varName2) {
+    enable($('#filterBtn'));
   }
 }
 
@@ -92,7 +114,7 @@ function getRange() {
 function getAllColumns(event) {
   var checked = $('#compareAllColumnsInput').checked;
   var columnHeaders = document.querySelectorAll('select[data-select="variable"]')[0];
-  
+
   if (checked) {
     for (var i = 0; i < columnHeaders.length; i++) {
       google.script.run
@@ -220,7 +242,7 @@ function filterData(sheetData) {
         disable($('#resetSecondButton'));
         resetFilter('first');
         resetFilter('second');
-        $('#boolean').value = 'select an option';
+        $('#boolean').selectedIndex = 0;
         $('#compareAllColumnsInput').checked = false;
         allColumns = [];
       })

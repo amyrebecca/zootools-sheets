@@ -104,10 +104,11 @@ var SheetManager = (function() {
   var fetchRange = function(varName){
     var activeSheet = SpreadsheetApp.getActiveSheet();
     var data = activeSheet.getDataRange().getValues();
-    var flattenedData = flatten(data);
-    var selectedColumnIndex = findVariableIndex(flattenedData, varName);
+    for(var colIdx = 0; colIdx < data[0].length; colIdx++){
+      if(data[0][colIdx]==varName) break;
+    }
   
-    return activeSheet.getRange(1, selectedColumnIndex + 1, activeSheet.getLastRow() - 1);
+    return activeSheet.getRange(1, colIdx+1, activeSheet.getDataRange().getLastRow() - 1);
   }
   
   var getA1Notation = function(varName) {
@@ -122,11 +123,13 @@ var SheetManager = (function() {
     var A1Notation, firstA1, secondA1, endRow;
     var query = {};
     firstA1 = fetchRange(varName1).getA1Notation();
-
+    query.varName1 = varName1
+  
     if (varName2) {
       secondA1 = fetchRange(varName2).getA1Notation();
       query.A1Notation = [firstA1, secondA1].join(',');
       query.columnTwo = secondA1[0];
+      query.varName2 = varName2
     } else {
       query.A1Notation = firstA1;
     }
@@ -159,7 +162,6 @@ var SheetManager = (function() {
   }
   
   var filterData = function(A1Notation) {
-    var randomString = (Math.random()*1e32).toString(36);
     var filteredDataSheet = setupUniqueNamedSheet('Filtered Data');
     addFilteredData(A1Notation, filteredDataSheet);
   }
