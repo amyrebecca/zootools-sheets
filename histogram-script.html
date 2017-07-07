@@ -87,7 +87,7 @@ function extractDOMState(){
     x: {
       variable: $('#xVar').value
     },
-    bucketNum: $('#bucketNum').value
+    histogram: { bucketSize: $('#bucketNum').value }
   };
 
   return state;
@@ -129,11 +129,26 @@ function clientChangeSelection(){
     .clientGetColumnValues(xVar);
 }
 
+function checkBucketSizeState() {
+  var customButton = $('#customBucketSize');
+  var bucketNum = $('#bucketNum');
+  if (customButton.checked) {
+    bucketNum.classList.remove('hide')
+  } else {
+    bucketNum.classList.add('hide');
+    bucketNum.value = null;
+  } 
+}
+
 function buildChartOptions(state) {
   options = {
     legend: { position: 'none' },
     hAxis: { title: state.x.variable },
     vAxis: { title: "Frequency" }
+  }
+  
+  if (state.histogram.bucketSize) {
+    options.histogram = { bucketSize: state.histogram.bucketSize };
   }
   
   return options;

@@ -16,8 +16,8 @@
     line-height: 1em;
   }
   
-  .show { display: block; } 
-  .hide { display: none; }
+  .show { display: block !important; } 
+  .hide { display: none !important; }
   
   fieldset{ margin-bottom: 2em; } 
   legend{ margin-left: -0.4em; }
@@ -92,6 +92,19 @@
   
   .dialog .dialog-button-bar {
     margin: 10px 0;
+  }
+  
+  .stats-table {
+    border-bottom: solid thin #acacac;
+    margin-top: 0.5em;
+    margin-left: 0.2em;
+    width: 100%;
+  }
+  
+  .stats-table caption {
+    border-top: solid thin #acacac;
+    border-bottom: solid thin #acacac;
+    padding: 0.5em 0;
   }
   
   .stats-table td {

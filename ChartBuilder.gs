@@ -47,7 +47,13 @@ var ChartBuilder = (function() {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Charts');
     var offset = determineOffset();
     var chart = sheet.newChart().asHistogramChart();
+    
+    if (config.histogram.bucketSize) {
+      chart.setOption('histogram.bucketSize', config.histogram.bucketSize)
+    }
+    
     chart.setTitle('Frequency vs ' + config.x.variable)
+      .setXAxisTitle(config.x.variable)
       .addRange(xRange)
       .setPosition(3, 2, 0, offset);
     
