@@ -43,8 +43,8 @@ function loadChart() {
 // use async call to determine initial state of dropdown lists
 // from contents of chart cells
 function getVariables() {
-  showStatus('Getting variables...');
   resetDOMState();
+  showStatus('Getting variables...');
   google.script.run
     .withSuccessHandler(function(response){
       columnDefs = response;
