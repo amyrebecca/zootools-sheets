@@ -5,11 +5,10 @@ var UIManager = (function(){
       ui.createAddonMenu()
           .addItem('Scatter Plot Helper', 'clientShowScatter')
           .addItem('Histogram Helper', 'clientShowHistogram')
+          .addItem('Pie Chart Helper', 'clientShowPie')
           .addItem('Summary Stats Helper', 'clientShowStats')
-          .addItem('Galaxy Column Chart Helper', 'clientShowGalaxyColumn')
           .addItem('Data Filter Helper', 'clientShowFilter')
           .addItem('Map Helper', 'clientShowMapDialog')
-          .addItem('Student Location Survey', 'clientShowFormDialog')
           .addToUi();
     },
     showSidebar: function(which){
@@ -25,14 +24,9 @@ var UIManager = (function(){
     showDialog: function(menuItem){
       var dialog = {
         map: {
-          height: 400,
-          width: 600,
+          height: 500,
+          width: 700,
           title: 'Google Map'
-        },
-        form: {
-          height: 280,
-          width: 400,
-          title: 'Student Location Survey'
         },
         working: {
           height: 100,

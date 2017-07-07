@@ -28,10 +28,6 @@ var ChartBuilder = (function() {
     if(config.y.axes.invert){ chart.setOption('vAxis.direction', -1); }
     if(config.y.axes.log){ chart.setOption('vAxis.logScale', true); }
 
-    if(config.x.range && config.x.range.min){ chart.setOption('hAxis.minValue',config.x.range.min); }
-    if(config.x.range && config.x.range.max){ chart.setOption('hAxis.maxValue',config.x.range.max); }
-    if(config.y.range && config.y.range.min){ chart.setOption('vAxis.minValue',config.y.range.min); }
-    if(config.y.range && config.y.range.max){ chart.setOption('vAxis.maxValue',config.y.range.max); }
     if(config.trendlines !== 'none'){ 
       var options = {
         0: {
@@ -47,54 +43,40 @@ var ChartBuilder = (function() {
     sheet.insertChart(chart);
   }
   
-  var addHistogramChart = function(data, config) {
-    // setup pseudo-histogram data range in sheet
-    var xRange, yRange;
-    var columnChartDataSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Histogram Chart Data');
-    var numColumns = data[0].length;
-    var numRows = data.length;
-    var columnToStart = columnChartDataSheet.getLastColumn() + 1;
-    var range = columnChartDataSheet.getRange(1, columnToStart, numRows, numColumns);
-    range.setValues(data);
-    xRange = columnChartDataSheet.getRange(1, columnToStart, numRows, 1).setNumberFormat('@STRING@');
-    yRange = columnChartDataSheet.getRange(1, columnToStart + 1, numRows, 1);
-
-    // setup pseudo-histogram chart using column chart
+  var addHistogramChart = function(xRange, config) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Charts');
     var offset = determineOffset();
-    var chart = sheet.newChart().asColumnChart();
+    var chart = sheet.newChart().asHistogramChart();
+    
+    if (config.histogram.bucketSize) {
+      chart.setOption('histogram.bucketSize', config.histogram.bucketSize)
+    }
+    
     chart.setTitle('Frequency vs ' + config.x.variable)
-      .setYAxisTitle('Frequency')
       .setXAxisTitle(config.x.variable)
       .addRange(xRange)
-      .addRange(yRange)
-      .setOption('legend.position', 'none')
-      .setOption('bar.groupWidth', '100%')
       .setPosition(3, 2, 0, offset);
     
     chart = chart.build();
     sheet.insertChart(chart);
   }
-  
-  var addColumnChart = function(data, config) {
+
+  var addPieChart = function(data, config) {
     var chartDataRange;
-    var galaxyDataSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Galaxy Column Chart Data');
+    var pieDataSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Pie Chart Data');
     var numColumns = data[0].length;
     var numRows = data.length;
-    var columnToStart = galaxyDataSheet.getLastColumn() + 1;
-    var range = galaxyDataSheet.getRange(1, columnToStart, numRows, numColumns);
+    var columnToStart = pieDataSheet.getLastColumn() + 1;
+    var range = pieDataSheet.getRange(1, columnToStart, numRows, numColumns);
     range.setValues(data);
-    chartDataRange = galaxyDataSheet.getRange(1, columnToStart, numRows, numColumns);
+    chartDataRange = pieDataSheet.getRange(1, columnToStart, numRows, numColumns);
     
-    // Setup column chart
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Charts');
     var offset = determineOffset();
-    var chart = sheet.newChart().asColumnChart();
-    chart.setTitle('Galaxy ' + config.x.variable)
-      .setYAxisTitle('Count of Votes')
+    var chart = sheet.newChart().asPieChart();
+    
+    chart.setTitle(config.title)
       .addRange(chartDataRange)
-      .setOption('legend.position', 'none')
-      .setOption('bar.groupWidth', '100%')
       .setPosition(3, 2, 0, offset);
     
     chart = chart.build();
@@ -104,6 +86,6 @@ var ChartBuilder = (function() {
   return {
     addScatterChart: addScatterChart,
     addHistogramChart: addHistogramChart,
-    addColumnChart: addColumnChart
+    addPieChart: addPieChart
   };
 })();

@@ -16,8 +16,8 @@
     line-height: 1em;
   }
   
-  .show { display: block; } 
-  .hide { display: none; }
+  .show { display: block !important; } 
+  .hide { display: none !important; }
   
   fieldset{ margin-bottom: 2em; } 
   legend{ margin-left: -0.4em; }
@@ -94,6 +94,19 @@
     margin: 10px 0;
   }
   
+  .stats-table {
+    border-bottom: solid thin #acacac;
+    margin-top: 0.5em;
+    margin-left: 0.2em;
+    width: 100%;
+  }
+  
+  .stats-table caption {
+    border-top: solid thin #acacac;
+    border-bottom: solid thin #acacac;
+    padding: 0.5em 0;
+  }
+  
   .stats-table td {
     text-align: center;
   }
@@ -149,5 +162,21 @@
   
   .survey-question {
     margin-bottom: 1em !important;
+  }
+  
+  #pie-section-labels {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #pie-section-labels label {
+    border-bottom: solid thin grey;
+    display: block;
+    margin: 0.25em 0;
+    padding-bottom: 0.25em
+  }
+  
+  .variable-orientation label {
+    display: flex;
   }
 </style>

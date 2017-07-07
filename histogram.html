@@ -15,18 +15,22 @@
     </div>
     <div style="text-align: center; width: 100%;"><button class="button action" onclick="getVariables()">Refresh Data</button></div>
     <div class="block">
-      <? columnDefs = clientGetVariables(); ?>
       <fieldset>
       <legend>Histogram Variable</legend>
       <div class="form-group collapse" id="xDef">
-        <select id="xVar" data-select="variable" style="width: 100%;" oninput="updateSelection('x')" disabled>
-          <? for(var i = 0; i < columnDefs.length; i++) { ?>
-            <option><?= columnDefs[i].name ?></option>
-          <? } ?>
+        <select id="xVar" data-select="variable" style="width: 100%;" disabled>
+            <option value="" disabled selected style="display: none;">Select the variable</option>
         </select>
         <div class="extended" aria-hidden="true" data-options="x">
           <div>
-            <p><label>Bucket Number: <input title="Minimum Selection 5. Maximum 20." id="bucketNum" type="number" min="5" max="20" value="5" onclick="updateSelection()"></label></p>
+            <p>Bucket Size:</p>
+            <div>
+              <label><input type="radio" name="sizeOption" id="autoBucketSize" onchange="checkBucketSizeState()" checked /> Auto</label>
+              <p>
+                <label><input type="radio" name="sizeOption" id="customBucketSize" onchange="checkBucketSizeState()" /> Custom</label>
+                <input class="hide" id="bucketNum" type="number" min="0" />
+              </p>
+            </div>
           </div>
         </div>
         <div class="toggle-buttons">
@@ -48,5 +52,6 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     
     <?!= include('histogram-script'); ?>
+    <script src="https://use.fontawesome.com/c7e23c37e5.js"></script>
   </body>
 </html>

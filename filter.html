@@ -18,15 +18,12 @@
       <button class="button action" onclick="getVariables()">Refresh Data</button>
     </div>
 
-    <? columnDefs = clientGetVariables(); ?>
     <div class="form-group">
       <div class="block">
         <fieldset>
           <legend>First Filter</legend>
-          <select id="varName1" data-select="variable" style="width: 100%;">
-            <? for(var i = 0; i < columnDefs.length; i++) { ?>
-            <option><?= columnDefs[i].name ?></option>
-            <? } ?>
+          <select id="varName1" data-select="variable" style="width: 100%;" onchange="checkSelectionState()">
+            <option value="" disabled selected>Select the first variable</option>
           </select>
           <select class="select-operator" id="firstFilterOperator">
             <option value="=">=</option>
@@ -46,7 +43,7 @@
         <p><small>The secondary filter is optional. Select a boolean operator to enable editing of the second filter.</small></p>
         <div style="text-align: center">
           <select id="boolean" onchange="enableSecondFilter()">
-            <option disabled selected style="display: none;">select an option</option>
+            <option value="" disabled selected style="display: none;">select an option</option>
             <option value="and">AND</option>
             <option value="or">OR</option>
           </select>
@@ -55,10 +52,8 @@
       <div class="block">
         <fieldset>
           <legend>Second Filter</legend>
-          <select id="varName2" data-select="variable" style="width: 100%;" disabled>
-            <? for(var i = 0; i < columnDefs.length; i++) { ?>
-            <option><?= columnDefs[i].name ?></option>
-            <? } ?>
+          <select id="varName2" data-select="variable" style="width: 100%;" onchange="checkSelectionState()" disabled>
+            <option value="" disabled selected style="display: none;">Select the second variable</option>
           </select>
           <select class="select-operator" id="secondFilterOperator" disabled>
             <option value="=">=</option>
