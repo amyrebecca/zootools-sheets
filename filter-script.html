@@ -114,7 +114,8 @@ function getRange() {
 function getAllColumns(event) {
   var checked = $('#compareAllColumnsInput').checked;
   var columnHeaders = document.querySelectorAll('select[data-select="variable"]')[0];
-
+  var arrayColumnHeaders = Array.from(columnHeaders); // Make it a true array
+  arrayColumnHeaders.shift(); // Remove the placeholder
   if (checked) {
     for (var i = 0; i < columnHeaders.length; i++) {
       google.script.run
