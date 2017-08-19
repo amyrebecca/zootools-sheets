@@ -76,3 +76,11 @@ function clientShowGenericDialog(prompt) {
 function clientFilterData(A1Notation) {
   return SheetManager.filterData(A1Notation);
 };
+
+function clientShowFormDialog(){
+  return UIManager.showDialog('form');
+};
+
+function clientAddFormSubmission(institution, institutionAddress, location, locationAddress, eyeColor){
+  return SheetManager.addFormSubmission(institution, institutionAddress, location, locationAddress, eyeColor);
+};

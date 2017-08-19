@@ -9,6 +9,7 @@ var UIManager = (function(){
           .addItem('Summary Stats Helper', 'clientShowStats')
           .addItem('Data Filter Helper', 'clientShowFilter')
           .addItem('Map Helper', 'clientShowMapDialog')
+          .addItem('Student Location Survey', 'clientShowFormDialog')
           .addToUi();
     },
     showSidebar: function(which){
@@ -27,6 +28,11 @@ var UIManager = (function(){
           height: 500,
           width: 700,
           title: 'Google Map'
+        },
+        form: {
+          height: 280,
+          width: 400,
+          title: 'Student Location Survey'
         },
         working: {
           height: 100,
