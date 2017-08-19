@@ -1,0 +1,122 @@
+<script>
+  var autocomplete = {
+    institution: null,
+    location: null
+  };
+  
+  var isFirefox = typeof InstallTrigger !== 'undefined';
+  // Selector function
+  var $ = function(sel){ return document.querySelector(sel); };
+  $('#form-submit').addEventListener('click', onSubmitClick);
+  
+  /**
+   * Run initializations on dialog load.
+   */
+  function initAutocomplete() {
+    // Create the autocomplete object, restricting the search to geographical
+    // location types.
+    autocomplete.institution = new google.maps.places.SearchBox(
+      /** @type {!HTMLInputElement} */($("#institution")),
+      {types: ['geocode']});
+    autocomplete.location = new google.maps.places.SearchBox(
+      /** @type {!HTMLInputElement} */($("#location")),
+      {types: ['geocode']});
+  }
+  
+  // Add onfocus event to inputs after document is loaded
+  document.addEventListener("DOMContentLoaded", function(event) { 
+    var locationInputs = document.querySelectorAll('input[data-input="location"]');
+    
+    for (var i = 0; i < locationInputs.length; i++) {
+      if (isFirefox) {
+        locationInputs[i].addEventListener('click', geolocate);
+        locationInputs[i].addEventListener('onkeydown', geolocate);
+      } else {
+        locationInputs[i].addEventListener('focus', geolocate);
+      } 
+    } 
+  });
+  
+  function geolocate(event) {
+    var el = event.target;
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var geolocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        var circle = new google.maps.Circle({
+          center: geolocation,
+          radius: position.coords.accuracy
+        });
+        autocomplete[el.id].setBounds(circle.getBounds());
+      }, failureHandler, {timeout: 10000});
+    }
+  }
+  /**
+   * Adds form submission to the sheet
+   */
+  function onSubmitClick() {
+    this.disabled = true;
+    // Gather any information that needs to be sent to the server here.
+    var institutionAddress, locationAddress;
+    var institution = $('#institution').value;
+    var institutionPlace = autocomplete.institution.getPlaces();
+    var location = $('#location').value;
+    var locationPlace = autocomplete.location.getPlaces();
+    var eyeColor = $('#eye-color').value;
+    
+    // Send something to the geocoder in case the getPlaces() call fails
+    if (institutionPlace) {
+      institutionAddress = institutionPlace[0].formatted_address;
+    } else {
+      institutionAddress = institution;
+    }
+    
+    if (locationPlace) {
+      locationAddress = locationPlace[0].formatted_address;
+    } else {
+      locationAddress = location;
+    } 
+    
+    showStatus('Working...');
+    // Send the value to the server and handle the response.
+    if (institutionAddress && locationAddress) {
+      google.script.run
+        .withSuccessHandler(function() {
+          showCompletionMsg();
+        })
+        .withFailureHandler(failureHandler)
+        .withUserObject(this)
+        .clientAddFormSubmission(institution, institutionAddress, location, locationAddress, eyeColor);
+    } else {
+      showStatus('Please complete the form with valid values.', 'error');
+      $('#form-submit').disabled = false;
+    }
+
+  }
+  
+  function showCompletionMsg(){
+    var completionMsg = "Thank you for submitting your response. Please now close the browser tab with the Google spreadsheet.";
+    google.script.run
+      .withSuccessHandler(function() { google.script.host.close(); })
+      .withFailureHandler(function(error){ console.error(error); })
+      .clientShowGenericDialog(completionMsg);
+  }
+  
+  function failureHandler(err) {
+    console.error(err);
+    showStatus('Something went wrong: ' + err, 'error');
+  }
+
+  function showStatus(msg, classId) {
+    var status = $('#status'); 
+    status.className = ""
+    status.innerHTML = msg;
+    if (classId) {
+      status.classList.add(classId);
+    }
+  }
+</script>
+
