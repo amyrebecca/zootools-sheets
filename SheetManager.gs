@@ -95,10 +95,15 @@ var SheetManager = (function() {
     var rowVariables = getRowVariables();
     var selectedRowIndex = findVariableIndex(rowVariables, varName);
 
-    var rowValues = sheet.getRange(selectedRowIndex + 2, 2, 1, sheet.getLastColumn() - 2).getValues() || [];
+    var rowValues = sheet.getRange(selectedRowIndex + 2, 2, 1, sheet.getLastColumn() - 1).getValues() || [];
+    
     var flattenedRowValues = flatten(rowValues);
+    var filteredRowValues = flattenedRowValues.filter(function(value) {
+      if (typeof value === "string") value.trim();
+      return (typeof value !== "string" || !(/^\s*$/.test(value)));
+    });
 
-    return flattenedRowValues;
+    return filteredRowValues;
   }
   
   var fetchRange = function(varName){
