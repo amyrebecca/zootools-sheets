@@ -81,7 +81,11 @@ var SheetManager = (function() {
 
     var columnValues = activeSheet.getRange(2, selectedColumnIndex + 1, activeSheet.getLastRow() - 1).getValues() || [];
     var flattenedColumnValues = flatten(columnValues);
-    return flattenedColumnValues;
+    var filteredColumnValues = flattenedColumnValues.filter(function(value) {
+       if (typeof value === "string") value.trim();
+       return (typeof value !== "string" || !(/^\s*$/.test(value)));
+    });
+    return filteredColumnValues;
   }
   
   var getMultipleColumnValues = function(varNameX, varNameY) {
