@@ -1,5 +1,5 @@
-var ChartBuilder = (function() {
-  var determineOffset = function() {
+var ChartBuilder = (function () {
+  var determineOffset = function () {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Charts');
     var charts = sheet.getCharts();
     if (charts.length > 0) {
@@ -8,8 +8,10 @@ var ChartBuilder = (function() {
       return 0;
     }
   }
-  
-  var addScatterChart = function(xRange, yRange, config) {
+
+  var addScatterChart = function (xRange, yRange, config) {
+    var ui = SpreadsheetApp.getUi()
+
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Charts');
     var offset = determineOffset();
     var chart = sheet.newChart().asScatterChart();
@@ -21,14 +23,14 @@ var ChartBuilder = (function() {
       .setOption('aggregationTarget', 'category')
       .setOption('pointSize', 1)
       .setOption('legend.position', 'none')
-      .setPosition(3, 2, 0 , offset);
-      
-    if(config.x.axes.invert){ chart.setOption('hAxis.direction', -1); }
-    if(config.x.axes.log){ chart.setOption('hAxis.logScale', true); }
-    if(config.y.axes.invert){ chart.setOption('vAxis.direction', -1); }
-    if(config.y.axes.log){ chart.setOption('vAxis.logScale', true); }
+      .setPosition(3, 2, 0, offset);
 
-    if(config.trendlines !== 'none'){ 
+    if (config.x.axes.invert) { chart.setOption('hAxis.direction', -1); }
+    if (config.x.axes.log) { chart.setOption('hAxis.logScale', true); }
+    if (config.y.axes.invert) { chart.setOption('vAxis.direction', -1); }
+    if (config.y.axes.log) { chart.setOption('vAxis.logScale', true); }
+
+    if (config.trendlines !== 'none') {
       var options = {
         0: {
           type: config.trendlines,
@@ -37,31 +39,34 @@ var ChartBuilder = (function() {
         }
       };
       chart.setOption('trendlines', options);
-    } 
+    }
+
 
     chart = chart.build();
+    var options = chart.getOptions();
+
     sheet.insertChart(chart);
   }
-  
-  var addHistogramChart = function(xRange, config) {
+
+  var addHistogramChart = function (xRange, config) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Charts');
     var offset = determineOffset();
     var chart = sheet.newChart().asHistogramChart();
-    
+
     if (config.histogram.bucketSize) {
       chart.setOption('histogram.bucketSize', config.histogram.bucketSize)
     }
-    
+
     chart.setTitle('Frequency vs ' + config.x.variable)
       .setXAxisTitle(config.x.variable)
       .addRange(xRange)
       .setPosition(3, 2, 0, offset);
-    
+
     chart = chart.build();
     sheet.insertChart(chart);
   }
 
-  var addPieChart = function(data, config) {
+  var addPieChart = function (data, config) {
     var chartDataRange;
     var pieDataSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Pie Chart Data');
     var numColumns = data[0].length;
@@ -70,19 +75,19 @@ var ChartBuilder = (function() {
     var range = pieDataSheet.getRange(1, columnToStart, numRows, numColumns);
     range.setValues(data);
     chartDataRange = pieDataSheet.getRange(1, columnToStart, numRows, numColumns);
-    
+
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Charts');
     var offset = determineOffset();
     var chart = sheet.newChart().asPieChart();
-    
+
     chart.setTitle(config.title)
       .addRange(chartDataRange)
       .setPosition(3, 2, 0, offset);
-    
+
     chart = chart.build();
     sheet.insertChart(chart);
   }
-  
+
   return {
     addScatterChart: addScatterChart,
     addHistogramChart: addHistogramChart,

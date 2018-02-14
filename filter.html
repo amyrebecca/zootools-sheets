@@ -1,89 +1,98 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
-    <?!= include('styles'); ?>
-  </head>
-  <body class="sidebar filter">
-    <div class="block">
-      <h1>Data Filter</h1>
-    </div>
-    <div class="block form-group">
-      <p class="instructions">Filter a variable column by a value put into the input below. Then press <code class="button-like action">Filter</code> to insert the filtered data into a new sheet. Use <code class="button-like action">Refresh Data</code> to refresh the available variables in the drop down menu.</p>
-      <p class="instructions">Numerical and text inputs are supported. Text inputs are case sensitive. For numerical inputs, negative and decimal numbers with periods can be used. Do not use commas in numerical input.</p>
-      <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
-    </div>
-    <div style="text-align: center; width: 100%;">
-      <button class="button action" onclick="getVariables()">Refresh Data</button>
-    </div>
 
-    <div class="form-group">
-      <div class="block">
-        <fieldset>
-          <legend>First Filter</legend>
-          <select id="varName1" data-select="variable" style="width: 100%;" onchange="checkSelectionState()">
-            <option value="" disabled selected>Select the first variable</option>
-          </select>
-          <select class="select-operator" id="firstFilterOperator">
-            <option value="=">=</option>
-            <option value="!=">&#8800;</option>
-            <option value="<"><</option>
-            <option value=">">></option>
-            <option value="<=">&#8804;</option>
-            <option value=">=">&#8805;</option>
-          </select>
-          <input type="text" id="firstFilterValue" />
-          <div style="text-align: center;">
-            <button type="button" id="resetFirstButton" class="button" onclick="resetFilter('first')">Reset Filter</button>
-          </div>
-        </fieldset>
-      </div>
-      <div class="block">
-        <p><small>The secondary filter is optional. Select a boolean operator to enable editing of the second filter.</small></p>
-        <div style="text-align: center">
-          <select id="boolean" onchange="enableSecondFilter()">
-            <option value="" disabled selected style="display: none;">select an option</option>
-            <option value="and">AND</option>
-            <option value="or">OR</option>
-          </select>
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
+  <?!= include('styles'); ?>
+</head>
+
+<body class="sidebar filter">
+  <div class="block">
+    <h1>Data Filter</h1>
+  </div>
+  <div class="block form-group">
+    <p class="instructions">Filter a variable column by a value put into the input below. Then press
+      <code class="button-like action">Filter</code> to insert the filtered data into a new sheet. Use
+      <code class="button-like action">Refresh Data</code> to refresh the available variables in the drop down menu.</p>
+    <p class="instructions">Numerical and text inputs are supported. Text inputs are case sensitive. For numerical inputs, negative and decimal numbers
+      with periods can be used. Do not use commas in numerical input.</p>
+    <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
+  </div>
+  <div style="text-align: center; width: 100%;">
+    <button class="button action" onclick="getVariables()">Refresh Data</button>
+  </div>
+
+  <div class="form-group">
+    <div class="block">
+      <fieldset>
+        <legend>First Filter</legend>
+        <select id="varName1" data-select="variable" style="width: 100%;" onchange="checkSelectionState()">
+          <option value="" disabled selected>Select the first variable</option>
+        </select>
+        <select class="select-operator" id="firstFilterOperator">
+          <option value="=">=</option>
+          <option value="!=">&#8800;</option>
+          <option value="<">
+            <</option>
+              <option value=">">></option>
+              <option value="<=">&#8804;</option>
+              <option value=">=">&#8805;</option>
+        </select>
+        <input type="text" id="firstFilterValue" />
+        <div style="text-align: center;">
+          <button type="button" id="resetFirstButton" class="button" onclick="resetFilter('first')">Reset Filter</button>
         </div>
-      </div>
-      <div class="block">
-        <fieldset>
-          <legend>Second Filter</legend>
-          <select id="varName2" data-select="variable" style="width: 100%;" onchange="checkSelectionState()" disabled>
-            <option value="" disabled selected style="display: none;">Select the second variable</option>
-          </select>
-          <select class="select-operator" id="secondFilterOperator" disabled>
-            <option value="=">=</option>
-            <option value="!=">&#8800;</option>
-            <option value="<"><</option>
-            <option value=">">></option>
-            <option value="<=">&#8804;</option>
-            <option value=">=">&#8805;</option>
-          </select>
-          <input type="text" id="secondFilterValue" disabled />
-          <div style="text-align: center;">
-            <button type="button" id="resetSecondButton" class="button" onclick="resetFilter('second')" disabled>Reset Filter</button>
-          </div>
-        </fieldset>
+      </fieldset>
+    </div>
+    <div class="block">
+      <p>
+        <small>The secondary filter is optional. Select a boolean operator to enable editing of the second filter.</small>
+      </p>
+      <div style="text-align: center">
+        <select id="boolean" onchange="enableSecondFilter()">
+          <option value="" disabled selected style="display: none;">select an option</option>
+          <option value="and">AND</option>
+          <option value="or">OR</option>
+        </select>
       </div>
     </div>
-    <div class="block form-group">
-      <label>
-        <input id="compareAllColumnsInput" type="checkbox" onChange="getAllColumns()" disabled />
-        Copy all columns over to a new tab in order to compare to the whole data set.
-      </label>
+    <div class="block">
+      <fieldset>
+        <legend>Second Filter</legend>
+        <select id="varName2" data-select="variable" style="width: 100%;" onchange="checkSelectionState()" disabled>
+          <option value="" disabled selected style="display: none;">Select the second variable</option>
+        </select>
+        <select class="select-operator" id="secondFilterOperator" disabled>
+          <option value="=">=</option>
+          <option value="!=">&#8800;</option>
+          <option value="<">
+            <</option>
+              <option value=">">></option>
+              <option value="<=">&#8804;</option>
+              <option value=">=">&#8805;</option>
+        </select>
+        <input type="text" id="secondFilterValue" disabled />
+        <div style="text-align: center;">
+          <button type="button" id="resetSecondButton" class="button" onclick="resetFilter('second')" disabled>Reset Filter</button>
+        </div>
+      </fieldset>
     </div>
-    <div class="block form-group" style="text-align: center; ">
-      <div data-ui="status" id="status" style="display: block; margin: 1em;"></div>
-      <div class="inline-button-block">
-        <button type="button" id="filterBtn" class="button action" onclick="getRange()" disabled>Filter</button>
-        <button type="button" class="button" onclick="google.script.host.close()">Close</button>
-      </div>
-    </div>      
-    <?!= include('filter-script'); ?>
+  </div>
+  <div class="block form-group">
+    <label>
+      <input id="compareAllColumnsInput" type="checkbox" onChange="getAllColumns()" disabled /> Copy all columns over to a new tab in order to compare to the whole data set.
+    </label>
+  </div>
+  <div class="block form-group" style="text-align: center; ">
+    <div data-ui="status" id="status" style="display: block; margin: 1em;"></div>
+    <div class="inline-button-block">
+      <button type="button" id="filterBtn" class="button action" onclick="getRange()" disabled>Filter</button>
+      <button type="button" class="button" onclick="google.script.host.close()">Close</button>
+    </div>
+  </div>
+  <?!= include('filter-script'); ?>
     <script src="https://use.fontawesome.com/c7e23c37e5.js"></script>
-  </body>
+</body>
+
 </html>

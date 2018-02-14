@@ -1,21 +1,29 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
-    <?!= include('styles'); ?>
-  </head>
-  <body class="sidebar">
-    <div class="block">
-      <h1>Scatter Plot Helper</h1>
-    </div>
-    <div class="block">
-      <p class="instructions">You may change the independent (X) and dependent (Y) variables below, then press <code class="button-like action">Plot</code> to draw or redraw the plot. Use <code class="button-like action">Refresh Data</code> to refresh the available variables in the drop down menus.</p>
-      <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
-    </div>
-    <div style="text-align: center; width: 100%;"><p><button class="button action" onclick="getVariables()">Refresh Data</button></p></div>
-    <div class="block">
-      <fieldset>
+
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
+  <?!= include('styles'); ?>
+</head>
+
+<body class="sidebar">
+  <div class="block">
+    <h1>Scatter Plot Helper</h1>
+  </div>
+  <div class="block">
+    <p class="instructions">You may change the independent (X) and dependent (Y) variables below, then press
+      <code class="button-like action">Plot</code> to draw or redraw the plot. Use
+      <code class="button-like action">Refresh Data</code> to refresh the available variables in the drop down menus.</p>
+    <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
+  </div>
+  <div style="text-align: center; width: 100%;">
+    <p>
+      <button class="button action" onclick="getVariables()">Refresh Data</button>
+    </p>
+  </div>
+  <div class="block">
+    <fieldset>
       <legend>X Variable</legend>
       <div class="block form-group collapse" id="xDef">
         <select id="xVar" data-select="variable" style="width: 100%;" onchange="checkSelectionState()" disabled>
@@ -23,9 +31,17 @@
         </select>
         <div class="extended" aria-hidden="true" data-options="x">
           <div>
-            <p><strong>Axis</strong></p>
-            <div style="float: right; width: 50%;"><label for="logX"><input type="checkbox" id="logX">Logarithmic</label></div>
-            <div><label for="invertX"><input type="checkbox" id="invertX" />Invert</label></div>
+            <p>
+              <strong>Axis</strong>
+            </p>
+            <div style="float: right; width: 50%;">
+              <label for="logX">
+                <input type="checkbox" id="logX">Logarithmic</label>
+            </div>
+            <div>
+              <label for="invertX">
+                <input type="checkbox" id="invertX" />Invert</label>
+            </div>
           </div>
         </div>
         <div class="toggle-buttons">
@@ -33,8 +49,8 @@
           <button type="button" class="toggle toggle-less" onclick="toggleVar('x')">Less &#9652;</button>
         </div>
       </div>
-      </fieldset>
-      <fieldset>
+    </fieldset>
+    <fieldset>
       <legend>Y Variable</legend>
       <div class="block form-group collapse" id="yDef">
         <select id="yVar" data-select="variable" style="width: 100%;" onchange="checkSelectionState()" disabled>
@@ -42,9 +58,17 @@
         </select>
         <div class="extended" aria-hidden="true" data-options="y">
           <div>
-            <p><strong>Axis</strong></p>
-            <div style="float: right; width: 50%;"><label for="logY"><input type="checkbox" id="logY">Logarithmic</label></div>
-            <div><label for="invertY"><input type="checkbox" id="invertY" />Invert</label></div>
+            <p>
+              <strong>Axis</strong>
+            </p>
+            <div style="float: right; width: 50%;">
+              <label for="logY">
+                <input type="checkbox" id="logY">Logarithmic</label>
+            </div>
+            <div>
+              <label for="invertY">
+                <input type="checkbox" id="invertY" />Invert</label>
+            </div>
           </div>
         </div>
         <div class="toggle-buttons">
@@ -52,27 +76,28 @@
           <button type="button" class="toggle toggle-less" onclick="toggleVar('y')">Less &#9652;</button>
         </div>
       </div>
-      </fieldset>
+    </fieldset>
+  </div>
+  <div class="trendline-option-container">
+    <label for="trendlineSelector">Trendline</label>
+    <select id="trendlineSelector" name="trendline">
+      <option value="none" selected>None</option>
+      <option value="linear">Linear</option>
+      <option value="exponential">Exponential</option>
+      <option value="polynomial">Polynomial</option>
+    </select>
+  </div>
+  <div id="chart-preview" style="width: 100%"></div>
+  <div class="action-button-bar" style="text-align: center; ">
+    <div data-ui="status" style="display: block; margin: 1em;"></div>
+    <div class="inline-button-block">
+      <button type="button" id="updateBtn" class="button action" onclick="clientChangeSelection()" disabled>Plot</button>
+      <button type="button" id="sendToSheetBtn" class="button create" onclick="clientSendToSheet()" disabled>Send to Sheet</button>
+      <button type="button" class="button" onclick="google.script.host.close()">Close</button>
     </div>
-    <div class="trendline-option-container">
-      <label for="trendlineSelector">Trendline</label>
-      <select id="trendlineSelector" name="trendline">
-        <option value="none" selected>None</option>
-        <option value="linear">Linear</option>
-        <option value="exponential">Exponential</option>
-        <option value="polynomial">Polynomial</option>
-      </select>
-    </div>
-    <div id="chart-preview" style="width: 100%"></div>
-    <div class="action-button-bar" style="text-align: center; ">
-      <div data-ui="status" style="display: block; margin: 1em;"></div>
-      <div class="inline-button-block">
-        <button type="button" id="updateBtn" class="button action" onclick="clientChangeSelection()" disabled>Plot</button>
-        <button type="button" id="sendToSheetBtn" class="button create" onclick="clientSendToSheet()" disabled>Send to Sheet</button>
-        <button type="button" class="button" onclick="google.script.host.close()">Close</button>
-      </div>
-    </div>
-    <?!= include('scatter-script'); ?>
-    <script src="https://use.fontawesome.com/c7e23c37e5.js"></script>
-  </body>
+  </div>
+  <script src="https://use.fontawesome.com/c7e23c37e5.js"></script>
+  <?!= include('scatter-script'); ?>
+</body>
+
 </html>

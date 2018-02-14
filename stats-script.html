@@ -1,172 +1,174 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.13.3/math.min.js"></script>
 <script type="text/javascript">
 
-var columnDefs = null;
-var template = null;
-var statTemplate = null;
-var summary = null;
-var $ = function(sel){ return document.querySelector(sel); };
-var enable = function(node){ node.removeAttribute('disabled'); }
-var disable = function(node){ node.setAttribute('disabled', true); }
+  var columnDefs = null;
+  var template = null;
+  var statTemplate = null;
+  var summary = null;
+  var $ = function (sel) { return document.querySelector(sel); };
+  var enable = function (node) { node.removeAttribute('disabled'); }
+  var disable = function (node) { node.setAttribute('disabled', true); }
 
-// polyfill for ChildNode.remove()
-if (!('remove' in Element.prototype)) {
-    Element.prototype.remove = function() {
-        if (this.parentNode) {
-            this.parentNode.removeChild(this);
-        }
+  // polyfill for ChildNode.remove()
+  if (!('remove' in Element.prototype)) {
+    Element.prototype.remove = function () {
+      if (this.parentNode) {
+        this.parentNode.removeChild(this);
+      }
     };
-}
-
-function showStatus(msg, classId) {
-  var status = document.querySelectorAll('div[data-ui="status"]');
-  var icon = '';
-  
-  if (msg !== '' && classId === 'error') {
-    icon = '<i class="fa fa-exclamation-circle" aria-hidden="true"></i>';
-  } else if (msg !== '') {
-    icon = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>';  
-  } else {
-    icon = '';
   }
-  
-  for (var i = 0; i < status.length; i++) {
-    status[i].className = ""
-    status[i].innerHTML = icon + " " + msg;
-    if (classId) {
-      status[i].classList.add(classId);
+
+  function showStatus(msg, classId) {
+    var status = document.querySelectorAll('div[data-ui="status"]');
+    var icon = '';
+
+    if (msg !== '' && classId === 'error') {
+      icon = '<i class="fa fa-exclamation-circle" aria-hidden="true"></i>';
+    } else if (msg !== '') {
+      icon = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>';
+    } else {
+      icon = '';
+    }
+
+    for (var i = 0; i < status.length; i++) {
+      status[i].className = ""
+      status[i].innerHTML = icon + " " + msg;
+      if (classId) {
+        status[i].classList.add(classId);
+      }
     }
   }
-}
 
-function failureHandler(err) {
-  console.error(err);
-  showStatus('Something went wrong: ' + err, 'error');
-}
-
-// use async call to determine initial state of dropdown lists
-// from contents of chart cells
-function getVariables() {
-  showStatus('Getting variables...');
-  google.script.run
-    .withSuccessHandler(function(response){
-      columnDefs = response;
-    
-      // Handle if user is not on a sheet with no data
-      if (response.length === 0) {
-        showStatus('No variables to choose from.', 'error');
-        disable($('#calcBtn'));
-      } else {
-        showStatus('');
-      }
-      
-      addVariableOptions();
-    })
-    .withFailureHandler(failureHandler)
-    .clientGetColumnVariables();
-}
-
-getVariables();
-
-function addVariableOptions() {
-  var options = '<option value="" disabled selected>Select the variable</option>';
-  var selects = document.querySelectorAll('select');
-  var sortedVariableDefs = columnDefs.concat().sort(function(a,b) { return a - b; });
-  
-  sortedVariableDefs.forEach(function(variable) {
-    var newOption = '<option value="' + variable + '">' + variable + '</option>';
-    options += newOption;
-  });
-  
-  for (var i = 0; i < selects.length; i++) {
-    selects[i].innerHTML = options;
+  function failureHandler(err) {
+    console.error(err);
+    showStatus('Something went wrong: ' + err, 'error');
   }
-}
 
-function checkSelectionState() {
-  var variable = $('#varName');
-  
-  if (variable.value) {
-    enable($('#calcBtn'));
-  }
-}
+  // use async call to determine initial state of dropdown lists
+  // from contents of chart cells
+  function getVariables() {
+    showStatus('Getting variables...');
+    google.script.run
+      .withSuccessHandler(function (response) {
+        columnDefs = response;
 
-function calculateNew(){
-  var varName = $('#varName').value;
-  var resultsList = $('#resultList');
-  google.script.run
-    .withSuccessHandler(function(response){
-      summary = {
-        name: varName,
-        min: math.round(math.min(response),3),
-        max: math.round(math.max(response),3),
-        mean: math.round(math.mean(response),3),
-        median: math.round(math.median(response),3),
-        stdev: math.round(math.std(response),3)
-      }
-
-      resultsList.innerHTML = statTemplate(summary);
-      resultsList.classList.remove('hide');
-      resultsList.classList.add('show');
-      enable($('#addToSheetBtn'));
-    })
-    .withFailureHandler(failureHandler)
-    .clientGetColumnValues(varName);
-}
-
-var compile = function(selector){
-  var r = /(\{\{.+?\}\})/;
-  var elem = document.querySelector(selector);
-  var markup = elem.outerHTML;
-  elem.remove();
-  markup = markup.replace(/\s+/,' ');
-
-  var fragments = markup.split(r);
-
-  var template = (function(tpl){
-    return function(obj){
-      var r = /(\{\{.+?\}\})/;
-      var accum = [];
-      for(var idx in fragments){
-        var fragment = fragments[idx];
-        if(r.test(fragment)){
-          fragment = fragment.replace(/(\{\{)|(\}\})/g,'');
-          accum.push(obj[fragment]);
+        // Handle if user is not on a sheet with no data
+        if (response.length === 0) {
+          showStatus('No variables to choose from.', 'error');
+          disable($('#calcBtn'));
         } else {
-          accum.push(fragment);
+          showStatus('');
         }
-      }
-      return accum.join('');
-    };
-  })(fragments);
 
-  return template;
-};
+        addVariableOptions();
+      })
+      .withFailureHandler(failureHandler)
+      .clientGetColumnVariables();
+  }
 
-var statTemplate = compile('#result');
+  getVariables();
 
-function clientAddToSheet() {
-  var dataTable = [
-    [summary.name + " Min", summary.min],
-    [summary.name + " Max", summary.max],
-    [summary.name + " Mean", summary.mean],
-    [summary.name + " Median", summary.median],
-    [summary.name + " Std. Dev.", summary.stdev]
-  ];
-  showStatus('Sending...');
-  
-  google.script.run
-    .withSuccessHandler(function() {
-      var resultsList = $('#resultList')
-      resultsList.classList.remove('show');
-      resultsList.classList.add('hide');
-      
-      disable($('#addToSheetBtn'));
-      showStatus('');
-      getVariables();
-    })
-    .withFailureHandler(failureHandler)
-    .clientAddStats(dataTable);
-}
+  function addVariableOptions() {
+    var options = '<option value="" disabled selected>Select the variable</option>';
+    var selects = document.querySelectorAll('select');
+    var sortedVariableDefs = columnDefs.concat().sort(function (a, b) { return a - b; });
+
+    sortedVariableDefs.forEach(function (variable) {
+      var newOption = '<option value="' + variable + '">' + variable + '</option>';
+      options += newOption;
+    });
+
+    for (var i = 0; i < selects.length; i++) {
+      selects[i].innerHTML = options;
+    }
+  }
+
+  function checkSelectionState() {
+    var variable = $('#varName');
+
+    if (variable.value) {
+      enable($('#calcBtn'));
+    }
+  }
+
+  function calculateNew() {
+    var varName = $('#varName').value;
+    var resultsList = $('#resultList');
+    showStatus('Calculating...');
+    google.script.run
+      .withSuccessHandler(function (response) {
+        summary = {
+          name: varName,
+          min: math.round(math.min(response), 3),
+          max: math.round(math.max(response), 3),
+          mean: math.round(math.mean(response), 3),
+          median: math.round(math.median(response), 3),
+          stdev: math.round(math.std(response), 3)
+        }
+
+        resultsList.innerHTML = statTemplate(summary);
+        resultsList.classList.remove('hide');
+        resultsList.classList.add('show');
+        enable($('#addToSheetBtn'));
+        showStatus('');
+      })
+      .withFailureHandler(failureHandler)
+      .clientGetColumnValues(varName);
+  }
+
+  var compile = function (selector) {
+    var r = /(\{\{.+?\}\})/;
+    var elem = document.querySelector(selector);
+    var markup = elem.outerHTML;
+    elem.remove();
+    markup = markup.replace(/\s+/, ' ');
+
+    var fragments = markup.split(r);
+
+    var template = (function (tpl) {
+      return function (obj) {
+        var r = /(\{\{.+?\}\})/;
+        var accum = [];
+        for (var idx in fragments) {
+          var fragment = fragments[idx];
+          if (r.test(fragment)) {
+            fragment = fragment.replace(/(\{\{)|(\}\})/g, '');
+            accum.push(obj[fragment]);
+          } else {
+            accum.push(fragment);
+          }
+        }
+        return accum.join('');
+      };
+    })(fragments);
+
+    return template;
+  };
+
+  var statTemplate = compile('#result');
+
+  function clientAddToSheet() {
+    var dataTable = [
+      [summary.name + " Min", summary.min],
+      [summary.name + " Max", summary.max],
+      [summary.name + " Mean", summary.mean],
+      [summary.name + " Median", summary.median],
+      [summary.name + " Std. Dev.", summary.stdev]
+    ];
+    showStatus('Sending...');
+
+    google.script.run
+      .withSuccessHandler(function () {
+        var resultsList = $('#resultList')
+        resultsList.classList.remove('show');
+        resultsList.classList.add('hide');
+
+        disable($('#addToSheetBtn'));
+        showStatus('');
+        getVariables();
+      })
+      .withFailureHandler(failureHandler)
+      .clientAddStats(dataTable);
+  }
 
 </script>

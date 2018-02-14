@@ -1,38 +1,41 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
-    <?!= include('styles'); ?>
-  </head>
-  <body class="dialog">
-    <!-- Below is the HTML code that defines the dialog element structure. -->
-    <div>
-      <div class="block dialog-elements">
-        <div class="form-group" style="display: inline-block;">
-          <h6>Latitude</h6>
-          <select data-select="variable" id="latitude" style="width:100%;">
-            <option></option>
-          </select>
-        </div>
-        <div class="form-group" style="display: inline-block;">
-          <h6>Longitude</h6>
-          <select data-select="variable" id="longitude" style="width: 100%;">
-            <option></option>
-          </select>
-        </div>
-        <div data-ui="status" id="status" style="display: inline-block; margin-left: 1em;"></div>
-        <div id="map-container" style="height: 100%; max-height: 380px; width: 100%;"></div>
-      </div>
-      <div class="block dialog-button-bar">
-        <button type="button" id="updateBtn" class="button action" onclick="getCoordinates()">Map</button>
-        <button type="button" class="button" onclick="google.script.host.close()">Close</button>
-      </div> 
-    </div>
 
-    <!-- Use a templated HTML printing scriptlet to import JavaScript. -->
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <?!= include('map-script'); ?>
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
+  <?!= include('styles'); ?>
+</head>
+
+<body class="dialog">
+  <!-- Below is the HTML code that defines the dialog element structure. -->
+  <div>
+    <div class="block dialog-elements">
+      <div class="form-group" style="display: inline-block;">
+        <h6>Latitude</h6>
+        <select data-select="variable" id="latitude" style="width:100%;">
+          <option></option>
+        </select>
+      </div>
+      <div class="form-group" style="display: inline-block;">
+        <h6>Longitude</h6>
+        <select data-select="variable" id="longitude" style="width: 100%;">
+          <option></option>
+        </select>
+      </div>
+      <div data-ui="status" id="status" style="display: inline-block; margin-left: 1em;"></div>
+      <div id="map-container" style="height: 100%; max-height: 380px; width: 100%;"></div>
+    </div>
+    <div class="block dialog-button-bar">
+      <button type="button" id="updateBtn" class="button action" onclick="getCoordinates()">Map</button>
+      <button type="button" class="button" onclick="google.script.host.close()">Close</button>
+    </div>
+  </div>
+
+  <!-- Use a templated HTML printing scriptlet to import JavaScript. -->
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBRGZULWkpcL786BdrHLek-HA5OfvN3kos"></script>
+  <?!= include('map-script'); ?>
     <script src="https://use.fontawesome.com/c7e23c37e5.js"></script>
-  </body>
+</body>
+
 </html>
