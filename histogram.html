@@ -1,33 +1,41 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
-    <?!= include('styles'); ?>
-  </head>
-  <body class="sidebar">
-    <div class="block">
-      <h1>Histogram Helper</h1>
-    </div>
-    <div class="block">
-      <p class="instructions">You may change the histogram variable below, then press <code class="button-like action">Plot</code> to draw or redraw the plot. Use <code class="button-like action">Refresh Data</code> to refresh the available variables in the drop down menu.</p>
-      <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
-    </div>
-    <div style="text-align: center; width: 100%;"><button class="button action" onclick="getVariables()">Refresh Data</button></div>
-    <div class="block">
-      <fieldset>
+
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
+  <?!= include('styles'); ?>
+</head>
+
+<body class="sidebar">
+  <div class="block">
+    <h1>Histogram Helper</h1>
+  </div>
+  <div class="block">
+    <p class="instructions">You may change the histogram variable below, then press
+      <code class="button-like action">Plot</code> to draw or redraw the plot. Use
+      <code class="button-like action">Refresh Data</code> to refresh the available variables in the drop down menu.</p>
+    <div data-ui="status" style="display: block; margin: 1em; text-align: center;"></div>
+  </div>
+  <div style="text-align: center; width: 100%;">
+    <button class="button action" onclick="getVariables()">Refresh Data</button>
+  </div>
+  <div class="block">
+    <fieldset>
       <legend>Histogram Variable</legend>
       <div class="form-group collapse" id="xDef">
         <select id="xVar" data-select="variable" style="width: 100%;" disabled>
-            <option value="" disabled selected style="display: none;">Select the variable</option>
+          <option value="" disabled selected style="display: none;">Select the variable</option>
         </select>
         <div class="extended" aria-hidden="true" data-options="x">
           <div>
             <p>Bucket Size:</p>
             <div>
-              <label><input type="radio" name="sizeOption" id="autoBucketSize" onchange="checkBucketSizeState()" checked /> Auto</label>
+              <label>
+                <input type="radio" name="sizeOption" id="autoBucketSize" onchange="checkBucketSizeState()" checked /> Auto</label>
               <p>
-                <label><input type="radio" name="sizeOption" id="customBucketSize" onchange="checkBucketSizeState()" /> Custom</label>
+                <label>
+                  <input type="radio" name="sizeOption" id="customBucketSize" onchange="checkBucketSizeState()" /> Custom</label>
                 <input class="hide" id="bucketNum" type="number" min="0" />
               </p>
             </div>
@@ -38,20 +46,21 @@
           <button type="button" class="toggle toggle-less" onclick="toggleVar('x')">Less &#9652;</button>
         </div>
       </div>
-      </fieldset>
+    </fieldset>
+  </div>
+  <div id="chart-preview" style="width: 100%"></div>
+  <div class="action-button-bar" style="text-align: center; ">
+    <div data-ui="status" id="status" style="display: block; margin: 1em;"></div>
+    <div class="inline-button-block">
+      <button type="button" id="updateBtn" class="button action" onclick="clientChangeSelection()" disabled>Plot</button>
+      <button type="button" id="sendToSheetBtn" class="button create" onclick="clientSendToSheet()" disabled>Send to Sheet</button>
+      <button type="button" class="button" onclick="google.script.host.close()">Close</button>
     </div>
-    <div id="chart-preview" style="width: 100%"></div>
-    <div class="action-button-bar" style="text-align: center; ">
-      <div data-ui="status" id="status" style="display: block; margin: 1em;"></div>
-      <div class="inline-button-block">
-        <button type="button" id="updateBtn" class="button action" onclick="clientChangeSelection()" disabled>Plot</button>
-        <button type="button" id="sendToSheetBtn" class="button create" onclick="clientSendToSheet()" disabled>Send to Sheet</button>
-        <button type="button" class="button" onclick="google.script.host.close()">Close</button>
-      </div>
-    </div>
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    
-    <?!= include('histogram-script'); ?>
+  </div>
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+  <?!= include('histogram-script'); ?>
     <script src="https://use.fontawesome.com/c7e23c37e5.js"></script>
-  </body>
+</body>
+
 </html>

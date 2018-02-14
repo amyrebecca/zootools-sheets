@@ -5,43 +5,39 @@ function clientGetSpreadsheetID() {
   return SheetManager.getID();
 };
 
-function clientGetColumnVariables(){ 
-  return SheetManager.getColumnVariables(); 
+function clientGetColumnVariables() {
+  return SheetManager.getColumnVariables();
 };
 
-function clientGetRowVariables(){
+function clientGetRowVariables() {
   return SheetManager.getRowVariables();
 };
 
-function clientShowStats(){
-  return UIManager.showSidebar('stats'); 
+function clientShowStats() {
+  return UIManager.showSidebar('stats');
 };
 
-function clientShowScatter(){
-  return UIManager.showSidebar('scatter'); 
+function clientShowScatter() {
+  return UIManager.showSidebar('scatter');
 };
 
-function clientShowHistogram(){
-  return UIManager.showSidebar('histogram'); 
+function clientShowHistogram() {
+  return UIManager.showSidebar('histogram');
 };
 
-function clientShowPie(){
-  return UIManager.showSidebar('pie'); 
+function clientShowPie() {
+  return UIManager.showSidebar('pie');
 };
 
-function clientShowFilter(){
+function clientShowFilter() {
   return UIManager.showSidebar('filter');
 };
 
-function clientShowMapDialog(){
+function clientShowMapDialog() {
   return UIManager.showDialog('map');
 };
 
-function clientGetCoordinates(latitude, longitude){
-  return SheetManager.getCoordinates(latitude, longitude);
-};
-
-function clientGetColumnValues(varName){
+function clientGetColumnValues(varName) {
   return SheetManager.getColumnValues(varName);
 };
 
@@ -59,7 +55,7 @@ function clientGetA1Notation(varName) {
 
 function clientGetQuery(varName1, varName2) {
   return SheetManager.getQuery(varName1, varName2);
-}; 
+};
 
 function clientAddChart(config, data, type) {
   return SheetManager.addChart(config, data, type);
@@ -77,10 +73,6 @@ function clientFilterData(A1Notation) {
   return SheetManager.filterData(A1Notation);
 };
 
-function clientShowFormDialog(){
-  return UIManager.showDialog('form');
-};
-
-function clientAddFormSubmission(institution, institutionAddress, location, locationAddress, eyeColor){
-  return SheetManager.addFormSubmission(institution, institutionAddress, location, locationAddress, eyeColor);
+function clientGetCoordinates(latitude, longitude) {
+  return SheetManager.getCoordinates(latitude, longitude);
 };

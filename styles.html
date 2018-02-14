@@ -1,6 +1,9 @@
 <style type="text/css">
   /* Button reset */
-  button, button:focus, button:hover {
+
+  button,
+  button:focus,
+  button:hover {
     background: transparent;
     border: 0;
     color: inherit;
@@ -11,59 +14,79 @@
     position: relative;
     text-decoration: none
   }
-  
+
   h1 {
     line-height: 1em;
   }
-  
-  .show { display: block !important; } 
-  .hide { display: none !important; }
-  
-  fieldset{ margin-bottom: 2em; } 
-  legend{ margin-left: -0.4em; }
-  
-  *:disabled { cursor: not-allowed; }
-  
-  .collapse .extended { 
+
+  .show {
+    display: block !important;
+  }
+
+  .hide {
+    display: none !important;
+  }
+
+  fieldset {
+    margin-bottom: 2em;
+  }
+
+  legend {
+    margin-left: -0.4em;
+  }
+
+  *:disabled {
+    cursor: not-allowed;
+  }
+
+  .collapse .extended {
     max-height: 0;
   }
-    
-  .extended {  
+
+  .extended {
     max-height: 200px;
     overflow-y: hidden;
     transition: all .5s ease-in-out;
     -webkit-transition: all .5s ease-in-out;
   }
-  
+
   .toggle-buttons {
     float: right;
     position: relative;
     width: 100%;
-  } 
-  
-  .toggle, .toggle:hover, .toggle:focus { 
-    float: right;
-    font-size: 0.9em;  
-    margin-top: 1em; 
-    cursor: pointer; 
   }
-  
-  .toggle-more{ display: none; }
-  .toggle-less{ }
-  
-  .collapse .toggle-more { 
+
+  .toggle,
+  .toggle:hover,
+  .toggle:focus {
+    float: right;
+    font-size: 0.9em;
+    margin-top: 1em;
+    cursor: pointer;
+  }
+
+  .toggle-more {
+    display: none;
+  }
+
+  .toggle-less {}
+
+  .collapse .toggle-more {
     display: block;
   }
-  
-  .collapse .toggle-less { 
-    display: none; 
+
+  .collapse .toggle-less {
+    display: none;
   }
-  .preinit fieldset{ display: none; }
-  
+
+  .preinit fieldset {
+    display: none;
+  }
+
   .dialog {
     margin: 0;
   }
-  
+
   .dialog h6 {
     margin: 0 0 0.5em 0;
   }
@@ -71,60 +94,60 @@
   .dialog .form-group {
     margin: 0.5em 0;
   }
-  
+
   .dialog label {
-    font-weight: bold;  
+    font-weight: bold;
   }
 
   .width-100 {
     width: 100%;
     box-sizing: border-box;
-    -webkit-box-sizing : border-box;‌
-    -moz-box-sizing : border-box;
+    -webkit-box-sizing: border-box;
+    ‌ -moz-box-sizing: border-box;
   }
-  
+
   .dialog .dialog-elements {
     background-color: #eee;
     border-color: #eee;
     border-width: 5px;
     border-style: solid;
   }
-  
+
   .dialog .dialog-button-bar {
     margin: 10px 0;
   }
-  
+
   .stats-table {
     border-bottom: solid thin #acacac;
     margin-top: 0.5em;
     margin-left: 0.2em;
     width: 100%;
   }
-  
+
   .stats-table caption {
     border-top: solid thin #acacac;
     border-bottom: solid thin #acacac;
     padding: 0.5em 0;
   }
-  
+
   .stats-table td {
     text-align: center;
   }
-  
+
   .stats-table th {
     padding: 0.5em 0;
   }
-  
+
   .inline-button-block {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
   }
-  
+
   .instructions {
     line-height: 2em;
   }
-  
+
   .button-like {
     border-radius: 2.5px;
     color: white;
@@ -134,11 +157,11 @@
     padding: 5px 7.5px;
     white-space: nowrap;
   }
-  
+
   .button-like.action {
     background-color: #4d90fe;
   }
-  
+
   .button-like.green {
     background-color: #3d9400;
   }
@@ -146,24 +169,24 @@
   .trendline-option-container {
     text-align: center;
   }
-  
+
   .filter select[data-select="variable"] {
     margin-bottom: 0.5em;
   }
-  
+
   .filter .select-operator {
     height: 26px
   }
-  
+
   .filter input[type="text"] {
     margin-bottom: 0.5em;
     width: 70%;
   }
-  
+
   .survey-question {
     margin-bottom: 1em !important;
   }
-  
+
   #pie-section-labels {
     display: flex;
     flex-direction: column;
@@ -175,8 +198,12 @@
     margin: 0.25em 0;
     padding-bottom: 0.25em
   }
-  
+
   .variable-orientation label {
     display: flex;
+  }
+
+  select {
+    text-align: left;
   }
 </style>

@@ -1,225 +1,225 @@
 <script type="text/javascript">
-// Setup and utility functions
-var columnDefs, chartWrapper;
-var $ = function(sel){ return document.querySelector(sel); };
-var enable = function(node){ node.removeAttribute('disabled'); };
-var disable = function(node){ node.setAttribute('disabled', true); };
+  // Setup and utility functions
+  var columnDefs, chartWrapper;
+  var $ = function (sel) { return document.querySelector(sel); };
+  var enable = function (node) { node.removeAttribute('disabled'); };
+  var disable = function (node) { node.setAttribute('disabled', true); };
 
-function showStatus(msg, classId) {
-  var status = document.querySelectorAll('div[data-ui="status"]');
-  var icon = '';
-  
-  if (msg !== '' && classId === 'error') {
-    icon = '<i class="fa fa-exclamation-circle" aria-hidden="true"></i>';
-  } else if (msg !== '') {
-    icon = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>';  
-  } else {
-    icon = '';
-  }
-  
-  for (var i = 0; i < status.length; i++) {
-    status[i].className = ""
-    status[i].innerHTML = icon + " " + msg;
-    if (classId) {
-      status[i].classList.add(classId);
+  function showStatus(msg, classId) {
+    var status = document.querySelectorAll('div[data-ui="status"]');
+    var icon = '';
+
+    if (msg !== '' && classId === 'error') {
+      icon = '<i class="fa fa-exclamation-circle" aria-hidden="true"></i>';
+    } else if (msg !== '') {
+      icon = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>';
+    } else {
+      icon = '';
     }
-  }
-}
 
-function failureHandler(err) {
-  console.error(err);
-  showStatus('Something went wrong: ' + err, 'error');
-}
-
-// Load the Google Visualization library
-google.load("visualization", "1", {packages:["corechart"]});
-google.setOnLoadCallback(loadChart);
-
-// Instantiate the chart
-function loadChart() {
-  chartWrapper = new google.visualization.ChartWrapper();
-} 
-
-// use async call to determine initial state of dropdown lists
-// from contents of chart cells
-function getVariables() {
-  resetDOMState();
-  showStatus('Getting variables...');
-  google.script.run
-    .withSuccessHandler(function(response){
-      columnDefs = response;
-
-      // Handle if user is not on a sheet with no data
-      if (response.length === 0) {
-        showStatus('No variables to choose from.', 'error');
-        disable($('#xVar'));
-        disable($('#yVar'));
-        disable($('#updateBtn'));
-      } else {
-        enable($('#xVar'));
-        enable($('#yVar'));
-        showStatus('');
+    for (var i = 0; i < status.length; i++) {
+      status[i].className = ""
+      status[i].innerHTML = icon + " " + msg;
+      if (classId) {
+        status[i].classList.add(classId);
       }
-      
-      addVariableOptions();
-    })
-    .withFailureHandler(failureHandler)
-    .clientGetColumnVariables();
-}
-
-getVariables();
-
-function addVariableOptions() {
-  var options = '';
-  var selects = document.querySelectorAll('select[data-select="variable"]');
-  var sortedVariableDefs = columnDefs.concat().sort(function(a,b) { return a - b; });
-  
-  sortedVariableDefs.forEach(function(variable) {
-    var newOption = '<option value="' + variable + '">' + variable + '</option>';
-    options += newOption;
-  });
-  
-  for (var i = 0; i < selects.length; i++) {
-    var withPlaceholder = '';
-    if (selects[i].id === 'xVar') {
-      withPlaceholder = '<option value="" disabled selected>Select the X variable</option>' + options;
-    } else if (selects[i].id === 'yVar') {
-      withPlaceholder = '<option value="" disabled selected>Select the Y variable</option>' + options;
     }
-    selects[i].innerHTML = withPlaceholder;
   }
-}
 
-function extractDOMState(){
-  var state = {
-    x: {
-      variable: $('#xVar').value,
-      axes: { invert: $('#invertX').checked, log: $('#logX').checked },
-    },
-    y: {
-      variable: $('#yVar').value,
-      axes: { invert: $('#invertY').checked, log: $('#logY').checked },
-    },
-    trendlines: $('#trendlineSelector').value
-  };
-
-  return state;
-}
-
-function resetDOMState() {
-  showStatus('');
-  disable($('#sendToSheetBtn'));
-  $('#invertX').checked = false;
-  $('#logX').checked = false;
-  $('#invertY').checked = false;
-  $('#logY').checked = false;
-  $('#trendlineSelector').value = 'none';
-  $('#chart-preview').innerHTML = '';
-}
-
-function toggleVar(varName){
-  var elemId = varName + 'Def';
-  var extensionEl = $('div[data-options="' + varName + '"]');
-
-  if (extensionEl.getAttribute("aria-hidden") === 'true') {
-    extensionEl.setAttribute("aria-hidden", "false");
-  } else {
-    extensionEl.setAttribute("aria-hidden", "true");
+  function failureHandler(err) {
+    console.error(err);
+    showStatus('Something went wrong: ' + err, 'error');
   }
-  
-  $("#" + elemId).classList.toggle('collapse');
-}
 
-function checkSelectionState() {
-  var state = extractDOMState();
-  
-  if (state.x.variable && state.y.variable) {
-    enable($('#updateBtn'));
+  // Load the Google Visualization library
+  google.load("visualization", "1", { packages: ["corechart"] });
+  google.setOnLoadCallback(loadChart);
+
+  // Instantiate the chart
+  function loadChart() {
+    chartWrapper = new google.visualization.ChartWrapper();
   }
-}
 
-// update the chart from the client's selected variables
-function clientChangeSelection(){
-  var state = extractDOMState()
-    
-  if (state.x.variable !== state.y.variable) {
-    showStatus('Drawing Plot...');
-    
+  // use async call to determine initial state of dropdown lists
+  // from contents of chart cells
+  function getVariables() {
+    resetDOMState();
+    showStatus('Getting variables...');
     google.script.run
-      .withSuccessHandler(function(response) {
-        showStatus('');
-        previewChart(response);
+      .withSuccessHandler(function (response) {
+        columnDefs = response;
+
+        // Handle if user is not on a sheet with no data
+        if (response.length === 0) {
+          showStatus('No variables to choose from.', 'error');
+          disable($('#xVar'));
+          disable($('#yVar'));
+          disable($('#updateBtn'));
+        } else {
+          enable($('#xVar'));
+          enable($('#yVar'));
+          showStatus('');
+        }
+
+        addVariableOptions();
       })
       .withFailureHandler(failureHandler)
-      .clientGetMultipleColumnValues(state.x.variable, state.y.variable);  
-  } else {
-    showStatus('X and Y variables are the same selection. Please update your variable selections so that they are not the same', 'error'); 
+      .clientGetColumnVariables();
   }
 
-}
+  getVariables();
 
-// Use response from sheet to setup data in format expected by Charts API for scatter plots
-function setupDataTable(spreadsheetValues, state) {
-  var table = [[state.x.variable, state.y.variable]];
-  for (var i = spreadsheetValues.x.length - 1; i >= 0; i--) {
-    var row = [spreadsheetValues.x[i], spreadsheetValues.y[i]];
-    table.push(row);
-  };
-  
-  return table;
-}
+  function addVariableOptions() {
+    var options = '';
+    var selects = document.querySelectorAll('select[data-select="variable"]');
+    var sortedVariableDefs = columnDefs.concat().sort(function (a, b) { return a - b; });
 
-function buildChartOptions(state) {
-  options = {
-    hAxis: { title: state.x.variable },
-    vAxis: { title: state.y.variable },
-    pointSize: 1,
-    aggregationTarget: 'category',
-    legend: { position: 'none' }
+    sortedVariableDefs.forEach(function (variable) {
+      var newOption = '<option value="' + variable + '">' + variable + '</option>';
+      options += newOption;
+    });
+
+    for (var i = 0; i < selects.length; i++) {
+      var withPlaceholder = '';
+      if (selects[i].id === 'xVar') {
+        withPlaceholder = '<option value="" disabled selected>Select the X variable</option>' + options;
+      } else if (selects[i].id === 'yVar') {
+        withPlaceholder = '<option value="" disabled selected>Select the Y variable</option>' + options;
+      }
+      selects[i].innerHTML = withPlaceholder;
+    }
   }
-  
-  if (state.x.axes.invert === true) { options.hAxis.direction = -1; }
-  if (state.x.axes.log === true) { options.hAxis.logScale = true; }
-  if (state.y.axes.invert === true) { options.vAxis.direction = -1; }
-  if (state.y.axes.log === true) { options.vAxis.logScale = true; }
-  if (state.trendlines !== "none") { options.trendlines = state.trendlines; }
 
-  return options;
-}
+  function extractDOMState() {
+    var state = {
+      x: {
+        variable: $('#xVar').value,
+        axes: { invert: $('#invertX').checked, log: $('#logX').checked },
+      },
+      y: {
+        variable: $('#yVar').value,
+        axes: { invert: $('#invertY').checked, log: $('#logY').checked },
+      },
+      trendlines: $('#trendlineSelector').value
+    };
 
-function previewChart(spreadsheetValues) {
-  var state = extractDOMState();
-  var load = setupDataTable(spreadsheetValues, state);
-  var data = google.visualization.arrayToDataTable(load);
-  var options = buildChartOptions(state);
-  var sendToSheetBtn = $('#sendToSheetBtn');
+    return state;
+  }
 
-  disable(sendToSheetBtn);
-  
-  chartWrapper.setChartType('ScatterChart');
-  chartWrapper.setDataTable(data);
-  chartWrapper.setOptions(options);
-  chartWrapper.setContainerId('chart-preview');
-    
-  // Add event listener
-  google.visualization.events.addListener(chartWrapper, 'ready', function(){
-    enable(sendToSheetBtn);
-  });
-  
-  // Draw the chart
-  chartWrapper.draw();
-}
+  function resetDOMState() {
+    showStatus('');
+    disable($('#sendToSheetBtn'));
+    $('#invertX').checked = false;
+    $('#logX').checked = false;
+    $('#invertY').checked = false;
+    $('#logY').checked = false;
+    $('#trendlineSelector').value = 'none';
+    $('#chart-preview').innerHTML = '';
+  }
 
-function clientSendToSheet() {
-  var state = extractDOMState();
-  showStatus('Sending...');
-  google.script.run
-    .withSuccessHandler(function(res){
-      chartWrapper = new google.visualization.ChartWrapper();
-      getVariables();
-    })
-    .withFailureHandler(failureHandler)
-    .clientAddChart(state, null, 'scatter');
-}
+  function toggleVar(varName) {
+    var elemId = varName + 'Def';
+    var extensionEl = $('div[data-options="' + varName + '"]');
+
+    if (extensionEl.getAttribute("aria-hidden") === 'true') {
+      extensionEl.setAttribute("aria-hidden", "false");
+    } else {
+      extensionEl.setAttribute("aria-hidden", "true");
+    }
+
+    $("#" + elemId).classList.toggle('collapse');
+  }
+
+  function checkSelectionState() {
+    var state = extractDOMState();
+
+    if (state.x.variable && state.y.variable) {
+      enable($('#updateBtn'));
+    }
+  }
+
+  // update the chart from the client's selected variables
+  function clientChangeSelection() {
+    var state = extractDOMState()
+
+    if (state.x.variable !== state.y.variable) {
+      showStatus('Drawing Plot...');
+
+      google.script.run
+        .withSuccessHandler(function (response) {
+          showStatus('');
+          previewChart(response);
+        })
+        .withFailureHandler(failureHandler)
+        .clientGetMultipleColumnValues(state.x.variable, state.y.variable);
+    } else {
+      showStatus('X and Y variables are the same selection. Please update your variable selections so that they are not the same', 'error');
+    }
+
+  }
+
+  // Use response from sheet to setup data in format expected by Charts API for scatter plots
+  function setupDataTable(spreadsheetValues, state) {
+    var table = [[state.x.variable, state.y.variable]];
+    for (var i = spreadsheetValues.x.length - 1; i >= 0; i--) {
+      var row = [spreadsheetValues.x[i], spreadsheetValues.y[i]];
+      table.push(row);
+    };
+
+    return table;
+  }
+
+  function buildChartOptions(state) {
+    options = {
+      hAxis: { title: state.x.variable },
+      vAxis: { title: state.y.variable },
+      pointSize: 1,
+      aggregationTarget: 'category',
+      legend: { position: 'none' }
+    }
+
+    if (state.x.axes.invert === true) { options.hAxis.direction = -1; }
+    if (state.x.axes.log === true) { options.hAxis.logScale = true; }
+    if (state.y.axes.invert === true) { options.vAxis.direction = -1; }
+    if (state.y.axes.log === true) { options.vAxis.logScale = true; }
+    if (state.trendlines !== "none") { options.trendlines = state.trendlines; }
+
+    return options;
+  }
+
+  function previewChart(spreadsheetValues) {
+    var state = extractDOMState();
+    var load = setupDataTable(spreadsheetValues, state);
+    var data = google.visualization.arrayToDataTable(load);
+    var options = buildChartOptions(state);
+    var sendToSheetBtn = $('#sendToSheetBtn');
+
+    disable(sendToSheetBtn);
+
+    chartWrapper.setChartType('ScatterChart');
+    chartWrapper.setDataTable(data);
+    chartWrapper.setOptions(options);
+    chartWrapper.setContainerId('chart-preview');
+
+    // Add event listener
+    google.visualization.events.addListener(chartWrapper, 'ready', function () {
+      enable(sendToSheetBtn);
+    });
+
+    // Draw the chart
+    chartWrapper.draw();
+  }
+
+  function clientSendToSheet() {
+    var state = extractDOMState();
+    showStatus('Sending...');
+    google.script.run
+      .withSuccessHandler(function (res) {
+        chartWrapper = new google.visualization.ChartWrapper();
+        getVariables();
+      })
+      .withFailureHandler(failureHandler)
+      .clientAddChart(state, null, 'scatter');
+  }
 
 </script>

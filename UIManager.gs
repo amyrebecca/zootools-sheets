@@ -1,38 +1,32 @@
-var UIManager = (function(){
+var UIManager = (function () {
   return {
-    registerMenu: function(){
+    registerMenu: function () {
       var ui = SpreadsheetApp.getUi();
       ui.createAddonMenu()
-          .addItem('Scatter Plot Helper', 'clientShowScatter')
-          .addItem('Histogram Helper', 'clientShowHistogram')
-          .addItem('Pie Chart Helper', 'clientShowPie')
-          .addItem('Summary Stats Helper', 'clientShowStats')
-          .addItem('Data Filter Helper', 'clientShowFilter')
-          .addItem('Map Helper', 'clientShowMapDialog')
-          .addItem('Student Location Survey', 'clientShowFormDialog')
-          .addToUi();
+        .addItem('Scatter Plot Helper', 'clientShowScatter')
+        .addItem('Histogram Helper', 'clientShowHistogram')
+        .addItem('Pie Chart Helper', 'clientShowPie')
+        .addItem('Summary Stats Helper', 'clientShowStats')
+        .addItem('Data Filter Helper', 'clientShowFilter')
+        .addItem('Map Helper', 'clientShowMapDialog')
+        .addToUi();
     },
-    showSidebar: function(which){
+    showSidebar: function (which) {
       var html = HtmlService
-          .createTemplateFromFile(which)
-          .evaluate()
-          .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-          .setTitle('Zoo Tools');
-  
+        .createTemplateFromFile(which)
+        .evaluate()
+        .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+        .setTitle('Zoo Tools');
+
       SpreadsheetApp.getUi()
-          .showSidebar(html);
+        .showSidebar(html);
     },
-    showDialog: function(menuItem){
+    showDialog: function (menuItem) {
       var dialog = {
         map: {
           height: 500,
           width: 700,
           title: 'Google Map'
-        },
-        form: {
-          height: 280,
-          width: 400,
-          title: 'Student Location Survey'
         },
         working: {
           height: 100,
@@ -40,7 +34,7 @@ var UIManager = (function(){
           title: 'Working...'
         }
       };
-      
+
       var ui = HtmlService.createTemplateFromFile(menuItem + '-dialog')
         .evaluate()
         .setWidth(dialog[menuItem].width)
@@ -48,9 +42,9 @@ var UIManager = (function(){
         .setSandboxMode(HtmlService.SandboxMode.IFRAME);
       SpreadsheetApp.getUi().showModalDialog(ui, dialog[menuItem].title);
     },
-    showGenericDialog: function(prompt) {
+    showGenericDialog: function (prompt) {
       var ui = SpreadsheetApp.getUi();
-      
+
       ui.alert(prompt);
     }
   }

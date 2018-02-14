@@ -1,20 +1,20 @@
-var SheetManager = (function() {
-  
-  var getID = function() {
+var SheetManager = (function () {
+
+  var getID = function () {
     return SpreadsheetApp.getActiveSpreadsheet().getId();
   }
-  
-  var flatten = function(array) {
+
+  var flatten = function (array) {
     if (array.length > 0) {
-      return array.reduce(function(a, b) {
+      return array.reduce(function (a, b) {
         return a.concat(b);
       });
     }
-    
+
     return array;
   }
-  
-  var convertArrayValuesToString = function(array) {
+
+  var convertArrayValuesToString = function (array) {
     var convertedValuesArray = [];
     for (var i = 0; i < array.length; i++) {
       if (typeof array[i] !== 'string') {
@@ -23,117 +23,117 @@ var SheetManager = (function() {
         convertedValuesArray.push(array[i]);
       }
     }
-    
+
     return convertedValuesArray;
   }
 
-  var flattenAndConvert = function(array) {
+  var flattenAndConvert = function (array) {
     var flattenedArray = flatten(array);
 
     return convertArrayValuesToString(flattenedArray);
   }
-  
-  var cleanVariableList = function(variableList) {
-    return variableList.filter(function(variable){
+
+  var cleanVariableList = function (variableList) {
+    return variableList.filter(function (variable) {
       return variable;
     });
   }
-  
-  var findVariableIndex = function(array, varName) {
+
+  var findVariableIndex = function (array, varName) {
     var index;
-    
+
     if (array.indexOf(varName) > -1) {
       index = array.indexOf(varName);
     }
-    
+
     return index;
   }
-  
+
   // Headers for the data is in the first row
-  var getColumnVariables = function(){
+  var getColumnVariables = function () {
     var sheet = SpreadsheetApp.getActiveSheet();
     var data = sheet.getDataRange().getValues() || [];
     var variableList = convertArrayValuesToString(data[0]);
-    
+
     var cleanedVariables = cleanVariableList(variableList)
-    
+
     return cleanedVariables;
   }
-  
+
   // Headers for the data is in the first column
-  var getRowVariables = function(){
+  var getRowVariables = function () {
     var data = [];
     var sheet = SpreadsheetApp.getActiveSheet();
     if (sheet.getLastRow()) {
       data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues();
     }
-    
+
     var flattenedData = flattenAndConvert(data);
     var cleanedVariables = cleanVariableList(flattenedData);
 
     return cleanedVariables;
   }
-  
-  var getColumnValues = function(varName) {
+
+  var getColumnValues = function (varName) {
     var activeSheet = SpreadsheetApp.getActiveSheet();
     var columnVariables = getColumnVariables();
     var selectedColumnIndex = findVariableIndex(columnVariables, varName);
 
     var columnValues = activeSheet.getRange(2, selectedColumnIndex + 1, activeSheet.getLastRow() - 1).getValues() || [];
     var flattenedColumnValues = flatten(columnValues);
-    var filteredColumnValues = flattenedColumnValues.filter(function(value) {
-       if (typeof value === "string") value.trim();
-       return (typeof value !== "string" || !(/^\s*$/.test(value)));
+    var filteredColumnValues = flattenedColumnValues.filter(function (value) {
+      if (typeof value === "string") value.trim();
+      return (typeof value !== "string" || !(/^\s*$/.test(value)));
     });
     return filteredColumnValues;
   }
-  
-  var getMultipleColumnValues = function(varNameX, varNameY) {
+
+  var getMultipleColumnValues = function (varNameX, varNameY) {
     var returnedValues = { x: getColumnValues(varNameX), y: getColumnValues(varNameY) };
-    
+
     return returnedValues;
   }
-  
-  var getRowValues = function(varName) {
+
+  var getRowValues = function (varName) {
     var sheet = SpreadsheetApp.getActiveSheet();
     var rowVariables = getRowVariables();
     var selectedRowIndex = findVariableIndex(rowVariables, varName);
 
     var rowValues = sheet.getRange(selectedRowIndex + 2, 2, 1, sheet.getLastColumn() - 1).getValues() || [];
-    
+
     var flattenedRowValues = flatten(rowValues);
-    var filteredRowValues = flattenedRowValues.filter(function(value) {
+    var filteredRowValues = flattenedRowValues.filter(function (value) {
       if (typeof value === "string") value.trim();
       return (typeof value !== "string" || !(/^\s*$/.test(value)));
     });
 
     return filteredRowValues;
   }
-  
-  var fetchRange = function(varName){
+
+  var fetchRange = function (varName) {
     var activeSheet = SpreadsheetApp.getActiveSheet();
     var data = activeSheet.getDataRange().getValues();
-    for(var colIdx = 0; colIdx < data[0].length; colIdx++){
-      if(data[0][colIdx]==varName) break;
+    for (var colIdx = 0; colIdx < data[0].length; colIdx++) {
+      if (data[0][colIdx] == varName) break;
     }
-  
-    return activeSheet.getRange(1, colIdx+1, activeSheet.getDataRange().getLastRow() - 1);
+
+    return activeSheet.getRange(1, colIdx + 1, activeSheet.getDataRange().getLastRow() - 1);
   }
-  
-  var getA1Notation = function(varName) {
+
+  var getA1Notation = function (varName) {
     var A1Notation = {
       sheetName: SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName(),
       range: fetchRange(varName).getA1Notation()
     };
     return A1Notation;
   }
-  
-  var getQuery = function(varName1, varName2) {
+
+  var getQuery = function (varName1, varName2) {
     var A1Notation, firstA1, secondA1, endRow;
     var query = {};
     firstA1 = fetchRange(varName1).getA1Notation();
     query.varName1 = varName1
-  
+
     if (varName2) {
       secondA1 = fetchRange(varName2).getA1Notation();
       query.A1Notation = [firstA1, secondA1].join(',');
@@ -142,46 +142,46 @@ var SheetManager = (function() {
     } else {
       query.A1Notation = firstA1;
     }
-    
+
     query.columnOne = firstA1[0];
     query.sheetName = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName();
-    
+
     return query;
   }
-  
-  var setupNamedSheet = function(sheetName) {
+
+  var setupNamedSheet = function (sheetName) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
     var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
-    
+
     if (sheet === undefined || sheet === null) {
       SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName, sheets.length + 1);
     } else {
       SpreadsheetApp.setActiveSheet(sheet);
     }
-    
+
     return sheet;
   }
-  
-  var setupUniqueNamedSheet = function(sheetName) {
+
+  var setupUniqueNamedSheet = function (sheetName) {
     var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
-    var randomString = (Math.random()*1e32).toString(36);
+    var randomString = (Math.random() * 1e32).toString(36);
     var newSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName + '-' + randomString, sheets.length + 1);
-    
+
     return newSheet;
   }
-  
-  var filterData = function(A1Notation) {
+
+  var filterData = function (A1Notation) {
     var filteredDataSheet = setupUniqueNamedSheet('Filtered Data');
     addFilteredData(A1Notation, filteredDataSheet);
   }
-  
-  var addFilteredData = function(A1Notation, filteredDataSheet) {
+
+  var addFilteredData = function (A1Notation, filteredDataSheet) {
     var rangeToInsert = filteredDataSheet.getRange(1, filteredDataSheet.getLastColumn() + 1);
-    
+
     rangeToInsert.setFormula(A1Notation);
   }
-  
-  var addChart = function(config, data, type) {
+
+  var addChart = function (config, data, type) {
     var xRange, yRange;
     var sheet = SpreadsheetApp.getActiveSheet();
     if (config.x) {
@@ -191,7 +191,7 @@ var SheetManager = (function() {
     if (config.y) {
       yRange = fetchRange(config.y.variable);
     }
-    
+
     if (data) {
       if (type === 'pie') {
         setupNamedSheet('Pie Chart Data');
@@ -209,85 +209,46 @@ var SheetManager = (function() {
         return ChartBuilder.addPieChart(data, config);
     }
   }
-  
-  var destroyCharts = function(){
+
+  var destroyCharts = function () {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Charts');
     var charts = sheet.getCharts();
-    for(var idx in charts){
+    for (var idx in charts) {
       sheet.removeChart(charts[idx]);
     }
   }
-  
-  var addStats = function(data) {
-    setupNamedSheet('Statistics');    
+
+  var addStats = function (data) {
+    setupNamedSheet('Statistics');
     addStatsValues(data);
   }
-  
-  var addStatsValues = function(data) {
+
+  var addStatsValues = function (data) {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Statistics');
     var rowToStart = sheet.getLastRow() + 1;
 
     sheet.getRange(rowToStart + 1, 1, 5, 2).setValues(data);
   }
-        
-  var getCoordinates = function(latitude, longitude){
-    // Latitude and longitude will already be validated from the form submission
-    var coordinates = [['Lat','Long', 'Name']];
+
+  var getCoordinates = function (latitude, longitude) {
+    var coordinates = [['Lat', 'Long', 'Name']];
     var latitudeValues = getColumnValues(latitude);
     var longitudeValues = getColumnValues(longitude);
-    
+
     // Setup array for use with Maps API
     for (var i = latitudeValues.length - 1; i >= 0; i--) {
       // create row of lat, long, and use lat, long for tooltip popup on map
       var row = [latitudeValues[i], longitudeValues[i], latitudeValues[i] + ', ' + longitudeValues[i]];
       coordinates.push(row);
     };
-    
+
     return coordinates;
   }
-  
-  var getFormResponseSheet = function() {
-    var sheetName = 'Student Responses';
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
-    var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
-    
-    if (sheet === undefined || sheet === null) {
-       sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName, sheets.length + 1);
-       var lastColumnWithContent = sheet.getLastColumn();
 
-       // Setup headers for new sheet
-       var headerRow = sheet.getRange(1, lastColumnWithContent + 1, 1, 8);
-       headerRow.setValues([['DateTime', 'Where are you from?', 'What is your institution?', 'Student eye color', 'Student latitude', 'Student longitude', 'Institution latitude', 'Institution longitude', 'Calculated Distance in km']]);
-       sheet.setFrozenRows(1); // Freeze header row
-    } else {
-      SpreadsheetApp.setActiveSheet(sheet);
-    }
-    
-    return sheet;
-  }
-  
-  var getDate = function() {
-    var formattedDate;
-    var date = new Date();
-  
-    var year = date.getUTCFullYear(),
-        month = date.getUTCMonth(),
-        day = date.getUTCDate(),
-        hour = date.getUTCHours(),
-        minutes = date.getUTCMinutes(),
-        seconds = date.getUTCSeconds();
-  
-    //month 2 digits
-    month = ("0" + (month + 1)).slice(-2);
-    formattedDate = month + '/' + day  + "/" + year + " " + hour + ":" + minutes + ":" + seconds;
-  
-    return formattedDate;
-  }
-
-  var geolocate = function(geocoder, location) {
+  var geolocate = function (geocoder, location) {
     var latLongResults = [];
     var ui = SpreadsheetApp.getUi()
-  
+
     var geocodedLocation = geocoder.geocode(location);
 
     if (geocodedLocation.status === "OK") {
@@ -303,22 +264,6 @@ var SheetManager = (function() {
 
     return latLongResults;
   }
-  
-  var addFormSubmission = function(institution, institutionAddress, location, locationAddress, eyeColor) {
-    // Setup latitude and longitude headers if needed
-    var formResponseSheet = getFormResponseSheet();
-    
-    addFormRow(institution, institutionAddress, location, locationAddress, eyeColor, formResponseSheet);
-  }
-  
-  var addFormRow = function(institution, institutionAddress, location, locationAddress, eyeColor, sheet) {
-    var geocoder = Maps.newGeocoder(),
-        date = getDate(),   
-        institutionGeocoded = geolocate(geocoder, institutionAddress),
-        locationGeocoded = geolocate(geocoder, locationAddress);
-    
-    sheet.appendRow([date, location, institution, eyeColor, locationGeocoded[0], locationGeocoded[1], institutionGeocoded[0], institutionGeocoded[1]]);
-  }
 
   return {
     getID: getID,
@@ -330,11 +275,10 @@ var SheetManager = (function() {
     getRowVariables: getRowVariables,
     getA1Notation: getA1Notation,
     getQuery: getQuery,
-    getCoordinates: getCoordinates,
     addChart: addChart,
     addStats: addStats,
     filterData: filterData,
-    addFormSubmission: addFormSubmission
+    getCoordinates: getCoordinates
   };
-  
+
 })();

@@ -1,285 +1,285 @@
 <script type="text/javascript">
-// Setup and utility functions
-var chartWrapper;
-var dataStore = {
-  variableDefs: null,
-  labelDefs: null,
-  dataTable: null
-};
-var $ = function(sel){ return document.querySelector(sel); };
-var enable = function(node){ node.removeAttribute('disabled'); };
-var disable = function(node){ node.setAttribute('disabled', true); };
-
-function showStatus(msg, classId) {
-  var status = document.querySelectorAll('div[data-ui="status"]');
-  var icon = '';
-  
-  if (msg !== '' && classId === 'error') {
-    icon = '<i class="fa fa-exclamation-circle" aria-hidden="true"></i>';
-  } else if (msg !== '') {
-    icon = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>';  
-  } else {
-    icon = '';
-  }
-  
-  for (var i = 0; i < status.length; i++) {
-    status[i].className = ""
-    status[i].innerHTML = icon + " " + msg;
-    if (classId) {
-      status[i].classList.add(classId);
-    }
-  }
-}
-
-function failureHandler(err) {
-  console.error(err);
-  showStatus('Something went wrong: ' + err, 'error');
-}
-
-function getDataStore() {
-  return dataStore;
-}
-
-function setDataStoreValue(key, value) {
-  dataStore[key] = value;
-};
-
-function resetDataStore() {
-  dataStore = {
+  // Setup and utility functions
+  var chartWrapper;
+  var dataStore = {
     variableDefs: null,
-    labelDefs: null  
+    labelDefs: null,
+    dataTable: null
   };
-}
+  var $ = function (sel) { return document.querySelector(sel); };
+  var enable = function (node) { node.removeAttribute('disabled'); };
+  var disable = function (node) { node.setAttribute('disabled', true); };
 
-// Load the Google Visualization library
-google.load("visualization", "1", {packages:["corechart"]});
-google.setOnLoadCallback(loadChart);
+  function showStatus(msg, classId) {
+    var status = document.querySelectorAll('div[data-ui="status"]');
+    var icon = '';
 
-// Instantiate the chart
-function loadChart() {
-  chartWrapper = new google.visualization.ChartWrapper();
-} 
-
-// first column contains variable headers
-function getFirstColumnVariables(dataStoreKey, callback) {
-  showStatus('Getting first column variables...');
-  
-  google.script.run
-    .withSuccessHandler(function(response){
-      setDataStoreValue(dataStoreKey, response);
-    
-      // Handle if user is not on a sheet with no data
-      if (response.length === 0) {
-        showStatus('No variables to choose from.', 'error');
-        disable($('#xVar'));
-        disable($('#updateBtn'));
-      } else {
-        enable($('#xVar'));
-        enable($('#updateBtn'));
-        showStatus('');
-      }
-      
-      callback();
-    })
-    .withFailureHandler(failureHandler)
-    .clientGetRowVariables();
-}
-
-// first row contains variable headers
-function getFirstRowVariables(dataStoreKey, callback) {
-  showStatus('Getting first row variables...');
-
-  google.script.run
-    .withSuccessHandler(function(response){
-      setDataStoreValue(dataStoreKey, response);
-
-      // Handle if user is not on a sheet with no data
-      if (response.length === 0) {
-        showStatus('No variables to choose from', 'error');
-        disable($('#xVar'));
-        disable($('#updateBtn'));
-      } else {
-        enable($('#xVar'));
-        enable($('#updateBtn'));
-        showStatus('');
-      }
-      
-      callback();
-    })
-    .withFailureHandler(failureHandler)
-    .clientGetColumnVariables();
-}
-
-function addVariableOptions() {
-  var options = '';
-  var select = $('select[data-select="variable"]');
-  var store = getDataStore();
-  var state = extractDOMState();
-  var sortedVariableDefs = store.variableDefs.concat().sort(function(a,b) { return a - b; }); // Make a copy using concat() then sort
-
-  if (state.variableOrientation.firstRow) {
-    sortedVariableDefs = sortedVariableDefs.filter(function(label, i) { if (i !== 0) return label; }); // I don't want to permanently modify the store!
-  }
-
-  sortedVariableDefs.forEach(function(variable) {
-    var newOption = '<option>' + variable + '</option>';
-    options += newOption;
-  });
-  
-
-  select.innerHTML = options;
-
-  
-  getPieSectionLabels();
-}
-
-function getPieSectionLabels() {
-  var state = extractDOMState();
-  
-  if (state.variableOrientation.firstRow) {
-    getFirstColumnVariables('labelDefs', addPieSectionOptions);
-  } else if (state.variableOrientation.firstColumn)  {
-    getFirstRowVariables('labelDefs', addPieSectionOptions);
-  }
-}
-
-function addPieSectionOptions() {
-  var checkboxes = '';
-  var el = $('#pie-section-labels');
-  var store = getDataStore();
-  var state = extractDOMState();
-  var labelsToUse = store.labelDefs;
-
-  if (state.variableOrientation.firstColumn) {
-    labelsToUse = labelsToUse.filter(function(label, i) { if (i !== 0) return label; }); // I don't want to permanently modify the store!
-  }
-
-  labelsToUse.forEach(function(label, i) {
-    var newCheckbox = '<label><input type="checkbox" checked value="' + i + '" />' + label + '</label>';
-    checkboxes += newCheckbox;
-  })
-  
-  el.innerHTML = checkboxes;
-}
-
-function extractDOMState(){
-  var state = {
-    variableOrientation: {
-      firstRow: $('#first-row-orientation').checked,
-      firstColumn: $('#first-column-orientation').checked
-    },
-    variable: $('#xVar').value
-  };
-
-  return state;
-}
-
-function resetDOMState() {  
-  var inputs = document.querySelectorAll('input[name="variable-orientation"]');
-  for (var i = 0; i < inputs.length; i++) {
-    inputs[i].checked = false;
-  }
-  $('select[data-select="variable"]').innerHTML = '';
-  $('#pie-section-labels').innerHTML = '';
-  $('#chart-preview').innerHTML = '';
-  resetDataStore();
-  showStatus('');
-  disable($('#sendToSheetBtn'));
-  disable($('#updateBtn'));
-}
-
-// update the chart from the client's selected variables
-function clientChangeSelection(){
-  var variable = $('#xVar').value;
-  var state = extractDOMState();
-  
-  showStatus('Drawing Pie Chart...');
-  if (state.variableOrientation.firstRow) {
-    google.script.run
-    .withSuccessHandler(function(response) {
-      showStatus('');
-      previewChart(response);
-    })
-    .withFailureHandler(failureHandler)
-    .clientGetColumnValues(variable);
-  } else if (state.variableOrientation.firstColumn) {
-    google.script.run
-    .withSuccessHandler(function(response) {
-      showStatus('');
-      previewChart(response);
-    })
-    .withFailureHandler(failureHandler)
-    .clientGetRowValues(variable);
-  }
-}
-
-function setupDataTable(spreadsheetValues) {
-  var table = [];
-  var store = getDataStore();
-  var state = extractDOMState();
-  var variable = $('#xVar').value;
-  var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-  var labelsToUse = store.labelDefs;
-  
-  if (state.variableOrientation.firstColumn) {
-    table.push([store.labelDefs[0] + ' ' + variable, 'Data']);
-  } else if (state.variableOrientation.firstRow) {
-    table.push([store.variableDefs[0] + ' ' + variable, 'Data']);
-  }
-
-  if (state.variableOrientation.firstColumn) {
-    labelsToUse = labelsToUse.filter(function(label, i) { if (i !== 0) return label; }); // I don't want to permanently modify the store!
-  }
-
-  checkboxes.forEach(function(checkbox) {
-    if (checkbox.checked && labelsToUse.length === spreadsheetValues.length) {
-      table.push([labelsToUse[checkbox.value], spreadsheetValues[checkbox.value]])
+    if (msg !== '' && classId === 'error') {
+      icon = '<i class="fa fa-exclamation-circle" aria-hidden="true"></i>';
+    } else if (msg !== '') {
+      icon = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>';
+    } else {
+      icon = '';
     }
-  });
 
-  setDataStoreValue('dataTable', table);
-  return table;
-}
+    for (var i = 0; i < status.length; i++) {
+      status[i].className = ""
+      status[i].innerHTML = icon + " " + msg;
+      if (classId) {
+        status[i].classList.add(classId);
+      }
+    }
+  }
 
-function previewChart(spreadsheetValues) {
-  var data = setupDataTable(spreadsheetValues);
-  var dataTable = google.visualization.arrayToDataTable(data, false);
-  var state = extractDOMState();
-  var options = {
-    title: data[0][0] + ' ' + data[0][1]
+  function failureHandler(err) {
+    console.error(err);
+    showStatus('Something went wrong: ' + err, 'error');
+  }
+
+  function getDataStore() {
+    return dataStore;
+  }
+
+  function setDataStoreValue(key, value) {
+    dataStore[key] = value;
   };
-  var sendToSheetBtn = $('#sendToSheetBtn');
-  
-  disable(sendToSheetBtn); 
-  
-  chartWrapper.setChartType('PieChart');
-  chartWrapper.setDataTable(dataTable);
-  chartWrapper.setOptions(options);
-  chartWrapper.setContainerId('chart-preview');
 
-  // Add event listener
-  google.visualization.events.addListener(chartWrapper, 'ready', function(){
-    enable(sendToSheetBtn);
-  });
-  
-  // Draw the chart
-  chartWrapper.draw();
-}
+  function resetDataStore() {
+    dataStore = {
+      variableDefs: null,
+      labelDefs: null
+    };
+  }
 
-function clientSendToSheet() {
-  var state = extractDOMState();
-  var store = getDataStore();
-  var data = store.dataTable;
-  state.title = data[0][0] + ' ' + data[0][1];
+  // Load the Google Visualization library
+  google.load("visualization", "1", { packages: ["corechart"] });
+  google.setOnLoadCallback(loadChart);
 
-  showStatus('Sending...');
-  google.script.run
-    .withSuccessHandler(function(res){
-      chartWrapper = new google.visualization.ChartWrapper();
-      resetDOMState();
+  // Instantiate the chart
+  function loadChart() {
+    chartWrapper = new google.visualization.ChartWrapper();
+  }
+
+  // first column contains variable headers
+  function getFirstColumnVariables(dataStoreKey, callback) {
+    showStatus('Getting first column variables...');
+
+    google.script.run
+      .withSuccessHandler(function (response) {
+        setDataStoreValue(dataStoreKey, response);
+
+        // Handle if user is not on a sheet with no data
+        if (response.length === 0) {
+          showStatus('No variables to choose from.', 'error');
+          disable($('#xVar'));
+          disable($('#updateBtn'));
+        } else {
+          enable($('#xVar'));
+          enable($('#updateBtn'));
+          showStatus('');
+        }
+
+        callback();
+      })
+      .withFailureHandler(failureHandler)
+      .clientGetRowVariables();
+  }
+
+  // first row contains variable headers
+  function getFirstRowVariables(dataStoreKey, callback) {
+    showStatus('Getting first row variables...');
+
+    google.script.run
+      .withSuccessHandler(function (response) {
+        setDataStoreValue(dataStoreKey, response);
+
+        // Handle if user is not on a sheet with no data
+        if (response.length === 0) {
+          showStatus('No variables to choose from', 'error');
+          disable($('#xVar'));
+          disable($('#updateBtn'));
+        } else {
+          enable($('#xVar'));
+          enable($('#updateBtn'));
+          showStatus('');
+        }
+
+        callback();
+      })
+      .withFailureHandler(failureHandler)
+      .clientGetColumnVariables();
+  }
+
+  function addVariableOptions() {
+    var options = '';
+    var select = $('select[data-select="variable"]');
+    var store = getDataStore();
+    var state = extractDOMState();
+    var sortedVariableDefs = store.variableDefs.concat().sort(function (a, b) { return a - b; }); // Make a copy using concat() then sort
+
+    if (state.variableOrientation.firstRow) {
+      sortedVariableDefs = sortedVariableDefs.filter(function (label, i) { if (i !== 0) return label; }); // I don't want to permanently modify the store!
+    }
+
+    sortedVariableDefs.forEach(function (variable) {
+      var newOption = '<option>' + variable + '</option>';
+      options += newOption;
+    });
+
+
+    select.innerHTML = options;
+
+
+    getPieSectionLabels();
+  }
+
+  function getPieSectionLabels() {
+    var state = extractDOMState();
+
+    if (state.variableOrientation.firstRow) {
+      getFirstColumnVariables('labelDefs', addPieSectionOptions);
+    } else if (state.variableOrientation.firstColumn) {
+      getFirstRowVariables('labelDefs', addPieSectionOptions);
+    }
+  }
+
+  function addPieSectionOptions() {
+    var checkboxes = '';
+    var el = $('#pie-section-labels');
+    var store = getDataStore();
+    var state = extractDOMState();
+    var labelsToUse = store.labelDefs;
+
+    if (state.variableOrientation.firstColumn) {
+      labelsToUse = labelsToUse.filter(function (label, i) { if (i !== 0) return label; }); // I don't want to permanently modify the store!
+    }
+
+    labelsToUse.forEach(function (label, i) {
+      var newCheckbox = '<label><input type="checkbox" checked value="' + i + '" />' + label + '</label>';
+      checkboxes += newCheckbox;
     })
-    .withFailureHandler(failureHandler)
-    .clientAddChart(state, data, 'pie');
-}
+
+    el.innerHTML = checkboxes;
+  }
+
+  function extractDOMState() {
+    var state = {
+      variableOrientation: {
+        firstRow: $('#first-row-orientation').checked,
+        firstColumn: $('#first-column-orientation').checked
+      },
+      variable: $('#xVar').value
+    };
+
+    return state;
+  }
+
+  function resetDOMState() {
+    var inputs = document.querySelectorAll('input[name="variable-orientation"]');
+    for (var i = 0; i < inputs.length; i++) {
+      inputs[i].checked = false;
+    }
+    $('select[data-select="variable"]').innerHTML = '';
+    $('#pie-section-labels').innerHTML = '';
+    $('#chart-preview').innerHTML = '';
+    resetDataStore();
+    showStatus('');
+    disable($('#sendToSheetBtn'));
+    disable($('#updateBtn'));
+  }
+
+  // update the chart from the client's selected variables
+  function clientChangeSelection() {
+    var variable = $('#xVar').value;
+    var state = extractDOMState();
+
+    showStatus('Drawing Pie Chart...');
+    if (state.variableOrientation.firstRow) {
+      google.script.run
+        .withSuccessHandler(function (response) {
+          showStatus('');
+          previewChart(response);
+        })
+        .withFailureHandler(failureHandler)
+        .clientGetColumnValues(variable);
+    } else if (state.variableOrientation.firstColumn) {
+      google.script.run
+        .withSuccessHandler(function (response) {
+          showStatus('');
+          previewChart(response);
+        })
+        .withFailureHandler(failureHandler)
+        .clientGetRowValues(variable);
+    }
+  }
+
+  function setupDataTable(spreadsheetValues) {
+    var table = [];
+    var store = getDataStore();
+    var state = extractDOMState();
+    var variable = $('#xVar').value;
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    var labelsToUse = store.labelDefs;
+
+    if (state.variableOrientation.firstColumn) {
+      table.push([store.labelDefs[0] + ' ' + variable, 'Data']);
+    } else if (state.variableOrientation.firstRow) {
+      table.push([store.variableDefs[0] + ' ' + variable, 'Data']);
+    }
+
+    if (state.variableOrientation.firstColumn) {
+      labelsToUse = labelsToUse.filter(function (label, i) { if (i !== 0) return label; }); // I don't want to permanently modify the store!
+    }
+
+    checkboxes.forEach(function (checkbox) {
+      if (checkbox.checked && labelsToUse.length === spreadsheetValues.length) {
+        table.push([labelsToUse[checkbox.value], spreadsheetValues[checkbox.value]])
+      }
+    });
+
+    setDataStoreValue('dataTable', table);
+    return table;
+  }
+
+  function previewChart(spreadsheetValues) {
+    var data = setupDataTable(spreadsheetValues);
+    var dataTable = google.visualization.arrayToDataTable(data, false);
+    var state = extractDOMState();
+    var options = {
+      title: data[0][0] + ' ' + data[0][1]
+    };
+    var sendToSheetBtn = $('#sendToSheetBtn');
+
+    disable(sendToSheetBtn);
+
+    chartWrapper.setChartType('PieChart');
+    chartWrapper.setDataTable(dataTable);
+    chartWrapper.setOptions(options);
+    chartWrapper.setContainerId('chart-preview');
+
+    // Add event listener
+    google.visualization.events.addListener(chartWrapper, 'ready', function () {
+      enable(sendToSheetBtn);
+    });
+
+    // Draw the chart
+    chartWrapper.draw();
+  }
+
+  function clientSendToSheet() {
+    var state = extractDOMState();
+    var store = getDataStore();
+    var data = store.dataTable;
+    state.title = data[0][0] + ' ' + data[0][1];
+
+    showStatus('Sending...');
+    google.script.run
+      .withSuccessHandler(function (res) {
+        chartWrapper = new google.visualization.ChartWrapper();
+        resetDOMState();
+      })
+      .withFailureHandler(failureHandler)
+      .clientAddChart(state, data, 'pie');
+  }
 
 </script>
