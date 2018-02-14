@@ -245,6 +245,26 @@ var SheetManager = (function () {
     return coordinates;
   }
 
+  var geolocate = function (geocoder, location) {
+    var latLongResults = [];
+    var ui = SpreadsheetApp.getUi()
+
+    var geocodedLocation = geocoder.geocode(location);
+
+    if (geocodedLocation.status === "OK") {
+      var results = geocodedLocation.results;
+      var lat = results[0].geometry.location.lat;
+      var long = results[0].geometry.location.lng;
+
+      latLongResults = [lat, long];
+    } else {
+      ui.alert("Error parsing location. Check form responses for invalid location.");
+      latLongResults = ["invalid", "invalid"];
+    }
+
+    return latLongResults;
+  }
+
   return {
     getID: getID,
     getColumnVariables: getColumnVariables,
