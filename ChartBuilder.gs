@@ -43,8 +43,6 @@ var ChartBuilder = (function () {
 
 
     chart = chart.build();
-    var options = chart.getOptions();
-
     sheet.insertChart(chart);
   }
 
