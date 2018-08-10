@@ -8,6 +8,7 @@ It is developed with:
 - [Google Apps Script](https://developers.google.com/apps-script/)
 - [math.js library](http://mathjs.org/)
 - [underscore.js library](http://underscorejs.org/)
+- [leaflet.js](https://leafletjs.com/) with an open street map tile set. 
 
 ## Usage
 

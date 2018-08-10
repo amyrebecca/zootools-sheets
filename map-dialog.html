@@ -4,6 +4,8 @@
 <head>
   <base target="_top">
   <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+    crossorigin="" />
   <?!= include('styles'); ?>
 </head>
 
@@ -24,7 +26,7 @@
         </select>
       </div>
       <div data-ui="status" id="status" style="display: inline-block; margin-left: 1em;"></div>
-      <div id="map-container" style="height: 100%; max-height: 380px; width: 100%;"></div>
+      <div id="map-container"></div>
     </div>
     <div class="block dialog-button-bar">
       <button type="button" id="updateBtn" class="button action" onclick="getCoordinates()">Map</button>
@@ -33,8 +35,10 @@
   </div>
 
   <!-- Use a templated HTML printing scriptlet to import JavaScript. -->
-  <?!= include('map-script'); ?>
+  <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js" integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q=="
+    crossorigin=""></script>
   <script src="https://use.fontawesome.com/c7e23c37e5.js"></script>
+  <?!= include('map-script'); ?>
 </body>
 
 </html>

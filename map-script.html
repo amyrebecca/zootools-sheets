@@ -34,9 +34,12 @@
   // from contents of chart cells
 
 
-  // Setup map visualization via Charts API
-  google.load('visualization', '1.0', { 'packages': ['map'] });
-  google.setOnLoadCallback(getGoogleMap);
+  // Setup map visualization using leaflet.js
+  var map = L.map('map-container').setView([41.8781, -87.6298], 1);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18
+  }).addTo(map);
 
   function getVariables() {
     showStatus('Getting variables...');
@@ -88,24 +91,22 @@
 
     google.script.run
       .withSuccessHandler(
-      function (response) {
-        getGoogleMap(null, response);
-        showStatus('');
-      })
+        function (response) {
+          setCoordinates(null, response);
+          showStatus('');
+        })
       .withFailureHandler(failureHandler)
       .clientGetCoordinates(latitude, longitude)
   }
 
-  function getGoogleMap(event, coordinates) {
-    var load = [];
-    if (coordinates) {
-      load = coordinates;
-    } else {
-      load = [['Lat', 'Long', 'Name'], [41.8339042, -88.0123485, 'Placeholder']];
+  function setCoordinates(event, coordinates) {
+    if (coordinates && coordinates.length > 1) {
+      coordinates.forEach(function (coordinateRow, index) {
+        if (index > 0) {
+          var title = coordinateRow[2];
+          L.marker([coordinateRow[0], coordinateRow[1]], { title: title, alt: title }).addTo(map);
+        }
+      })
     }
-    var data = google.visualization.arrayToDataTable(load);
-    var map = new google.visualization.Map($('#map-container'));
-
-    map.draw(data, { showTip: true });
   }
 </script>

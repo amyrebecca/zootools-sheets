@@ -26,7 +26,7 @@ var UIManager = (function () {
         map: {
           height: 500,
           width: 700,
-          title: 'Google Map'
+          title: 'Map'
         },
         working: {
           height: 100,
