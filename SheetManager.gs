@@ -85,6 +85,7 @@ var SheetManager = (function () {
       if (typeof value === "string") value.trim();
       return (typeof value !== "string" || !(/^\s*$/.test(value)));
     });
+
     return filteredColumnValues;
   }
 
@@ -117,7 +118,7 @@ var SheetManager = (function () {
       if (data[0][colIdx] == varName) break;
     }
 
-    return activeSheet.getRange(1, colIdx + 1, activeSheet.getDataRange().getLastRow() - 1);
+    return activeSheet.getRange(1, colIdx + 1, activeSheet.getDataRange().getLastRow());
   }
 
   var getA1Notation = function (varName) {
@@ -243,26 +244,6 @@ var SheetManager = (function () {
     };
 
     return coordinates;
-  }
-
-  var geolocate = function (geocoder, location) {
-    var latLongResults = [];
-    var ui = SpreadsheetApp.getUi()
-
-    var geocodedLocation = geocoder.geocode(location);
-
-    if (geocodedLocation.status === "OK") {
-      var results = geocodedLocation.results;
-      var lat = results[0].geometry.location.lat;
-      var long = results[0].geometry.location.lng;
-
-      latLongResults = [lat, long];
-    } else {
-      ui.alert("Error parsing location. Check form responses for invalid location.");
-      latLongResults = ["invalid", "invalid"];
-    }
-
-    return latLongResults;
   }
 
   return {
