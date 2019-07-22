@@ -4,8 +4,6 @@ var UIManager = (function () {
       var ui = SpreadsheetApp.getUi();
       ui.createAddonMenu()
         .addItem('Scatter Plot Helper', 'clientShowScatter')
-        .addItem('Histogram Helper', 'clientShowHistogram')
-        .addItem('Pie Chart Helper', 'clientShowPie')
         .addItem('Summary Stats Helper', 'clientShowStats')
         .addItem('Data Filter Helper', 'clientShowFilter')
         .addItem('Map Helper', 'clientShowMapDialog')
