@@ -1,7 +1,7 @@
-# Zoo Tools for Google Sheets Add-on Privacy Policy
+# ZooTools for Google Sheets Add-on Privacy Policy
 
-We (the Zooniverse) need to ask for permission for our add-on program to view and edit the current spreadsheet in order for this experience to work; the add-on has a set of scripts that will process spreadsheet data that you input, and output either statistics or plots for you. This makes the whole thing easier, and avoids you having to learn spreadsheet notation.
+We (the Zooniverse) need to ask for permission for our add-on to view and edit the current spreadsheet and display prompts and sidebars. The add-on has a set of scripts that will process input spreadsheet data and will output statistics or plots. The add-on streamlines data manipulation and visualization.
 
-We want you to know, though, that we do not store your data, and the add-on has no data stores that it uses. It also does not use any intermediaries or 3rd parties who might store your data.
+We do not store your data, the add-on does not use any intermediaries or 3rd parties who might store your data, and the add-on’s use of information received from Google APIs will adhere to [Google API Services User Data Policy](https://developers.google.com/terms/api-services-user-data-policy#additional_requirements_for_specific_api_scopes), including the Limited Use requirements.
 
-Our add-on works using the Google Sheets API scope `https://www.googleapis.com/auth/spreadsheets.currentonly`.
+Our add-on utilizes the Google Sheets API scopes `https://www.googleapis.com/auth/spreadsheets.currentonly` and `https://www.googleapis.com/auth/script.container.ui`.
