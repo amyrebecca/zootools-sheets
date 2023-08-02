@@ -1,4 +1,4 @@
-# ZooTools for Google Sheets Add-on Privacy Policy
+# ZooTools for Sheets Add-On Privacy Policy
 
 We (the Zooniverse) need to ask for permission for our add-on to view and edit the current spreadsheet and display prompts and sidebars. The add-on has a set of scripts that will process input spreadsheet data and will output statistics or plots.
 
