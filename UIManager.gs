@@ -14,7 +14,7 @@ var UIManager = (function () {
         .createTemplateFromFile(which)
         .evaluate()
         .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-        .setTitle('ZooTools for Sheets');
+        .setTitle('ZooTools for Sheets™');
 
       SpreadsheetApp.getUi()
         .showSidebar(html);

@@ -1,8 +1,8 @@
-# ZooTools for Sheets
+# ZooTools for Sheets™
 
 ## Development
 
-ZooTools for Sheets is a custom Google Sheets add-on originally developed for a curriculum for a college level introductory astronomy course using [Galaxy Zoo](http://www.galaxyzoo.org/) data.
+ZooTools for Sheets™ is a custom Google Sheets add-on originally developed for a curriculum for a college level introductory astronomy course using [Galaxy Zoo](http://www.galaxyzoo.org/) data.
 
 It is developed with:
 - [Google Apps Script](https://developers.google.com/apps-script/)
